@@ -1,0 +1,63 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+ml/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+backend/.venv/
+ml/.venv/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Runtime uploads
+backend/uploads/
+uploads/
+
+# Local databases / logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# ML datasets
+ml/data/
+**/PlantVillage-Dataset/
+
+# Large / generated ML training artifacts
+ml/artifacts/*.pt
+ml/artifacts/*.pth
+
+# Keep ONNX out of normal Git if large.
+# Prefer Git LFS or a release asset.
+ml/artifacts/*.onnx
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Backups / generated installers
+.cropguard-backups/
+.milestone-backups/
+*.ps1
+cropguard-*.zip
+
+# Build/cache
+.cache/
+coverage/
+htmlcov/

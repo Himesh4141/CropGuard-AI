@@ -1,0 +1,54 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-cropguard}
+      MYSQL_USER: ${MYSQL_USER:-cropguard_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-cropguard123}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-cropguard-root}
+    ports:
+      - "3306:3306"
+    volumes:
+      - cropguard_mysql:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: mysql+pymysql://${MYSQL_USER:-cropguard_user}:${MYSQL_PASSWORD:-cropguard123}@db:3306/${MYSQL_DATABASE:-cropguard}?charset=utf8mb4
+      CORS_ORIGINS: '["http://localhost:4141"]'
+      ML_MODEL_PATH: /models/tomato_disease_model.onnx
+      ML_METADATA_PATH: /models/model_metadata.json
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - cropguard_uploads:/app/uploads
+      - ./ml/artifacts:/models:ro
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8000/api/v1
+    ports:
+      - "4141:80"
+    depends_on:
+      - backend
+
+volumes:
+  cropguard_mysql:
+  cropguard_uploads:

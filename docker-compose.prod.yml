@@ -1,0 +1,14 @@
+services:
+  db:
+    restart: unless-stopped
+
+  backend:
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: production
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY}
+      COOKIE_SECURE: "true"
+      CORS_ORIGINS: ${CORS_ORIGINS:?Set CORS_ORIGINS}
+
+  frontend:
+    restart: unless-stopped
