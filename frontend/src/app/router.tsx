@@ -1,5 +1,5 @@
 import {
-  createBrowserRouter,
+  createHashRouter,
 } from "react-router-dom";
 
 import {
@@ -44,7 +44,7 @@ import WeatherPage from "@/pages/WeatherPage";
 
 
 export const router =
-  createBrowserRouter([
+  createHashRouter([
     {
       path:
         routes.home,
