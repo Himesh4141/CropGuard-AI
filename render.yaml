@@ -1,4 +1,7 @@
 services:
+  # ----------------------------------------------------------
+  # FastAPI backend
+  # ----------------------------------------------------------
   - type: web
     name: cropguard-api-himesh4141
     runtime: python
@@ -28,7 +31,7 @@ services:
         sync: false
 
       - key: CORS_ORIGINS
-        value: '["http://localhost:4141","https://cropguard-ai-himesh4141.vercel.app"]'
+        value: '["http://localhost:4141","https://cropguard-ai-himesh4141.onrender.com"]'
 
       - key: ML_MODEL_PATH
         value: ../ml/artifacts/tomato_disease_model.onnx
@@ -53,3 +56,32 @@ services:
 
       - key: WEATHER_CACHE_MINUTES
         value: "15"
+
+
+  # ----------------------------------------------------------
+  # React frontend
+  # ----------------------------------------------------------
+  - type: web
+    name: cropguard-ai-himesh4141
+    runtime: static
+    plan: free
+    rootDir: frontend
+
+    buildCommand: npm ci && npm run build
+
+    staticPublishPath: dist
+
+    envVars:
+      - key: VITE_APP_NAME
+        value: CropGuard AI
+
+      - key: VITE_APP_ENV
+        value: production
+
+      - key: VITE_API_BASE_URL
+        value: https://cropguard-api-himesh4141.onrender.com/api/v1
+
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
