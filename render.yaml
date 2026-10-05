@@ -1,0 +1,49 @@
+﻿services:
+  - type: web
+    name: cropguard-api-himesh4141
+    runtime: python
+    plan: free
+    rootDir: backend
+
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+
+    startCommand: python -m alembic upgrade head && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+    healthCheckPath: /api/v1/health
+
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: DATABASE_URL
+        sync: false
+
+      - key: CORS_ORIGINS
+        value: '["http://localhost:4141","https://cropguard-ai-himesh4141.vercel.app"]'
+
+      - key: ML_MODEL_PATH
+        value: ../ml/artifacts/tomato_disease_model.onnx
+
+      - key: ML_METADATA_PATH
+        value: ../ml/artifacts/model_metadata.json
+
+      - key: ML_MIN_CONFIDENCE
+        value: "0.55"
+
+      - key: UPLOAD_DIR
+        value: uploads
+
+      - key: MAX_UPLOAD_MB
+        value: "8"
+
+      - key: WEATHER_PROVIDER
+        value: open_meteo
+
+      - key: WEATHER_FORECAST_DAYS
+        value: "5"
+
+      - key: WEATHER_CACHE_MINUTES
+        value: "15"
