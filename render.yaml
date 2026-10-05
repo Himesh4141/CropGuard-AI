@@ -1,4 +1,4 @@
-services:
+﻿services:
   # ----------------------------------------------------------
   # FastAPI backend
   # ----------------------------------------------------------
@@ -31,7 +31,7 @@ services:
         sync: false
 
       - key: CORS_ORIGINS
-        value: '["http://localhost:4141","https://cropguard-ai-himesh4141.onrender.com"]'
+        value: '["http://localhost:4141","https://himesh4141.github.io"]'
 
       - key: ML_MODEL_PATH
         value: ../ml/artifacts/tomato_disease_model.onnx
