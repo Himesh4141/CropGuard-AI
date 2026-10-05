@@ -23,16 +23,15 @@ from app.core.logging import configure_logging
 configure_logging()
 
 
-PROJECT_ROOT = (
+BACKEND_ROOT = (
     Path(__file__)
     .resolve()
-    .parents[2]
+    .parents[1]
 )
 
 FRONTEND_DIST = (
-    PROJECT_ROOT
-    / "frontend"
-    / "dist"
+    BACKEND_ROOT
+    / "frontend_dist"
 )
 
 FRONTEND_ASSETS = (
@@ -80,9 +79,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=(
-        settings.cors_origins
-    ),
+    allow_origins=
+        settings.cors_origins,
     allow_credentials=True,
     allow_methods=[
         "GET",
@@ -115,7 +113,8 @@ if (
             directory=
                 FRONTEND_ASSETS,
         ),
-        name="frontend-assets",
+        name=
+            "frontend-assets",
     )
 
 
@@ -153,41 +152,31 @@ def frontend_spa(
             detail="Not found",
         )
 
-    if (
-        full_path.startswith(
-            "api/",
-        )
-        or full_path
-        in {
-            "docs",
-            "redoc",
-            "openapi.json",
-        }
+    if full_path.startswith(
+        "api/",
     ):
         raise HTTPException(
             status_code=404,
-            detail="Not found",
+            detail="API endpoint not found",
         )
+
+    requested = (
+        FRONTEND_DIST
+        / full_path
+    ).resolve()
 
     dist_root = (
         FRONTEND_DIST.resolve()
     )
 
-    requested_file = (
-        FRONTEND_DIST
-        / full_path
-    ).resolve()
-
     if (
-        requested_file
-        .is_relative_to(
+        requested.is_relative_to(
             dist_root,
         )
-        and requested_file
-        .is_file()
+        and requested.is_file()
     ):
         return FileResponse(
-            requested_file,
+            requested,
         )
 
     return FileResponse(
