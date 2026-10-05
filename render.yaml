@@ -1,4 +1,4 @@
-﻿services:
+services:
   - type: web
     name: cropguard-api-himesh4141
     runtime: python
@@ -12,11 +12,17 @@
     healthCheckPath: /api/v1/health
 
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+
       - key: ENVIRONMENT
         value: production
 
       - key: SECRET_KEY
         generateValue: true
+
+      - key: COOKIE_SECURE
+        value: "true"
 
       - key: DATABASE_URL
         sync: false
