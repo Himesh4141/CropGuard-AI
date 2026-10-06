@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -22,10 +21,7 @@ class DiagnosisPublic(BaseModel):
     advisory: str | None
     created_at: datetime
 
-    inference_mode: Literal[
-        "development_stub",
-        "onnx_model",
-    ]
+    inference_mode: str
 
     model_display_name: str
     model_version: str | None

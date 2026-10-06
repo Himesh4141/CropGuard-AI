@@ -92,12 +92,42 @@ class OnnxTomatoDiseaseClassifier:
         model_path = settings.ml_model_path
 
         if not model_path.is_absolute():
-            model_path = project_root / model_path
+            configured_model_path = (
+                project_root / model_path
+            ).resolve()
+
+            repo_model_path = (
+                project_root
+                / "ml"
+                / "artifacts"
+                / model_path.name
+            )
+
+            model_path = (
+                configured_model_path
+                if configured_model_path.exists()
+                else repo_model_path
+            )
 
         metadata_path = settings.ml_metadata_path
 
         if not metadata_path.is_absolute():
-            metadata_path = project_root / metadata_path
+            configured_metadata_path = (
+                project_root / metadata_path
+            ).resolve()
+
+            repo_metadata_path = (
+                project_root
+                / "ml"
+                / "artifacts"
+                / metadata_path.name
+            )
+
+            metadata_path = (
+                configured_metadata_path
+                if configured_metadata_path.exists()
+                else repo_metadata_path
+            )
 
         if not model_path.exists():
             raise FileNotFoundError(

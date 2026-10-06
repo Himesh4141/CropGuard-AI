@@ -10,4 +10,7 @@ router = APIRouter()
 @router.get("/health")
 def health(db: Session = Depends(get_db)) -> dict[str, str]:
     db.execute(text("SELECT 1"))
-    return {"status": "healthy"}
+    return {
+        "status": "healthy",
+        "diagnosis_pipeline": "v2",
+    }
