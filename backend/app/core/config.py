@@ -71,11 +71,11 @@ class Settings(BaseSettings):
     )
 
     ml_model_path: Path = Path(
-        "ml/artifacts/multicrop_disease_model.onnx"
+        "ml/artifacts/field_robust_v2/cropguard_field_robust_v2.onnx"
     )
 
     ml_metadata_path: Path = Path(
-        "ml/artifacts/multicrop_metadata.json"
+        "ml/artifacts/field_robust_v2/cropguard_field_robust_v2_metadata.json"
     )
 
     ml_min_confidence: float = Field(

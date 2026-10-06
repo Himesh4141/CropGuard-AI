@@ -2,19 +2,17 @@ from __future__ import annotations
 
 from io import BytesIO
 import json
+import math
 import re
 from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageOps
 
 from app.core.config import settings
 from app.ml.base import DiseasePrediction, PredictionAlternative
 
-
-IMAGE_SIZE = 224
-RESIZE_SHORT_SIDE = 256
 
 IMAGENET_MEAN = np.asarray(
     [0.485, 0.456, 0.406],
@@ -62,9 +60,7 @@ def _normalize_words(value: str) -> str:
 def canonical_crop(value: str) -> str:
     normalized = _normalize_words(value)
 
-    exact = CROP_ALIASES.get(
-        normalized
-    )
+    exact = CROP_ALIASES.get(normalized)
     if exact is not None:
         return exact
 
@@ -166,7 +162,11 @@ def severity_and_advisory(
             "Inspect leaf undersides for mites, eggs and webbing, record pest pressure "
             "across nearby plants, and use local integrated pest-management guidance."
         )
-    elif "spot" in normalized or "scab" in normalized or "scorch" in normalized:
+    elif (
+        "spot" in normalized
+        or "scab" in normalized
+        or "scorch" in normalized
+    ):
         guidance = (
             "Inspect surrounding leaves for similar lesions, reduce unnecessary leaf "
             "wetness and splash, remove heavily affected debris where appropriate, "
@@ -189,7 +189,6 @@ def severity_and_advisory(
 
 
 class OnnxMultiCropDiseaseClassifier:
-    engine_name = "CropGuard Multi-Crop MobileNetV3"
     inference_mode = "onnx_model"
 
     def __init__(self) -> None:
@@ -225,30 +224,54 @@ class OnnxMultiCropDiseaseClassifier:
             or len(class_names) < 2
         ):
             raise RuntimeError(
-                "Multi-crop metadata does not contain a valid class list"
+                "Field-robust metadata does not contain a valid class list"
             )
 
-        self.class_names = [
-            str(value)
-            for value in class_names
-        ]
-
+        self.class_names = [str(value) for value in class_names]
+        self.image_size = int(metadata.get("image_size", 288))
         self.temperature = max(
             0.05,
             float(metadata.get("temperature", 1.0)),
         )
 
-        self.confidence_threshold = float(
+        policy = metadata.get("rejection_policy") or {}
+
+        self.global_threshold = float(
+            policy.get(
+                "global_confidence_threshold",
+                metadata.get(
+                    "confidence_threshold",
+                    settings.ml_min_confidence,
+                ),
+            )
+        )
+
+        self.per_class_thresholds = {
+            int(key): float(value)
+            for key, value in (
+                policy.get("per_class_thresholds") or {}
+            ).items()
+        }
+
+        self.minimum_margin = float(
+            policy.get("minimum_top1_top2_margin", 0.04)
+        )
+
+        self.maximum_entropy = float(
+            policy.get("maximum_normalized_entropy", 0.70)
+        )
+
+        self.engine_name = str(
             metadata.get(
-                "confidence_threshold",
-                settings.ml_min_confidence,
+                "model_name",
+                "CropGuard Field-Robust Vision",
             )
         )
 
         self.engine_version = str(
             metadata.get(
                 "model_version",
-                "multicrop-v1",
+                "field-robust-v2",
             )
         )
 
@@ -256,14 +279,9 @@ class OnnxMultiCropDiseaseClassifier:
 
         for index, raw_label in enumerate(self.class_names):
             crop, _ = split_class_name(raw_label)
-            self.crop_to_indices.setdefault(
-                crop,
-                [],
-            ).append(index)
+            self.crop_to_indices.setdefault(crop, []).append(index)
 
-        self.supported_crops = tuple(
-            sorted(self.crop_to_indices)
-        )
+        self.supported_crops = tuple(sorted(self.crop_to_indices))
 
         self.session = ort.InferenceSession(
             str(self.model_path),
@@ -271,16 +289,6 @@ class OnnxMultiCropDiseaseClassifier:
         )
 
         self.input_name = self.session.get_inputs()[0].name
-
-        output_shape = self.session.get_outputs()[0].shape
-        if (
-            output_shape
-            and isinstance(output_shape[-1], int)
-            and output_shape[-1] != len(self.class_names)
-        ):
-            raise RuntimeError(
-                "ONNX output size does not match metadata class count"
-            )
 
     @staticmethod
     def _resolve_artifact(
@@ -294,14 +302,12 @@ class OnnxMultiCropDiseaseClassifier:
         if direct.exists():
             return direct
 
-        fallback = (
+        return (
             project_root
             / "ml"
             / "artifacts"
             / configured_path.name
         ).resolve()
-
-        return fallback
 
     def predict(
         self,
@@ -312,74 +318,43 @@ class OnnxMultiCropDiseaseClassifier:
         selected_crop = canonical_crop(crop_name)
 
         if selected_crop not in self.crop_to_indices:
-            supported = ", ".join(self.supported_crops)
             return DiseasePrediction(
                 label="unsupported_crop",
                 confidence=0.0,
                 severity="unknown",
                 advisory=(
-                    f"CropGuard Multi-Crop v1 does not have validated training "
-                    f"classes for '{crop_name}'. Supported dataset crops are: "
-                    f"{supported}."
+                    f"CropGuard Field-Robust v2 does not have trained disease "
+                    f"classes for '{crop_name}'."
                 ),
                 engine_name=self.engine_name,
                 engine_version=self.engine_version,
                 predicted_crop=None,
                 confidence_level="unsupported",
                 is_uncertain=True,
-                rejection_reason=(
-                    f"Unsupported crop: {crop_name}"
-                ),
+                rejection_reason=f"Unsupported crop: {crop_name}",
             )
 
-        input_tensor, quality_issue = self._prepare_image(
-            image_bytes
-        )
+        tensors, quality_note = self._prepare_views(image_bytes)
 
-        if quality_issue:
+        if not tensors:
             return DiseasePrediction(
                 label="image_quality_check_failed",
                 confidence=0.0,
                 severity="unknown",
                 advisory=(
-                    f"{quality_issue} Retake a clear, well-lit crop image with the "
-                    "affected leaf or plant area filling most of the frame."
+                    f"{quality_note or 'The image contains too little usable detail.'} "
+                    "CropGuard already attempted safe internal normalization."
                 ),
                 engine_name=self.engine_name,
                 engine_version=self.engine_version,
                 predicted_crop=selected_crop,
                 confidence_level="unusable",
                 is_uncertain=True,
-                rejection_reason=quality_issue,
+                rejection_reason=quality_note,
             )
 
-        outputs = self.session.run(
-            None,
-            {self.input_name: input_tensor},
-        )
-
-        if not outputs:
-            raise RuntimeError(
-                "The ONNX model returned no outputs"
-            )
-
-        logits = np.asarray(
-            outputs[0],
-            dtype=np.float32,
-        )
-
-        if (
-            logits.ndim != 2
-            or logits.shape[0] != 1
-            or logits.shape[1] != len(self.class_names)
-        ):
-            raise RuntimeError(
-                "Unexpected ONNX output shape"
-            )
-
-        probabilities = self._softmax(
-            logits[0] / self.temperature
-        )
+        logits = self._ensemble_logits(tensors)
+        probabilities = self._softmax(logits / self.temperature)
 
         crop_scores = {
             crop: float(
@@ -392,49 +367,35 @@ class OnnxMultiCropDiseaseClassifier:
             for crop, indices in self.crop_to_indices.items()
         }
 
-        predicted_crop = max(
-            crop_scores,
-            key=crop_scores.get,
-        )
-
+        predicted_crop = max(crop_scores, key=crop_scores.get)
         predicted_crop_score = crop_scores[predicted_crop]
         selected_crop_score = crop_scores[selected_crop]
 
-        global_top_indices = np.argsort(
-            probabilities
-        )[::-1][:3]
+        global_top = np.argsort(probabilities)[::-1][:3]
 
         if (
             predicted_crop != selected_crop
             and predicted_crop_score >= 0.70
             and selected_crop_score < 0.25
-            and (
-                predicted_crop_score
-                - selected_crop_score
-            ) >= 0.35
+            and predicted_crop_score - selected_crop_score >= 0.35
         ):
-            alternatives = self._alternatives(
-                probabilities,
-                global_top_indices,
-            )
-
             return DiseasePrediction(
                 label="crop_mismatch",
                 confidence=predicted_crop_score,
                 severity="unknown",
                 advisory=(
-                    f"The selected field is '{selected_crop}', but this image "
-                    f"most strongly resembles '{predicted_crop}' in the current "
-                    "model. Verify the field selection or upload the correct crop "
-                    "image before screening."
+                    f"The selected field is '{selected_crop}', while this image "
+                    f"most strongly resembles '{predicted_crop}'. CropGuard did not "
+                    "force a disease diagnosis."
                 ),
                 engine_name=self.engine_name,
                 engine_version=self.engine_version,
                 predicted_crop=predicted_crop,
-                confidence_level=self._confidence_level(
-                    predicted_crop_score
+                confidence_level="low",
+                top_predictions=self._alternatives(
+                    probabilities,
+                    global_top,
                 ),
-                top_predictions=alternatives,
                 is_uncertain=True,
                 rejection_reason=(
                     f"Field crop '{selected_crop}' does not match model crop "
@@ -448,19 +409,13 @@ class OnnxMultiCropDiseaseClassifier:
         )
 
         if len(selected_indices) < 2:
-            only_index = int(selected_indices[0])
-            only_label = self.class_names[only_index]
-            _, only_disease = split_class_name(only_label)
-
             return DiseasePrediction(
                 label="limited_crop_coverage",
-                confidence=float(probabilities[only_index]),
+                confidence=float(probabilities[int(selected_indices[0])]),
                 severity="unknown",
                 advisory=(
-                    f"The current PlantVillage training data contains only one "
-                    f"screening class for {selected_crop} ({only_disease}). "
-                    "CropGuard will not make a definitive diagnosis for this crop "
-                    "until broader healthy/disease field data is added."
+                    f"The current dataset has insufficient disease-class coverage "
+                    f"for {selected_crop}; CropGuard will not force a diagnosis."
                 ),
                 engine_name=self.engine_name,
                 engine_version=self.engine_version,
@@ -477,9 +432,7 @@ class OnnxMultiCropDiseaseClassifier:
             )
 
         selected_sorted = selected_indices[
-            np.argsort(
-                probabilities[selected_indices]
-            )[::-1]
+            np.argsort(probabilities[selected_indices])[::-1]
         ][:3]
 
         top_predictions = self._alternatives(
@@ -492,20 +445,52 @@ class OnnxMultiCropDiseaseClassifier:
         raw_label = self.class_names[primary_index]
         _, disease = split_class_name(raw_label)
 
-        confidence_level = self._confidence_level(
-            confidence
+        threshold = max(
+            self.global_threshold,
+            self.per_class_thresholds.get(
+                primary_index,
+                self.global_threshold,
+            ),
         )
 
-        if confidence < self.confidence_threshold:
+        second_confidence = (
+            float(probabilities[int(selected_sorted[1])])
+            if len(selected_sorted) > 1
+            else 0.0
+        )
+
+        margin = confidence - second_confidence
+        entropy = self._normalized_entropy(probabilities)
+
+        reasons: list[str] = []
+
+        if confidence < threshold:
+            reasons.append(
+                f"confidence {confidence:.1%} is below the "
+                f"{threshold:.0%} threshold"
+            )
+
+        if margin < self.minimum_margin:
+            reasons.append(
+                "the leading disease possibilities are too close"
+            )
+
+        if entropy > self.maximum_entropy:
+            reasons.append(
+                "the model distribution remains too uncertain"
+            )
+
+        if reasons:
             return DiseasePrediction(
                 label="uncertain_condition",
                 confidence=confidence,
                 severity="unknown",
                 advisory=(
-                    "The model is not confident enough to assign a supported "
-                    f"{selected_crop} disease class. Retake a closer, well-lit "
-                    "image of the affected area or request an extension-officer "
-                    "review."
+                    f"CropGuard found possible {selected_crop} conditions but is "
+                    "not confident enough to present one as reliable. The system "
+                    "already evaluated multiple views and normalized the image when "
+                    "needed. Continue monitoring or request officer review if the "
+                    "crop is worsening."
                 ),
                 engine_name=self.engine_name,
                 engine_version=self.engine_version,
@@ -513,10 +498,7 @@ class OnnxMultiCropDiseaseClassifier:
                 confidence_level="low",
                 top_predictions=top_predictions,
                 is_uncertain=True,
-                rejection_reason=(
-                    f"Confidence {confidence:.1%} is below the calibrated "
-                    f"{self.confidence_threshold:.0%} threshold."
-                ),
+                rejection_reason="; ".join(reasons),
             )
 
         severity, advisory = severity_and_advisory(
@@ -532,10 +514,45 @@ class OnnxMultiCropDiseaseClassifier:
             engine_name=self.engine_name,
             engine_version=self.engine_version,
             predicted_crop=selected_crop,
-            confidence_level=confidence_level,
+            confidence_level=(
+                "high"
+                if confidence >= 0.90
+                else "moderate"
+            ),
             top_predictions=top_predictions,
             is_uncertain=False,
             rejection_reason=None,
+        )
+
+    def _ensemble_logits(
+        self,
+        tensors: list[np.ndarray],
+    ) -> np.ndarray:
+        outputs: list[np.ndarray] = []
+
+        for tensor in tensors:
+            for view in (
+                tensor,
+                np.flip(tensor, axis=3).copy(),
+                np.flip(tensor, axis=2).copy(),
+            ):
+                result = self.session.run(
+                    None,
+                    {self.input_name: view},
+                )
+
+                if not result:
+                    raise RuntimeError(
+                        "The ONNX model returned no outputs"
+                    )
+
+                outputs.append(
+                    np.asarray(result[0], dtype=np.float32)[0]
+                )
+
+        return np.mean(
+            np.stack(outputs, axis=0),
+            axis=0,
         )
 
     def _alternatives(
@@ -561,16 +578,6 @@ class OnnxMultiCropDiseaseClassifier:
 
         return tuple(results)
 
-    def _confidence_level(
-        self,
-        confidence: float,
-    ) -> str:
-        if confidence >= 0.90:
-            return "high"
-        if confidence >= self.confidence_threshold:
-            return "moderate"
-        return "low"
-
     @staticmethod
     def _softmax(
         logits: np.ndarray,
@@ -587,71 +594,111 @@ class OnnxMultiCropDiseaseClassifier:
         return exponentials / denominator
 
     @staticmethod
-    def _prepare_image(
+    def _normalized_entropy(
+        probabilities: np.ndarray,
+    ) -> float:
+        clipped = np.clip(probabilities, 1e-12, 1.0)
+        entropy = -float(
+            np.sum(clipped * np.log(clipped))
+        )
+        return entropy / math.log(len(probabilities))
+
+    def _prepare_views(
+        self,
         image_bytes: bytes,
-    ) -> tuple[np.ndarray, str | None]:
+    ) -> tuple[list[np.ndarray], str | None]:
         with Image.open(BytesIO(image_bytes)) as image:
             image = image.convert("RGB")
 
-            quality_sample = np.asarray(
+            if min(image.size) < 64:
+                return (
+                    [],
+                    "The captured crop region is too small to recover safely.",
+                )
+
+            sample = np.asarray(
                 image.resize((128, 128)).convert("L"),
                 dtype=np.float32,
             )
 
-            brightness = float(quality_sample.mean())
-            contrast = float(quality_sample.std())
+            brightness = float(sample.mean())
+            contrast = float(sample.std())
 
-            quality_issue: str | None = None
-
-            if brightness < 18:
-                quality_issue = "The image is too dark for reliable screening."
-            elif brightness > 248:
-                quality_issue = "The image is too bright for reliable screening."
-            elif contrast < 6:
-                quality_issue = (
-                    "The image has too little visual contrast for reliable screening."
+            if brightness < 4 or brightness > 252 or contrast < 1.5:
+                return (
+                    [],
+                    "The image contains almost no recoverable visual detail.",
                 )
 
-            width, height = image.size
+            base_images = [image]
+            quality_note: str | None = None
 
-            if width <= height:
-                resized_width = RESIZE_SHORT_SIDE
-                resized_height = round(
-                    height * RESIZE_SHORT_SIDE / width
-                )
-            else:
-                resized_height = RESIZE_SHORT_SIDE
-                resized_width = round(
-                    width * RESIZE_SHORT_SIDE / height
-                )
+            # Non-generative normalization only. Original pixels remain in the ensemble.
+            if brightness < 48 or brightness > 210 or contrast < 20:
+                normalized = ImageOps.autocontrast(image, cutoff=0.5)
+                normalized = ImageEnhance.Contrast(
+                    normalized
+                ).enhance(1.08)
 
-            image = image.resize(
-                (resized_width, resized_height),
-                Image.Resampling.BILINEAR,
+                base_images.append(normalized)
+                quality_note = "normalized"
+
+            return (
+                [
+                    self._preprocess(item)
+                    for item in base_images
+                ],
+                quality_note,
             )
 
-            left = max(
-                0,
-                (resized_width - IMAGE_SIZE) // 2,
+    def _preprocess(
+        self,
+        image: Image.Image,
+    ) -> np.ndarray:
+        resize_short_side = int(
+            round(self.image_size * 320 / 288)
+        )
+
+        width, height = image.size
+
+        if width <= height:
+            resized_width = resize_short_side
+            resized_height = round(
+                height * resize_short_side / width
             )
-            top = max(
-                0,
-                (resized_height - IMAGE_SIZE) // 2,
+        else:
+            resized_height = resize_short_side
+            resized_width = round(
+                width * resize_short_side / height
             )
 
-            image = image.crop(
-                (
-                    left,
-                    top,
-                    left + IMAGE_SIZE,
-                    top + IMAGE_SIZE,
-                )
-            )
+        image = image.resize(
+            (resized_width, resized_height),
+            Image.Resampling.BILINEAR,
+        )
 
-            array = np.asarray(
-                image,
-                dtype=np.float32,
-            ) / 255.0
+        left = max(
+            0,
+            (resized_width - self.image_size) // 2,
+        )
+        top = max(
+            0,
+            (resized_height - self.image_size) // 2,
+        )
+
+        image = image.crop(
+            (
+                left,
+                top,
+                left + self.image_size,
+                top + self.image_size,
+            )
+        )
+
+        array = np.asarray(
+            image,
+            dtype=np.float32,
+        ) / 255.0
 
         array = (
             array - IMAGENET_MEAN
@@ -662,14 +709,10 @@ class OnnxMultiCropDiseaseClassifier:
             (2, 0, 1),
         )
 
-        return (
-            np.expand_dims(
-                array,
-                axis=0,
-            ).astype(np.float32),
-            quality_issue,
-        )
+        return np.expand_dims(
+            array,
+            axis=0,
+        ).astype(np.float32)
 
 
-# Backward-compatible name for any existing imports.
 OnnxTomatoDiseaseClassifier = OnnxMultiCropDiseaseClassifier

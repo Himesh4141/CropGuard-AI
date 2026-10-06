@@ -305,7 +305,7 @@ export function ImageUploader({
 
         <div>
           <strong>
-            Multi-crop screening model
+            Field-robust crop screening
           </strong>
 
           <span>

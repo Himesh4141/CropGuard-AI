@@ -16,5 +16,5 @@ def health(
 
     return {
         "status": "healthy",
-        "diagnosis_pipeline": "multicrop-v3",
+        "diagnosis_pipeline": "field-robust-v4",
     }
