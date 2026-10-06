@@ -305,16 +305,16 @@ export function ImageUploader({
 
         <div>
           <strong>
-            Trained tomato prototype
+            Multi-crop screening model
           </strong>
 
           <span>
-            Uploaded Tomato leaf images
-            are screened by the trained
-            MobileNetV3 ONNX model.
-            Results are decision-support
-            only and are not field-validated
-            agronomic diagnoses.
+            CropGuard now screens supported
+            PlantVillage crop classes with a
+            calibrated 38-class MobileNetV3
+            ONNX model. Low-confidence and
+            crop-mismatch cases are flagged
+            for review rather than forced.
           </span>
         </div>
       </div>

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import Enum, Float, ForeignKey, String, Text
+from sqlalchemy import Boolean, Enum, Float, ForeignKey, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.constants import DiagnosisStatus
@@ -72,6 +72,32 @@ class Diagnosis(UUIDTimestampMixin, Base):
 
     model_version: Mapped[str | None] = mapped_column(
         String(80),
+        nullable=True,
+    )
+
+    predicted_crop: Mapped[str | None] = mapped_column(
+        String(80),
+        nullable=True,
+    )
+
+    confidence_level: Mapped[str | None] = mapped_column(
+        String(24),
+        nullable=True,
+    )
+
+    top_predictions: Mapped[list[dict] | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    is_uncertain: Mapped[bool] = mapped_column(
+        Boolean(),
+        default=False,
+        nullable=False,
+    )
+
+    rejection_reason: Mapped[str | None] = mapped_column(
+        Text(),
         nullable=True,
     )
 

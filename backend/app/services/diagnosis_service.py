@@ -28,22 +28,18 @@ class DiagnosisService:
         storage: StorageProvider | None = None,
         classifier: DiseaseClassifier | None = None,
     ) -> None:
-        self.fields = FieldRepository(
-            db
-        )
-        self.diagnoses = DiagnosisRepository(
-            db
-        )
+        self.fields = FieldRepository(db)
+        self.diagnoses = DiagnosisRepository(db)
         self.storage = (
             storage
             if storage is not None
             else LocalStorageProvider(
-                settings.upload_dir
-                / "diagnoses"
+                settings.upload_dir / "diagnoses"
             )
         )
-        # Load the ML engine only when an actual image inference is requested.
-        # Listing diagnosis history must never depend on ONNX availability.
+
+        # ML stays lazy so diagnosis history remains available even if
+        # the inference engine cannot initialize.
         self.classifier = classifier
 
     async def upload(
@@ -83,14 +79,12 @@ class DiagnosisService:
 
         validated_image = validate_image_bytes(
             content=content,
-            declared_content_type=
-                file.content_type,
+            declared_content_type=file.content_type,
         )
 
         stored = self.storage.save(
             content=content,
-            suffix=
-                validated_image.suffix,
+            suffix=validated_image.suffix,
         )
 
         diagnosis = Diagnosis(
@@ -100,8 +94,7 @@ class DiagnosisService:
                 file.filename
                 or "crop-image"
             )[:255],
-            status=
-                DiagnosisStatus.UPLOADED,
+            status=DiagnosisStatus.UPLOADED,
         )
 
         try:
@@ -123,42 +116,21 @@ class DiagnosisService:
 
             prediction = classifier.predict(
                 image_bytes=content,
-                crop_name=
-                    field.crop_name,
+                crop_name=field.crop_name,
             )
         except Exception as exc:
-            diagnosis.status = (
-                DiagnosisStatus.FAILED
-            )
-
-            self.diagnoses.save(
-                diagnosis
-            )
+            diagnosis.status = DiagnosisStatus.FAILED
+            self.diagnoses.save(diagnosis)
 
             raise DiagnosisInferenceError(
                 "Crop-health screening could not be completed"
             ) from exc
 
-        diagnosis.status = (
-            DiagnosisStatus.ANALYZED
-        )
-
-        diagnosis.predicted_label = (
-            prediction.label
-        )
-
-        diagnosis.confidence = (
-            prediction.confidence
-        )
-
-        diagnosis.severity = (
-            prediction.severity
-        )
-
-        diagnosis.advisory = (
-            prediction.advisory
-        )
-
+        diagnosis.status = DiagnosisStatus.ANALYZED
+        diagnosis.predicted_label = prediction.label
+        diagnosis.confidence = prediction.confidence
+        diagnosis.severity = prediction.severity
+        diagnosis.advisory = prediction.advisory
         diagnosis.inference_mode = str(
             getattr(
                 classifier,
@@ -166,14 +138,21 @@ class DiagnosisService:
                 "development_stub",
             )
         )
-
-        diagnosis.model_display_name = (
-            prediction.engine_name
-        )
-
-        diagnosis.model_version = (
-            prediction.engine_version
-        )
+        diagnosis.model_display_name = prediction.engine_name
+        diagnosis.model_version = prediction.engine_version
+        diagnosis.predicted_crop = prediction.predicted_crop
+        diagnosis.confidence_level = prediction.confidence_level
+        diagnosis.top_predictions = [
+            {
+                "raw_label": item.raw_label,
+                "crop": item.crop,
+                "disease": item.disease,
+                "confidence": item.confidence,
+            }
+            for item in prediction.top_predictions
+        ]
+        diagnosis.is_uncertain = prediction.is_uncertain
+        diagnosis.rejection_reason = prediction.rejection_reason
 
         return self.diagnoses.save(
             diagnosis
@@ -185,7 +164,5 @@ class DiagnosisService:
     ) -> list[Diagnosis]:
         return (
             self.diagnoses
-            .list_for_owner(
-                owner_id
-            )
+            .list_for_owner(owner_id)
         )

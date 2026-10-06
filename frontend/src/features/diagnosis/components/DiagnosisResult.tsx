@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   Gauge,
   Microscope,
+  Sprout,
 } from "lucide-react";
 
 import type {
@@ -21,20 +22,41 @@ interface DiagnosisResultProps {
 function humanize(
   value: string,
 ): string {
-  return value
-    .replace(
-      "Tomato___",
-      "",
-    )
-    .replaceAll(
-      "_",
-      " ",
-    )
+  const withoutCrop =
+    value.includes("___")
+      ? value.split("___")[1] ?? value
+      : value;
+
+  return withoutCrop
+    .replaceAll("_", " ")
+    .replace(/\s+/g, " ")
     .replace(
       /\b\w/g,
       (letter) =>
         letter.toUpperCase(),
     );
+}
+
+
+function confidenceTone(
+  diagnosis: Diagnosis,
+): string {
+  if (diagnosis.is_uncertain) {
+    return "Needs review";
+  }
+
+  switch (
+    diagnosis.confidence_level
+  ) {
+    case "high":
+      return "High";
+    case "moderate":
+      return "Moderate";
+    case "low":
+      return "Low";
+    default:
+      return "Measured";
+  }
 }
 
 
@@ -45,8 +67,7 @@ export function DiagnosisResult({
   const confidence =
     diagnosis.confidence !== null
       ? Math.round(
-          diagnosis.confidence *
-            100,
+          diagnosis.confidence * 100,
         )
       : null;
 
@@ -58,8 +79,27 @@ export function DiagnosisResult({
     diagnosis.inference_mode ===
       "onnx_model";
 
+  const uncertain =
+    diagnosis.is_uncertain ?? false;
+
+  const topPredictions =
+    diagnosis.top_predictions ?? [];
+
+  const headline =
+    uncertain
+      ? "Screening needs review"
+      : successful
+        ? "Screening completed"
+        : "Screening unavailable";
+
   return (
-    <article className="panel diagnosis-result">
+    <article
+      className={
+        uncertain
+          ? "panel diagnosis-result diagnosis-result--uncertain"
+          : "panel diagnosis-result"
+      }
+    >
       <div className="diagnosis-result-head">
         <div>
           <span className="eyebrow">
@@ -67,13 +107,12 @@ export function DiagnosisResult({
           </span>
 
           <h2>
-            {successful
-              ? "Screening completed"
-              : "Screening unavailable"}
+            {headline}
           </h2>
         </div>
 
-        {successful ? (
+        {successful &&
+        !uncertain ? (
           <CheckCircle2 size={28} />
         ) : (
           <AlertTriangle size={28} />
@@ -82,18 +121,28 @@ export function DiagnosisResult({
 
       <div className="development-result-badge">
         {realModel
-          ? "TRAINED PROTOTYPE MODEL"
+          ? `${diagnosis.model_display_name} · ${diagnosis.model_version ?? "v1"}`
           : "LEGACY DEVELOPMENT SIMULATION"}
       </div>
+
+      {diagnosis.rejection_reason ? (
+        <div className="diagnosis-review-banner">
+          <AlertTriangle size={17} />
+
+          <span>
+            {diagnosis.rejection_reason}
+          </span>
+        </div>
+      ) : null}
 
       <div className="diagnosis-result-grid">
         <div>
           <Microscope size={18} />
 
           <span>
-            {realModel
-              ? "Predicted label"
-              : "Simulated label"}
+            {uncertain
+              ? "Current assessment"
+              : "Likely diagnosis"}
           </span>
 
           <strong>
@@ -109,34 +158,65 @@ export function DiagnosisResult({
           <Gauge size={18} />
 
           <span>
-            {realModel
-              ? "Model confidence"
-              : "Simulated confidence"}
+            Calibrated confidence
           </span>
 
           <strong>
             {confidence !== null
-              ? `${confidence}%`
+              ? `${confidence}% · ${confidenceTone(diagnosis)}`
               : "-"}
           </strong>
         </div>
 
         <div>
-          <AlertTriangle size={18} />
+          <Sprout size={18} />
 
           <span>
-            Severity
+            Crop consistency
           </span>
 
           <strong>
-            {diagnosis.severity
-              ? humanize(
-                  diagnosis.severity,
-                )
-              : "-"}
+            {diagnosis.predicted_crop ??
+              "Not determined"}
           </strong>
         </div>
       </div>
+
+      {topPredictions.length > 0 ? (
+        <div className="diagnosis-top-predictions">
+          <span className="diagnosis-block-label">
+            TOP MODEL SIGNALS
+          </span>
+
+          <div className="diagnosis-prediction-list">
+            {topPredictions.map(
+              (prediction, index) => (
+                <div
+                  key={`${prediction.raw_label}-${index}`}
+                  className="diagnosis-prediction-row"
+                >
+                  <div>
+                    <strong>
+                      {prediction.disease}
+                    </strong>
+
+                    <span>
+                      {prediction.crop}
+                    </span>
+                  </div>
+
+                  <strong>
+                    {Math.round(
+                      prediction.confidence * 100,
+                    )}
+                    %
+                  </strong>
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+      ) : null}
 
       <div className="diagnosis-context">
         <span>
@@ -162,10 +242,12 @@ export function DiagnosisResult({
       <p className="diagnosis-disclaimer">
         {realModel
           ? (
-            "This result comes from a trained prototype model based on "
-            + "PlantVillage tomato leaf images. It is decision-support only, "
-            + "not a field-validated agronomic diagnosis. Confirm important "
-            + "treatment decisions with local agronomic guidance."
+            "CropGuard Multi-Crop v1 was trained on 54,305 PlantVillage "
+            + "images across 38 classes and 14 crops. Its held-out PlantVillage "
+            + "test accuracy was 99.57% (macro-F1 99.41%), but those controlled "
+            + "images do not establish equivalent accuracy in real farms. "
+            + "Low-confidence, mismatched and insufficient-coverage cases are "
+            + "flagged instead of treated as certain diagnoses."
           )
           : (
             "This historical result was produced by the earlier development "

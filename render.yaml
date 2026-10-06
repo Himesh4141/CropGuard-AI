@@ -1,4 +1,4 @@
-﻿services:
+services:
   # ----------------------------------------------------------
   # FastAPI backend
   # ----------------------------------------------------------
@@ -34,13 +34,13 @@
         value: '["http://localhost:4141","https://himesh4141.github.io"]'
 
       - key: ML_MODEL_PATH
-        value: ml/artifacts/tomato_disease_model.onnx
+        value: ml/artifacts/multicrop_disease_model.onnx
 
       - key: ML_METADATA_PATH
-        value: ml/artifacts/model_metadata.json
+        value: ml/artifacts/multicrop_metadata.json
 
       - key: ML_MIN_CONFIDENCE
-        value: "0.55"
+        value: "0.65"
 
       - key: UPLOAD_DIR
         value: uploads

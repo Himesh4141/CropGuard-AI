@@ -126,6 +126,8 @@ def test_upload_and_list_diagnosis(
     assert diagnosis["advisory"]
     assert diagnosis["inference_mode"] == "development_stub"
     assert diagnosis["model_display_name"] == "CropGuard Development Simulator"
+    assert diagnosis["is_uncertain"] is False
+    assert diagnosis["top_predictions"] == []
 
     stored_files = list(
         (tmp_path / "uploads" / "diagnoses")

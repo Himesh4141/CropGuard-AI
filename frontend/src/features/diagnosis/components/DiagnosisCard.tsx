@@ -20,11 +20,12 @@ interface DiagnosisCardProps {
 function humanize(
   value: string,
 ): string {
-  return value
-    .replace(
-      "Tomato___",
-      "",
-    )
+  const withoutCrop =
+    value.includes("___")
+      ? value.split("___")[1] ?? value
+      : value;
+
+  return withoutCrop
     .replaceAll(
       "_",
       " ",
@@ -109,7 +110,7 @@ export function DiagnosisCard({
 
           <span className="development-result-badge">
             {realModel
-              ? "ML MODEL"
+              ? "MULTI-CROP ML"
               : "LEGACY RECORD"}
           </span>
         </div>

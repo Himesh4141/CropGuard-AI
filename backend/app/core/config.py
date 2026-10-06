@@ -71,15 +71,15 @@ class Settings(BaseSettings):
     )
 
     ml_model_path: Path = Path(
-        "ml/artifacts/tomato_disease_model.onnx"
+        "ml/artifacts/multicrop_disease_model.onnx"
     )
 
     ml_metadata_path: Path = Path(
-        "ml/artifacts/model_metadata.json"
+        "ml/artifacts/multicrop_metadata.json"
     )
 
     ml_min_confidence: float = Field(
-        default=0.55,
+        default=0.65,
         ge=0.0,
         le=1.0,
     )

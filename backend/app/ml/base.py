@@ -1,5 +1,12 @@
 from dataclasses import dataclass
-from typing import Protocol
+
+
+@dataclass(frozen=True, slots=True)
+class PredictionAlternative:
+    raw_label: str
+    crop: str
+    disease: str
+    confidence: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -10,9 +17,14 @@ class DiseasePrediction:
     advisory: str
     engine_name: str
     engine_version: str
+    predicted_crop: str | None = None
+    confidence_level: str | None = None
+    top_predictions: tuple[PredictionAlternative, ...] = ()
+    is_uncertain: bool = False
+    rejection_reason: str | None = None
 
 
-class DiseaseClassifier(Protocol):
+class DiseaseClassifier:
     def predict(
         self,
         *,
@@ -20,3 +32,4 @@ class DiseaseClassifier(Protocol):
         crop_name: str,
     ) -> DiseasePrediction:
         """Return a crop-health prediction for a validated image."""
+        raise NotImplementedError
