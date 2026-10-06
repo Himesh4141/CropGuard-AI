@@ -1,4 +1,4 @@
-﻿import {
+import {
   useState,
   type FormEvent,
 } from "react";
@@ -24,8 +24,15 @@ import {
   ApiClientError,
 } from "@/services/apiError";
 
+import {
+  useBackendStatus,
+} from "@/hooks/useBackendStatus";
+
+
 
 export default function RegisterPage() {
+  const backendStatus = useBackendStatus();
+
   const navigate =
     useNavigate();
 
@@ -129,6 +136,15 @@ export default function RegisterPage() {
         to start monitoring your
         fields.
       </p>
+
+      <div className={`service-state service-state--${backendStatus}`}>
+        <span />
+        {backendStatus === "ready"
+          ? "Cloud services ready"
+          : backendStatus === "delayed"
+            ? "Cloud service is taking longer than usual"
+            : "Starting secure cloud services…"}
+      </div>
 
       <form
         onSubmit={

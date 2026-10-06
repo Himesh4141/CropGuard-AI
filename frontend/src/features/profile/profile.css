@@ -1,44 +1,62 @@
 .profile-grid {
   display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   gap: 18px;
+}
+
+.profile-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-card > svg {
+  width: 46px;
+  height: 46px;
+  margin-bottom: 18px;
+  padding: 11px;
+  border-radius: 14px;
+  color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .profile-card h2 {
   margin: 0 0 6px;
+  font-size: 22px;
+  letter-spacing: -0.03em;
 }
 
 .profile-card > p {
   margin: 0 0 22px;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .profile-details {
-  display: grid;
-  gap: 12px;
   margin-bottom: 22px;
+  display: grid;
+  gap: 10px;
 }
 
 .profile-detail {
+  padding: 13px 14px;
   display: flex;
   justify-content: space-between;
   gap: 18px;
-  padding: 13px 14px;
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 12px;
+  background: var(--surface-2);
 }
 
 .profile-detail span {
-  color: var(--muted2);
+  color: var(--muted-2);
   font-size: 11px;
 }
 
 .profile-detail strong {
-  text-align: right;
+  color: var(--text-soft);
   font-size: 12px;
+  text-align: right;
+  text-transform: capitalize;
 }
 
 .profile-form {
@@ -49,36 +67,35 @@
 .profile-form label > span {
   display: block;
   margin-bottom: 7px;
-  color: var(--muted);
+  color: var(--text-soft);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 740;
 }
 
 .profile-form input {
   width: 100%;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid var(--border-2);
+  border-radius: 12px;
   outline: none;
   color: var(--text);
-  background: #07130c;
+  background: var(--surface-2);
 }
 
 .profile-form input:focus {
-  border-color: #479460;
-  box-shadow:
-    0 0 0 3px
-    rgba(65, 155, 94, 0.12);
+  border-color: #78ae88;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(35, 135, 84, 0.1);
 }
 
 .profile-note {
-  color: var(--muted2);
+  color: var(--muted-2);
   font-size: 11px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 860px) {
   .profile-grid {
     grid-template-columns: 1fr;
   }

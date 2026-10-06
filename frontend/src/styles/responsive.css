@@ -1,2 +1,347 @@
-@media(max-width:1050px){.hero{grid-template-columns:1fr;gap:45px}.health-card{max-width:520px}.auth-layout{grid-template-columns:1fr}.auth-visual{min-height:320px;border-right:0;border-bottom:1px solid var(--border)}.auth-visual>div{margin:70px 0 0}.auth-content{min-height:620px}.metrics{grid-template-columns:repeat(2,1fr)}.card-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:760px){:root{--sidebar:0px}.landing-nav,.hero{width:calc(100% - 32px)}.landing-nav{height:68px}.landing-nav .ghost{display:none}.hero{min-height:calc(100vh - 68px);padding:45px 0 80px}.hero h1{font-size:clamp(42px,13vw,62px)}.health-metrics{grid-template-columns:1fr}.auth-visual{padding:24px;min-height:280px}.auth-visual h1{font-size:43px}.auth-content{padding:55px 22px;min-height:auto}.sidebar{display:none}.dashboard-main{margin-left:0}.topbar{height:62px;padding:0 16px}.topbar>span,.userbox>div:nth-child(2){display:none}.page{padding:28px 16px 100px}.metrics,.two-col,.card-grid{grid-template-columns:1fr}.mobile-nav{position:fixed;display:grid;grid-template-columns:repeat(4,1fr);left:12px;right:12px;bottom:12px;height:62px;padding:5px;border:1px solid var(--border2);border-radius:17px;background:rgba(10,26,17,.96);backdrop-filter:blur(16px);z-index:40}.mobile-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-decoration:none;color:var(--muted2);font-size:9px}.mobile-nav a.active{color:var(--primary)}}
+@media (max-width: 1180px) {
+  :root {
+    --sidebar: 244px;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(390px, 0.9fr);
+    gap: 48px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .landing-nav,
+  .hero,
+  .landing-feature-strip {
+    width: min(100% - 40px, 760px);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 64px;
+  }
+
+  .hero-visual {
+    min-height: auto;
+    justify-items: start;
+  }
+
+  .health-card {
+    width: min(620px, 100%);
+  }
+
+  .landing-feature-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-feature + .landing-feature {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 0;
+  }
+
+  .auth-layout {
+    grid-template-columns: minmax(320px, 0.82fr) minmax(460px, 1.18fr);
+  }
+
+  .auth-visual {
+    padding: 32px;
+  }
+
+  .auth-visual h1 {
+    font-size: 48px;
+  }
+
+  .dashboard-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-hero-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 820px) {
+  :root {
+    --sidebar: 0px;
+    --topbar: 66px;
+  }
+
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-visual {
+    min-height: 370px;
+    padding: 28px;
+  }
+
+  .auth-visual-copy {
+    margin: 62px 0 0;
+  }
+
+  .auth-visual h1 {
+    font-size: clamp(42px, 10vw, 58px);
+  }
+
+  .auth-benefits {
+    display: none;
+  }
+
+  .auth-content {
+    min-height: auto;
+    padding: 54px 24px 70px;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .dashboard-main {
+    margin-left: 0;
+  }
+
+  .topbar {
+    padding: 0 18px;
+  }
+
+  .topbar-context > span {
+    display: none;
+  }
+
+  .page {
+    padding: 32px 18px 108px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .two-col,
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-nav {
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    z-index: 50;
+    min-height: 66px;
+    padding: 6px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    background: rgba(12, 36, 25, 0.96);
+    box-shadow: 0 18px 40px rgba(7, 28, 17, 0.24);
+    backdrop-filter: blur(18px);
+  }
+
+  .mobile-nav a {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 14px;
+    color: #809789;
+    font-size: 9px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .mobile-nav a.active {
+    color: #e9f7ee;
+    background: rgba(79, 180, 115, 0.17);
+  }
+
+  .mobile-nav a.active svg {
+    color: #7de0a0;
+  }
+}
+
+@media (max-width: 620px) {
+  .landing-nav,
+  .hero,
+  .landing-feature-strip {
+    width: calc(100% - 28px);
+  }
+
+  .landing-nav {
+    height: 74px;
+  }
+
+  .landing-nav .button.secondary {
+    display: none;
+  }
+
+  .landing-nav .button.primary {
+    min-height: 40px;
+    padding: 0 14px;
+  }
+
+  .hero {
+    padding: 54px 0 52px;
+  }
+
+  .hero h1 {
+    font-size: clamp(43px, 13vw, 60px);
+  }
+
+  .hero p {
+    font-size: 15px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions .button {
+    width: 100%;
+  }
+
+  .hero-trust {
+    gap: 11px;
+  }
+
+  .hero-visual {
+    display: block;
+  }
+
+  .health-card {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .health-score-wrap {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .health-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .health-metrics > div {
+    min-height: auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+  }
+
+  .health-metrics svg {
+    grid-row: 1 / 3;
+    margin: 0;
+  }
+
+  .landing-feature {
+    padding: 22px 10px;
+  }
+
+  .auth-visual {
+    min-height: 310px;
+    padding: 24px 20px;
+  }
+
+  .auth-visual-copy {
+    margin-top: 44px;
+  }
+
+  .auth-visual h1 {
+    font-size: 42px;
+  }
+
+  .auth-visual p {
+    font-size: 13px;
+  }
+
+  .auth-content {
+    padding: 46px 20px 66px;
+  }
+
+  .auth-card h2 {
+    font-size: 30px;
+  }
+
+  .topbar-live,
+  .userbox-link > div:last-child {
+    display: none;
+  }
+
+  .topbar {
+    padding: 0 14px;
+  }
+
+  .page {
+    padding: 28px 14px 106px;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+  }
+
+  .page-header h1 {
+    font-size: 34px;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .metrics article {
+    min-height: 146px;
+    padding: 18px;
+  }
+
+  .metrics strong {
+    font-size: 27px;
+  }
+
+  .dashboard-hero {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .dashboard-hero-actions {
+    flex-direction: column;
+  }
+
+  .dashboard-hero-actions .button {
+    width: 100%;
+  }
+
+  .panel {
+    padding: 19px;
+    border-radius: 17px;
+  }
+}
+
+@media (max-width: 420px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .userbox {
+    gap: 6px;
+  }
+
+  .mobile-nav {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+  }
+}

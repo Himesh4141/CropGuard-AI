@@ -1,4 +1,4 @@
-﻿import {
+import {
   useState,
   type FormEvent,
 } from "react";
@@ -25,6 +25,11 @@ import {
   ApiClientError,
 } from "@/services/apiError";
 
+import {
+  useBackendStatus,
+} from "@/hooks/useBackendStatus";
+
+
 
 interface LoginLocationState {
   from?: string;
@@ -32,6 +37,8 @@ interface LoginLocationState {
 
 
 export default function LoginPage() {
+  const backendStatus = useBackendStatus();
+
   const navigate =
     useNavigate();
 
@@ -139,6 +146,15 @@ export default function LoginPage() {
         diagnoses and crop-health
         alerts.
       </p>
+
+      <div className={`service-state service-state--${backendStatus}`}>
+        <span />
+        {backendStatus === "ready"
+          ? "Cloud services ready"
+          : backendStatus === "delayed"
+            ? "Cloud service is taking longer than usual"
+            : "Starting secure cloud services…"}
+      </div>
 
       <form
         onSubmit={

@@ -6,34 +6,18 @@ import {
   Sprout,
   Users,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
-import {
-  useQuery,
-} from "@tanstack/react-query";
-
-import {
-  PageHeader,
-} from "@/components/common/PageHeader";
-
-import {
-  adminApi,
-} from "@/features/admin/api/adminApi";
-
+import { PageHeader } from "@/components/common/PageHeader";
+import { adminApi } from "@/features/admin/api/adminApi";
 
 export default function AdminDashboardPage() {
-  const summaryQuery =
-    useQuery({
-      queryKey: [
-        "admin",
-        "summary",
-      ],
-      queryFn:
-        adminApi.summary,
-    });
+  const summaryQuery = useQuery({
+    queryKey: ["admin", "summary"],
+    queryFn: adminApi.summary,
+  });
 
-  if (
-    summaryQuery.isLoading
-  ) {
+  if (summaryQuery.isLoading) {
     return (
       <div className="page">
         <PageHeader
@@ -41,21 +25,15 @@ export default function AdminDashboardPage() {
           title="Admin dashboard"
           description="Platform-level CropGuard operations and usage."
         />
-
         <section className="panel empty">
           <div className="spinner" />
-          <p>
-            Loading platform metrics...
-          </p>
+          <p>Loading platform metrics...</p>
         </section>
       </div>
     );
   }
 
-  if (
-    summaryQuery.isError
-    || !summaryQuery.data
-  ) {
+  if (summaryQuery.isError || !summaryQuery.data) {
     return (
       <div className="page">
         <PageHeader
@@ -63,22 +41,16 @@ export default function AdminDashboardPage() {
           title="Admin dashboard"
           description="Platform-level CropGuard operations and usage."
         />
-
         <section className="panel empty">
           <ShieldCheck size={36} />
-          <h2>
-            Admin metrics unavailable
-          </h2>
-          <p>
-            Verify the backend and your admin permissions.
-          </p>
+          <h2>Admin metrics unavailable</h2>
+          <p>Verify the backend and your admin permissions.</p>
         </section>
       </div>
     );
   }
 
-  const data =
-    summaryQuery.data;
+  const data = summaryQuery.data;
 
   return (
     <div className="page">
@@ -91,105 +63,57 @@ export default function AdminDashboardPage() {
       <section className="metrics">
         <article>
           <Users />
-          <span>
-            Users
-          </span>
-          <strong>
-            {data.total_users}
-          </strong>
-          <small>
-            {data.active_users} active
-          </small>
+          <span>Users</span>
+          <strong>{data.total_users}</strong>
+          <small>{data.active_users} active</small>
         </article>
 
         <article>
           <Sprout />
-          <span>
-            Farms
-          </span>
-          <strong>
-            {data.farms}
-          </strong>
-          <small>
-            Farmer-owned locations
-          </small>
+          <span>Farms</span>
+          <strong>{data.farms}</strong>
+          <small>Farmer-owned locations</small>
         </article>
 
         <article>
           <Leaf />
-          <span>
-            Fields
-          </span>
-          <strong>
-            {data.fields}
-          </strong>
-          <small>
-            Crop fields registered
-          </small>
+          <span>Fields</span>
+          <strong>{data.fields}</strong>
+          <small>Crop fields registered</small>
         </article>
 
         <article>
           <Activity />
-          <span>
-            Diagnoses
-          </span>
-          <strong>
-            {data.diagnoses}
-          </strong>
-          <small>
-            Screening records
-          </small>
+          <span>Diagnoses</span>
+          <strong>{data.diagnoses}</strong>
+          <small>Screening records</small>
         </article>
       </section>
 
       <section className="two-col">
         <article className="panel">
-          <h2>
-            Account mix
-          </h2>
+          <div className="panel-title-row">
+            <Users size={20} />
+            <h2>Account mix</h2>
+          </div>
 
-          <div
-            style={{
-              display:
-                "grid",
-              gap:
-                "14px",
-              marginTop:
-                "18px",
-            }}
-          >
-            <MetricRow
-              label="Farmers"
-              value={data.farmers}
-            />
+          <div className="data-list">
+            <MetricRow label="Farmers" value={data.farmers} />
             <MetricRow
               label="Extension officers"
-              value={
-                data.extension_officers
-              }
+              value={data.extension_officers}
             />
-            <MetricRow
-              label="Administrators"
-              value={data.admins}
-            />
+            <MetricRow label="Administrators" value={data.admins} />
           </div>
         </article>
 
         <article className="panel">
-          <h2>
-            Attention signals
-          </h2>
+          <div className="panel-title-row">
+            <ShieldCheck size={20} />
+            <h2>Attention signals</h2>
+          </div>
 
-          <div
-            style={{
-              display:
-                "grid",
-              gap:
-                "14px",
-              marginTop:
-                "18px",
-            }}
-          >
+          <div className="data-list">
             <MetricRow
               label="Unread alerts"
               value={data.unread_alerts}
@@ -200,17 +124,13 @@ export default function AdminDashboardPage() {
               value={data.high_risk_fields}
               icon={<ShieldCheck size={17} />}
             />
-            <MetricRow
-              label="All alerts"
-              value={data.alerts}
-            />
+            <MetricRow label="All alerts" value={data.alerts} />
           </div>
         </article>
       </section>
     </div>
   );
 }
-
 
 function MetricRow({
   label,
@@ -222,43 +142,14 @@ function MetricRow({
   icon?: React.ReactNode;
 }) {
   return (
-    <div
-      style={{
-        display:
-          "flex",
-        alignItems:
-          "center",
-        justifyContent:
-          "space-between",
-        gap:
-          "12px",
-        padding:
-          "14px",
-        border:
-          "1px solid var(--border)",
-        borderRadius:
-          "12px",
-      }}
-    >
-      <span
-        style={{
-          display:
-            "flex",
-          gap:
-            "8px",
-          alignItems:
-            "center",
-          color:
-            "var(--muted)",
-        }}
-      >
-        {icon}
-        {label}
+    <div className="data-row">
+      <span className="data-row-copy">
+        <strong style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {icon}
+          {label}
+        </strong>
       </span>
-
-      <strong>
-        {value}
-      </strong>
+      <strong className="data-row-value">{value}</strong>
     </div>
   );
 }

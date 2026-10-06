@@ -1,29 +1,32 @@
 .management-layout {
   display: grid;
-  grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
-  gap: 20px;
+  grid-template-columns: minmax(330px, 0.82fr) minmax(0, 1.18fr);
+  gap: 22px;
   align-items: start;
 }
 
 .management-form-panel {
   position: sticky;
-  top: 88px;
+  top: calc(var(--topbar) + 18px);
 }
 
 .management-section-heading {
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .management-section-heading h2,
 .management-list-heading h2 {
-  margin: 7px 0;
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 22px;
+  letter-spacing: -0.03em;
 }
 
 .management-section-heading p {
-  margin: 0;
+  margin: 10px 0 0;
   color: var(--muted);
-  line-height: 1.6;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.65;
 }
 
 .management-form {
@@ -34,7 +37,7 @@
 
 .management-form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -45,59 +48,69 @@
 .management-form label > span {
   display: block;
   margin-bottom: 7px;
-  color: var(--muted);
+  color: var(--text-soft);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 740;
 }
 
 .management-form input,
 .management-form select {
   width: 100%;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid var(--border-2);
+  border-radius: 12px;
   outline: none;
   color: var(--text);
-  background: #07130c;
+  background: var(--surface-2);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.management-form input:hover,
+.management-form select:hover {
+  border-color: #b9cdbd;
 }
 
 .management-form input:focus,
 .management-form select:focus {
-  border-color: #479460;
-  box-shadow: 0 0 0 3px rgba(65, 155, 94, 0.12);
+  border-color: #78ae88;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(35, 135, 84, 0.1);
 }
 
 .management-form select {
   cursor: pointer;
 }
 
-.success-box {
-  padding: 12px;
-  border: 1px solid #2b6941;
-  border-radius: 10px;
-  color: var(--primary);
-  background: #10291a;
-  font-size: 12px;
+.management-form-actions {
+  padding-top: 2px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .management-list-heading {
-  min-height: 62px;
+  min-height: 68px;
   margin-bottom: 12px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 18px;
 }
 
 .management-list-heading strong {
-  min-width: 42px;
-  height: 42px;
+  min-width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  color: var(--primary);
-  background: var(--surface);
+  border: 1px solid #cde0d2;
+  border-radius: 13px;
+  color: var(--primary-strong);
+  background: var(--primary-soft);
+  font-size: 14px;
 }
 
 .management-card-list {
@@ -107,29 +120,42 @@
 }
 
 .management-card {
+  min-height: 118px;
   display: flex;
-  gap: 15px;
-  min-height: 110px;
+  gap: 16px;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.management-card:hover {
+  transform: translateY(-1px);
+  border-color: #cadbce;
+  box-shadow: var(--shadow-sm);
 }
 
 .management-card-icon {
+  width: 46px;
+  height: 46px;
   flex: 0 0 auto;
-  width: 42px;
-  height: 42px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--primary);
-  background: #10331f;
+  background: var(--primary-soft);
 }
 
 .management-card-content {
+  min-width: 0;
   width: 100%;
 }
 
 .management-card h3 {
   margin: 1px 0 7px;
+  color: var(--text);
   font-size: 17px;
+  letter-spacing: -0.02em;
 }
 
 .management-card p {
@@ -140,7 +166,7 @@
 .management-card small {
   display: block;
   margin-top: 8px;
-  color: var(--muted2);
+  color: var(--muted-2);
 }
 
 .management-location {
@@ -152,38 +178,46 @@
 
 .management-card-title-row {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 15px;
+  gap: 16px;
+}
+
+.management-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .crop-pill {
   height: max-content;
-  padding: 6px 9px;
-  border: 1px solid #2d6640;
+  padding: 6px 10px;
+  border: 1px solid #c6e0ce;
   border-radius: 999px;
-  color: var(--primary);
-  background: #10331f;
+  color: var(--primary-strong);
+  background: var(--primary-soft);
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 780;
 }
 
 .field-meta-grid {
+  margin-top: 16px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 16px;
+  gap: 9px;
 }
 
 .field-meta-grid > div {
-  min-height: 38px;
+  min-height: 42px;
+  padding: 9px 10px;
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 10px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 10px;
   color: var(--muted);
-  font-size: 11px;
+  background: var(--surface-2);
+  font-size: 10px;
 }
 
 .field-meta-grid svg {
@@ -191,7 +225,7 @@
   color: var(--primary);
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1040px) {
   .management-layout {
     grid-template-columns: 1fr;
   }
@@ -210,33 +244,9 @@
   .management-card-title-row {
     flex-direction: column;
   }
-}
 
-.management-form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.management-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.icon-button.danger {
-  color: #ff8f82;
-  border-color: #5d2f2a;
-}
-
-.icon-button.danger:hover {
-  background: #2a1512;
-}
-
-@media (max-width: 650px) {
   .management-card-actions {
     flex-wrap: wrap;
-    justify-content: flex-start;
   }
 
   .management-form-actions {
