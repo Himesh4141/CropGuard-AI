@@ -42,11 +42,9 @@ class DiagnosisService:
                 / "diagnoses"
             )
         )
-        self.classifier = (
-            classifier
-            if classifier is not None
-            else get_classifier()
-        )
+        # Load the ML engine only when an actual image inference is requested.
+        # Listing diagnosis history must never depend on ONNX availability.
+        self.classifier = classifier
 
     async def upload(
         self,
@@ -117,7 +115,13 @@ class DiagnosisService:
             raise
 
         try:
-            prediction = self.classifier.predict(
+            classifier = (
+                self.classifier
+                if self.classifier is not None
+                else get_classifier()
+            )
+
+            prediction = classifier.predict(
                 image_bytes=content,
                 crop_name=
                     field.crop_name,
@@ -157,7 +161,7 @@ class DiagnosisService:
 
         diagnosis.inference_mode = str(
             getattr(
-                self.classifier,
+                classifier,
                 "inference_mode",
                 "development_stub",
             )
