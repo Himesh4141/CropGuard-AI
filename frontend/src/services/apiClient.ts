@@ -1,4 +1,4 @@
-﻿import axios, {
+import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 
@@ -28,7 +28,7 @@ export const apiClient =
     baseURL:
       env.API_BASE_URL,
 
-    timeout: 20_000,
+    timeout: 90_000,
 
     withCredentials: true,
 
@@ -44,7 +44,7 @@ const refreshClient =
     baseURL:
       env.API_BASE_URL,
 
-    timeout: 20_000,
+    timeout: 90_000,
 
     withCredentials: true,
 
