@@ -1,0 +1,11 @@
+﻿.git
+.github
+**/.venv
+**/node_modules
+frontend/dist
+ml/data
+*.zip
+*.ps1
+backend/uploads
+__pycache__
+.pytest_cache
