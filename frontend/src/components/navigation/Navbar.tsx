@@ -1,4 +1,4 @@
-import {
+﻿import {
   Activity,
   LogOut,
 } from "lucide-react";
@@ -13,10 +13,6 @@ import {
 } from "@/config/routes";
 
 import {
-  authApi,
-} from "@/features/auth/api/authApi";
-
-import {
   useAuthStore,
 } from "@/features/auth/store";
 
@@ -28,32 +24,31 @@ export function Navbar() {
         state.user,
     );
 
-  const clear =
+  const logout =
     useAuthStore(
       (state) =>
-        state.clearSession,
+        state.logout,
     );
 
   const navigate =
     useNavigate();
 
 
-  const logout =
-    async () => {
-      try {
-        await authApi.logout();
-      } finally {
-        clear();
+  function handleLogout(): void {
+    /*
+     * Local logout happens immediately.
+     * Server refresh-session revocation continues in the background.
+     */
+    void logout();
 
-        navigate(
-          routes.login,
-          {
-            replace:
-              true,
-          },
-        );
-      }
-    };
+    navigate(
+      routes.login,
+      {
+        replace:
+          true,
+      },
+    );
+  }
 
 
   return (
@@ -80,12 +75,16 @@ export function Navbar() {
           style={{
             display:
               "flex",
+
             alignItems:
               "center",
+
             gap:
               "9px",
+
             color:
               "inherit",
+
             textDecoration:
               "none",
           }}
@@ -117,8 +116,11 @@ export function Navbar() {
         </Link>
 
         <button
+          type="button"
           className="icon-button"
-          onClick={logout}
+          onClick={
+            handleLogout
+          }
           aria-label="Sign out"
           title="Sign out"
         >

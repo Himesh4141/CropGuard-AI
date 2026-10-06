@@ -1,4 +1,4 @@
-import {
+﻿import {
   create,
 } from "zustand";
 
@@ -13,6 +13,46 @@ import {
 import type {
   User,
 } from "@/types/user";
+
+
+const EXPLICIT_SIGNOUT_KEY =
+  "cropguard:explicit-signout";
+
+
+function markExplicitSignOut(): void {
+  try {
+    window.localStorage.setItem(
+      EXPLICIT_SIGNOUT_KEY,
+      "1",
+    );
+  } catch {
+    // Local storage may be unavailable in restricted browsers.
+  }
+}
+
+
+function clearExplicitSignOut(): void {
+  try {
+    window.localStorage.removeItem(
+      EXPLICIT_SIGNOUT_KEY,
+    );
+  } catch {
+    // Local storage may be unavailable in restricted browsers.
+  }
+}
+
+
+function wasExplicitlySignedOut(): boolean {
+  try {
+    return (
+      window.localStorage.getItem(
+        EXPLICIT_SIGNOUT_KEY,
+      ) === "1"
+    );
+  } catch {
+    return false;
+  }
+}
 
 
 interface AuthState {
@@ -52,6 +92,8 @@ export const useAuthStore =
         user,
         token,
       ) => {
+        clearExplicitSignOut();
+
         tokenStorage.set(
           token,
         );
@@ -92,6 +134,20 @@ export const useAuthStore =
           return;
         }
 
+        if (
+          wasExplicitlySignedOut()
+        ) {
+          tokenStorage.clear();
+
+          set({
+            user: null,
+            initialized: true,
+            initializing: false,
+          });
+
+          return;
+        }
+
         set({
           initializing: true,
         });
@@ -107,8 +163,10 @@ export const useAuthStore =
           set({
             user:
               data.user,
+
             initialized:
               true,
+
             initializing:
               false,
           });
@@ -124,17 +182,32 @@ export const useAuthStore =
       },
 
       logout: async () => {
-        try {
-          await authApi.logout();
-        } finally {
-          tokenStorage.clear();
+        /*
+         * Logout must be instant for the user.
+         *
+         * Render Free may need time to wake up. We therefore clear the
+         * local authenticated state first and revoke the server refresh
+         * session in the background.
+         */
+        markExplicitSignOut();
 
-          set({
-            user: null,
-            initialized: true,
-            initializing: false,
+        tokenStorage.clear();
+
+        set({
+          user: null,
+          initialized: true,
+          initializing: false,
+        });
+
+        void authApi
+          .logout()
+          .catch(() => {
+            /*
+             * Local logout has already succeeded.
+             * The explicit-signout flag prevents a stale refresh cookie
+             * from silently logging the user back in.
+             */
           });
-        }
       },
     }),
   );
