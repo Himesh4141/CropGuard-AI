@@ -1,10 +1,6 @@
 @media (max-width: 1180px) {
-  :root {
-    --sidebar: 244px;
-  }
-
   .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(390px, 0.9fr);
+    grid-template-columns: minmax(0, 1fr) minmax(380px, 0.8fr);
     gap: 48px;
   }
 
@@ -15,63 +11,62 @@
   .card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
-
-@media (max-width: 980px) {
-  .landing-nav,
-  .hero,
-  .landing-feature-strip {
-    width: min(100% - 40px, 760px);
-  }
-
-  .hero {
-    grid-template-columns: 1fr;
-    padding-top: 64px;
-  }
-
-  .hero-visual {
-    min-height: auto;
-    justify-items: start;
-  }
-
-  .health-card {
-    width: min(620px, 100%);
-  }
-
-  .landing-feature-strip {
-    grid-template-columns: 1fr;
-  }
-
-  .landing-feature + .landing-feature {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    border-left: 0;
-  }
-
-  .auth-layout {
-    grid-template-columns: minmax(320px, 0.82fr) minmax(460px, 1.18fr);
-  }
-
-  .auth-visual {
-    padding: 32px;
-  }
-
-  .auth-visual h1 {
-    font-size: 48px;
-  }
 
   .dashboard-hero {
     grid-template-columns: 1fr;
   }
 
-  .dashboard-hero-actions {
+  .dashboard-quick-actions {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 980px) {
+  :root {
+    --sidebar: 236px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .hero-copy {
+    max-width: 850px;
+  }
+
+  .hero-visual {
+    width: min(640px, 100%);
+    min-height: 520px;
+    margin: 0 auto;
+  }
+
+  .auth-layout {
+    grid-template-columns: minmax(320px, 0.82fr) minmax(440px, 1.18fr);
+  }
+
+  .auth-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .auth-preview-item svg {
+    margin: 0;
   }
 }
 
 @media (max-width: 820px) {
   :root {
     --sidebar: 0px;
-    --topbar: 66px;
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .auth-layout {
@@ -79,25 +74,31 @@
   }
 
   .auth-visual {
-    min-height: 370px;
-    padding: 28px;
+    min-height: 300px;
+    padding: 26px 24px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
   }
 
-  .auth-visual-copy {
-    margin: 62px 0 0;
+  .auth-story {
+    margin: 52px 0 4px;
   }
 
-  .auth-visual h1 {
-    font-size: clamp(42px, 10vw, 58px);
+  .auth-story h1 {
+    font-size: clamp(42px, 10vw, 60px);
   }
 
-  .auth-benefits {
+  .auth-preview {
     display: none;
   }
 
   .auth-content {
     min-height: auto;
-    padding: 54px 24px 70px;
+    padding: 40px 20px 56px;
+  }
+
+  .auth-card {
+    padding: 28px;
   }
 
   .sidebar {
@@ -109,95 +110,94 @@
   }
 
   .topbar {
-    padding: 0 18px;
+    height: 66px;
+    padding: 0 16px;
   }
 
-  .topbar-context > span {
+  .topbar-context span,
+  .userbox > a > div:last-child {
     display: none;
   }
 
   .page {
-    padding: 32px 18px 108px;
+    padding: 30px 18px 112px;
   }
 
   .page-header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 16px;
-  }
-
-  .two-col,
-  .card-grid {
-    grid-template-columns: 1fr;
   }
 
   .mobile-nav {
     position: fixed;
-    left: 14px;
-    right: 14px;
-    bottom: 14px;
-    z-index: 50;
-    min-height: 66px;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 60;
+    min-height: 68px;
     padding: 6px;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    background: rgba(12, 36, 25, 0.96);
-    box-shadow: 0 18px 40px rgba(7, 28, 17, 0.24);
-    backdrop-filter: blur(18px);
+    gap: 4px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.91);
+    box-shadow: 0 18px 50px rgba(20, 37, 58, 0.16);
+    backdrop-filter: blur(22px);
   }
 
   .mobile-nav a {
     min-width: 0;
+    min-height: 54px;
+    padding: 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    border-radius: 14px;
-    color: #809789;
+    gap: 5px;
+    border-radius: 16px;
+    color: var(--muted2);
     font-size: 9px;
-    font-weight: 700;
+    font-weight: 720;
     text-decoration: none;
+    transition: all var(--transition);
   }
 
   .mobile-nav a.active {
-    color: #e9f7ee;
-    background: rgba(79, 180, 115, 0.17);
+    color: var(--primary-strong);
+    background: linear-gradient(135deg, var(--primary-soft), var(--secondary-soft));
   }
 
   .mobile-nav a.active svg {
-    color: #7de0a0;
+    color: var(--primary);
+  }
+
+  .dashboard-insight {
+    min-height: auto;
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 650px) {
   .landing-nav,
-  .hero,
-  .landing-feature-strip {
-    width: calc(100% - 28px);
+  .hero {
+    width: calc(100% - 32px);
   }
 
   .landing-nav {
-    height: 74px;
+    height: 72px;
   }
 
-  .landing-nav .button.secondary {
+  .landing-nav .ghost {
     display: none;
   }
 
-  .landing-nav .button.primary {
-    min-height: 40px;
-    padding: 0 14px;
-  }
-
   .hero {
-    padding: 54px 0 52px;
+    min-height: calc(100vh - 72px);
+    padding: 38px 0 72px;
   }
 
   .hero h1 {
-    font-size: clamp(43px, 13vw, 60px);
+    font-size: clamp(46px, 14.5vw, 66px);
   }
 
   .hero p {
@@ -212,22 +212,30 @@
     width: 100%;
   }
 
-  .hero-trust {
-    gap: 11px;
+  .hero-trust-row {
+    gap: 12px;
   }
 
   .hero-visual {
-    display: block;
+    min-height: 440px;
+  }
+
+  .hero-orb {
+    width: 94%;
   }
 
   .health-card {
-    padding: 20px;
-    border-radius: 22px;
+    width: 93%;
+    padding: 21px;
+    border-radius: 24px;
   }
 
-  .health-score-wrap {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .health-score strong {
+    font-size: 64px;
+  }
+
+  .health-score-copy {
+    display: none;
   }
 
   .health-metrics {
@@ -235,113 +243,131 @@
   }
 
   .health-metrics > div {
-    min-height: auto;
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
-    column-gap: 12px;
+    column-gap: 10px;
   }
 
   .health-metrics svg {
     grid-row: 1 / 3;
     margin: 0;
+    align-self: center;
   }
 
-  .landing-feature {
-    padding: 22px 10px;
+  .float-chip {
+    min-width: 132px;
+    padding: 10px 12px;
+  }
+
+  .float-chip.one {
+    right: -2px;
+  }
+
+  .float-chip.two {
+    left: -2px;
   }
 
   .auth-visual {
-    min-height: 310px;
-    padding: 24px 20px;
+    min-height: 265px;
   }
 
-  .auth-visual-copy {
-    margin-top: 44px;
+  .auth-story {
+    margin-top: 40px;
   }
 
-  .auth-visual h1 {
+  .auth-story h1 {
     font-size: 42px;
   }
 
-  .auth-visual p {
+  .auth-story > p {
     font-size: 13px;
   }
 
   .auth-content {
-    padding: 46px 20px 66px;
+    padding: 32px 16px 48px;
+  }
+
+  .auth-card {
+    padding: 24px 20px;
+    border-radius: 22px;
   }
 
   .auth-card h2 {
     font-size: 30px;
   }
 
-  .topbar-live,
-  .userbox-link > div:last-child {
-    display: none;
-  }
-
-  .topbar {
-    padding: 0 14px;
-  }
-
   .page {
-    padding: 28px 14px 106px;
-  }
-
-  .page-header {
-    margin-bottom: 24px;
+    padding: 26px 14px 110px;
   }
 
   .page-header h1 {
     font-size: 34px;
   }
 
-  .metrics {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+  .metrics,
+  .two-col,
+  .card-grid {
+    grid-template-columns: 1fr;
   }
 
   .metrics article {
-    min-height: 146px;
     padding: 18px;
-  }
-
-  .metrics strong {
-    font-size: 27px;
   }
 
   .dashboard-hero {
     padding: 22px;
-    border-radius: 20px;
+    border-radius: 23px;
   }
 
-  .dashboard-hero-actions {
+  .dashboard-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-action {
+    min-width: 0;
+  }
+
+  .dashboard-insight {
     flex-direction: column;
   }
 
-  .dashboard-hero-actions .button {
-    width: 100%;
-  }
-
-  .panel {
-    padding: 19px;
-    border-radius: 17px;
+  .panel,
+  .weather-panel {
+    padding: 18px;
+    border-radius: 19px;
   }
 }
 
-@media (max-width: 420px) {
-  .metrics {
-    grid-template-columns: 1fr;
+@media (max-width: 430px) {
+  .brand strong {
+    font-size: 14px;
   }
 
-  .userbox {
-    gap: 6px;
+  .hero h1 {
+    font-size: 45px;
+  }
+
+  .hero-visual {
+    min-height: 410px;
+  }
+
+  .float-chip {
+    display: none;
+  }
+
+  .topbar-context > div:last-child {
+    display: none;
+  }
+
+  .dashboard-quick-actions {
+    grid-template-columns: 1fr 1fr;
   }
 
   .mobile-nav {
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
+    left: 8px;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
   }
 }

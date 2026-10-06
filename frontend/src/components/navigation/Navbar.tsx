@@ -1,54 +1,130 @@
-import { LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Activity,
+  LogOut,
+} from "lucide-react";
 
-import { routes } from "@/config/routes";
-import { authApi } from "@/features/auth/api/authApi";
-import { useAuthStore } from "@/features/auth/store";
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  routes,
+} from "@/config/routes";
+
+import {
+  authApi,
+} from "@/features/auth/api/authApi";
+
+import {
+  useAuthStore,
+} from "@/features/auth/store";
+
 
 export function Navbar() {
-  const user = useAuthStore((state) => state.user);
-  const clear = useAuthStore((state) => state.clearSession);
-  const navigate = useNavigate();
+  const user =
+    useAuthStore(
+      (state) =>
+        state.user,
+    );
 
-  const logout = async () => {
-    try {
-      await authApi.logout();
-    } finally {
-      clear();
-      navigate(routes.login, { replace: true });
-    }
-  };
+  const clear =
+    useAuthStore(
+      (state) =>
+        state.clearSession,
+    );
+
+  const navigate =
+    useNavigate();
+
+
+  const logout =
+    async () => {
+      try {
+        await authApi.logout();
+      } finally {
+        clear();
+
+        navigate(
+          routes.login,
+          {
+            replace:
+              true,
+          },
+        );
+      }
+    };
+
 
   return (
     <header className="topbar">
       <div className="topbar-context">
-        <span>Smart Crop Health Platform</span>
-        <span className="topbar-live">Live monitoring</span>
+        <span className="topbar-context-badge">
+          <Activity size={16} />
+        </span>
+
+        <div>
+          <strong>
+            CropGuard workspace
+          </strong>
+
+          <span>
+            Live field intelligence
+          </span>
+        </div>
       </div>
 
       <div className="userbox">
         <Link
           to={routes.profile}
-          className="userbox-link"
+          style={{
+            display:
+              "flex",
+            alignItems:
+              "center",
+            gap:
+              "9px",
+            color:
+              "inherit",
+            textDecoration:
+              "none",
+          }}
           aria-label="Open profile"
         >
           <div className="avatar">
-            {user?.full_name.slice(0, 1).toUpperCase() ?? "U"}
+            {user?.full_name
+              .slice(
+                0,
+                1,
+              )
+              .toUpperCase()
+              ?? "U"}
           </div>
+
           <div>
-            <strong>{user?.full_name}</strong>
-            <small>{user?.role.replaceAll("_", " ")}</small>
+            <strong>
+              {user?.full_name}
+            </strong>
+
+            <small>
+              {user?.role
+                .replaceAll(
+                  "_",
+                  " ",
+                )}
+            </small>
           </div>
         </Link>
 
         <button
-          type="button"
           className="icon-button"
           onClick={logout}
           aria-label="Sign out"
           title="Sign out"
         >
-          <LogOut size={17} />
+          <LogOut
+            size={17}
+          />
         </button>
       </div>
     </header>

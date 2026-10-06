@@ -1,6 +1,6 @@
 .profile-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   gap: 18px;
 }
 
@@ -9,32 +9,29 @@
   overflow: hidden;
 }
 
-.profile-card > svg {
-  width: 46px;
-  height: 46px;
-  margin-bottom: 18px;
-  padding: 11px;
-  border-radius: 14px;
-  color: var(--primary);
-  background: var(--primary-soft);
+.profile-card:first-child {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(78, 124, 255, 0.09), transparent 13rem),
+    rgba(255, 255, 255, 0.9);
 }
 
 .profile-card h2 {
   margin: 0 0 6px;
-  font-size: 22px;
+  color: var(--text);
   letter-spacing: -0.03em;
 }
 
 .profile-card > p {
   margin: 0 0 22px;
   color: var(--muted);
+  font-size: 12px;
   line-height: 1.65;
 }
 
 .profile-details {
-  margin-bottom: 22px;
   display: grid;
   gap: 10px;
+  margin-bottom: 22px;
 }
 
 .profile-detail {
@@ -43,20 +40,19 @@
   justify-content: space-between;
   gap: 18px;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface-2);
+  border-radius: 14px;
+  background: #fafbfd;
 }
 
 .profile-detail span {
-  color: var(--muted-2);
-  font-size: 11px;
+  color: var(--muted2);
+  font-size: 10px;
 }
 
 .profile-detail strong {
   color: var(--text-soft);
-  font-size: 12px;
   text-align: right;
-  text-transform: capitalize;
+  font-size: 11px;
 }
 
 .profile-form {
@@ -67,35 +63,18 @@
 .profile-form label > span {
   display: block;
   margin-bottom: 7px;
-  color: var(--text-soft);
-  font-size: 11px;
-  font-weight: 740;
-}
-
-.profile-form input {
-  width: 100%;
-  min-height: 46px;
-  padding: 0 13px;
-  border: 1px solid var(--border-2);
-  border-radius: 12px;
-  outline: none;
-  color: var(--text);
-  background: var(--surface-2);
-}
-
-.profile-form input:focus {
-  border-color: #78ae88;
-  background: #fff;
-  box-shadow: 0 0 0 4px rgba(35, 135, 84, 0.1);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 760;
 }
 
 .profile-note {
-  color: var(--muted-2);
-  font-size: 11px;
-  line-height: 1.65;
+  color: var(--muted2);
+  font-size: 10px;
+  line-height: 1.6;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 850px) {
   .profile-grid {
     grid-template-columns: 1fr;
   }
