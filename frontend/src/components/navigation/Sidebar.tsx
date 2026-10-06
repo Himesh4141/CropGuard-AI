@@ -68,6 +68,7 @@ export function Sidebar() {
           <NavLink
             key={path}
             to={path}
+            end={path === routes.admin || path === routes.officer}
             className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
           >
             <Icon size={18} />
