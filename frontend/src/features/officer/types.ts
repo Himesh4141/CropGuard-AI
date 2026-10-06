@@ -1,3 +1,12 @@
+export interface OfficerServiceArea {
+  scope_mode: "assigned" | "global" | string;
+  state: string | null;
+  district: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  coverage_radius_km: number | null;
+}
+
 export interface OfficerSummary {
   farmers: number;
   farms: number;
@@ -5,8 +14,8 @@ export interface OfficerSummary {
   diagnoses: number;
   unread_alerts: number;
   high_risk_fields: number;
+  service_area: OfficerServiceArea;
 }
-
 
 export interface OfficerCase {
   diagnosis_id: string;
@@ -16,19 +25,16 @@ export interface OfficerCase {
   farmer_name: string;
   farmer_email: string;
   crop_name: string;
-  predicted_label:
-    string | null;
-  confidence:
-    number | null;
-  severity:
-    string | null;
+  predicted_label: string | null;
+  confidence: number | null;
+  severity: string | null;
   created_at: string;
-  risk_score:
-    number | null;
-  risk_level:
-    string | null;
+  risk_score: number | null;
+  risk_level: string | null;
+  village: string | null;
+  district: string | null;
+  state: string | null;
 }
-
 
 export interface OfficerHighRiskField {
   field_id: string;
@@ -39,4 +45,7 @@ export interface OfficerHighRiskField {
   risk_score: number;
   risk_level: string;
   observed_at: string;
+  village: string | null;
+  district: string | null;
+  state: string | null;
 }

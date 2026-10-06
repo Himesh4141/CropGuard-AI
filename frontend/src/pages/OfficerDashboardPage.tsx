@@ -62,6 +62,22 @@ export default function OfficerDashboardPage() {
 
       {summary && (
         <>
+          <section className="panel" style={{ marginBottom: "18px" }}>
+            <div className="eyebrow">SERVICE AREA</div>
+            <h2 style={{ margin: "8px 0 6px" }}>
+              {summary.service_area.scope_mode === "global"
+                ? "Global administrator view"
+                : summary.service_area.district || summary.service_area.state || "Area not assigned"}
+            </h2>
+            <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.65 }}>
+              {summary.service_area.scope_mode === "global"
+                ? "Admin access includes all CropGuard locations."
+                : summary.service_area.district || summary.service_area.state
+                  ? `${summary.service_area.district ?? ""}${summary.service_area.district && summary.service_area.state ? ", " : ""}${summary.service_area.state ?? ""}${summary.service_area.coverage_radius_km ? ` · nearby radius ${summary.service_area.coverage_radius_km} km` : ""}`
+                  : "No service area is assigned. Ask an administrator to assign your district or coverage radius."}
+            </p>
+          </section>
+
           <section className="metrics">
             <article>
               <Users />

@@ -17,4 +17,6 @@ export const routes = {
   admin: "/admin",
   adminUsers:
     "/admin/users",
+  adminLocations:
+    "/admin/locations",
 } as const;

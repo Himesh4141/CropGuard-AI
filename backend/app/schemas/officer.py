@@ -4,6 +4,15 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
+class OfficerServiceArea(BaseModel):
+    scope_mode: str
+    state: str | None
+    district: str | None
+    latitude: float | None
+    longitude: float | None
+    coverage_radius_km: float | None
+
+
 class OfficerSummary(BaseModel):
     farmers: int
     farms: int
@@ -11,6 +20,7 @@ class OfficerSummary(BaseModel):
     diagnoses: int
     unread_alerts: int
     high_risk_fields: int
+    service_area: OfficerServiceArea
 
 
 class OfficerCase(BaseModel):
@@ -27,6 +37,9 @@ class OfficerCase(BaseModel):
     created_at: datetime
     risk_score: int | None
     risk_level: str | None
+    village: str | None
+    district: str | None
+    state: str | None
 
 
 class OfficerHighRiskField(BaseModel):
@@ -38,3 +51,6 @@ class OfficerHighRiskField(BaseModel):
     risk_score: int
     risk_level: str
     observed_at: datetime
+    village: str | None
+    district: str | None
+    state: str | None

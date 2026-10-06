@@ -28,6 +28,7 @@ import {
 
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import AdminUsersPage from "@/pages/AdminUsersPage";
+import AdminLocationsPage from "@/pages/AdminLocationsPage";
 import AlertsPage from "@/pages/AlertsPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DiagnosePage from "@/pages/DiagnosePage";
@@ -232,6 +233,16 @@ export const router =
               ]}
             >
               <AdminUsersPage />
+            </RoleRoute>
+          ),
+        },
+
+        {
+          path:
+            routes.adminLocations,
+          element: (
+            <RoleRoute roles={["admin"]}>
+              <AdminLocationsPage />
             </RoleRoute>
           ),
         },

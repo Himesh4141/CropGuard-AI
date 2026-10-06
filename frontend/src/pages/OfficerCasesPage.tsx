@@ -144,6 +144,7 @@ export default function OfficerCasesPage() {
                     {item.field_name} ·{" "}
                     {item.farm_name} ·{" "}
                     {item.farmer_name}
+                    {(item.district || item.state) ? ` · ${[item.district, item.state].filter(Boolean).join(", ")}` : ""}
                   </p>
 
                   <small
