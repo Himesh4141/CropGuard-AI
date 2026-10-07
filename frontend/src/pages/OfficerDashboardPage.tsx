@@ -1,5 +1,6 @@
 import {
   AlertTriangle,
+  HeartPulse,
   Microscope,
   Sprout,
   Stethoscope,
@@ -128,6 +129,19 @@ export default function OfficerDashboardPage() {
               </strong>
               <small>
                 {summary.unread_alerts} unread alerts
+              </small>
+            </article>
+
+            <article>
+              <HeartPulse />
+              <span>
+                Active care cases
+              </span>
+              <strong>
+                {summary.open_care_cases}
+              </strong>
+              <small>
+                {summary.escalated_care_cases} escalated
               </small>
             </article>
           </section>

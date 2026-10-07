@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.constants import UserRole
 from app.models.alert import Alert
+from app.models.care_case import CareCase
 from app.models.diagnosis import Diagnosis
 from app.models.farm import Farm
 from app.models.field import Field
@@ -19,6 +20,8 @@ from app.schemas.admin import (
     AdminUserItem,
     OfficerServiceAreaUpdate,
 )
+
+from app.services.care_case_service import CareCaseService
 
 
 class AdminService:
@@ -41,6 +44,8 @@ class AdminService:
             or 0
         )
 
+        open_cases, escalated_cases = CareCaseService(self.db).global_counts()
+
         return AdminSummary(
             total_users=total_users,
             active_users=active_users,
@@ -53,6 +58,8 @@ class AdminService:
             alerts=self._count(Alert),
             unread_alerts=unread_alerts,
             high_risk_fields=self._high_risk_field_count(),
+            open_care_cases=open_cases,
+            escalated_care_cases=escalated_cases,
         )
 
     def _user_item(self, user: User) -> AdminUserItem:
@@ -163,6 +170,7 @@ class AdminService:
         farms = list(self.db.scalars(select(Farm)).all())
         fields = list(self.db.scalars(select(Field)).all())
         diagnoses = list(self.db.scalars(select(Diagnosis)).all())
+        care_cases = list(self.db.scalars(select(CareCase)).all())
         weather = list(
             self.db.scalars(
                 select(WeatherRecord).order_by(WeatherRecord.observed_at.desc())
@@ -189,6 +197,10 @@ class AdminService:
         for record in weather:
             latest_weather.setdefault(record.field_id, record)
 
+        care_cases_by_field: dict = defaultdict(list)
+        for care_case in care_cases:
+            care_cases_by_field[care_case.field_id].append(care_case)
+
         groups: dict[tuple[str, str, str], dict] = {}
         for farm in farms:
             country = (farm.country or "Unknown").strip() or "Unknown"
@@ -203,6 +215,8 @@ class AdminService:
                     "fields": 0,
                     "diagnoses": 0,
                     "high_risk_fields": 0,
+                    "open_care_cases": 0,
+                    "escalated_care_cases": 0,
                 }
 
             group = groups[key]
@@ -215,6 +229,12 @@ class AdminService:
                 latest = latest_weather.get(field.id)
                 if latest and latest.risk_level.lower() in {"high", "critical"}:
                     group["high_risk_fields"] += 1
+
+                for care_case in care_cases_by_field.get(field.id, []):
+                    if str(care_case.status.value) != "resolved":
+                        group["open_care_cases"] += 1
+                    if str(care_case.status.value) == "escalated":
+                        group["escalated_care_cases"] += 1
 
         items: list[AdminLocationItem] = []
         for (country, state, district), group in sorted(groups.items()):
@@ -237,6 +257,8 @@ class AdminService:
                     fields=group["fields"],
                     diagnoses=group["diagnoses"],
                     high_risk_fields=group["high_risk_fields"],
+                    open_care_cases=group["open_care_cases"],
+                    escalated_care_cases=group["escalated_care_cases"],
                     assigned_officers=assigned,
                 )
             )

@@ -20,6 +20,8 @@ class OfficerSummary(BaseModel):
     diagnoses: int
     unread_alerts: int
     high_risk_fields: int
+    open_care_cases: int
+    escalated_care_cases: int
     service_area: OfficerServiceArea
 
 

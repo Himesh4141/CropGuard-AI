@@ -14,7 +14,9 @@ from app.schemas.admin import (
     AdminUserStatusUpdate,
     OfficerServiceAreaUpdate,
 )
+from app.schemas.care_case import CareCasePublic
 from app.services.admin_service import AdminService
+from app.services.care_case_service import CareCaseService
 
 
 router = APIRouter()
@@ -84,3 +86,11 @@ def update_officer_service_area(
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Officer not found")
     return user
+
+
+@router.get("/care-cases", response_model=list[CareCasePublic])
+def care_cases(
+    admin: User = AdminAccess,
+    db: Session = Depends(get_db),
+) -> list[CareCasePublic]:
+    return CareCaseService(db).list_for_actor(admin)

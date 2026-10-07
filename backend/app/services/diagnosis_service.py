@@ -48,6 +48,7 @@ class DiagnosisService:
         owner_id: UUID,
         field_id: UUID,
         file: UploadFile,
+        create_care_case: bool = True,
     ) -> Diagnosis:
         field = self.fields.get_owned(
             field_id,
@@ -154,9 +155,25 @@ class DiagnosisService:
         diagnosis.is_uncertain = prediction.is_uncertain
         diagnosis.rejection_reason = prediction.rejection_reason
 
-        return self.diagnoses.save(
+        diagnosis = self.diagnoses.save(
             diagnosis
         )
+
+        if create_care_case:
+            try:
+                from app.services.care_case_service import CareCaseService
+
+                CareCaseService(self.diagnoses.db).create_or_update_from_diagnosis(
+                    diagnosis=diagnosis,
+                    field=field,
+                    farmer_id=owner_id,
+                )
+            except Exception:
+                # A care-case workflow failure must never turn a successful
+                # ML screening into an API failure. The diagnosis remains saved.
+                pass
+
+        return diagnosis
 
     def list(
         self,

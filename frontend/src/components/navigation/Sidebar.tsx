@@ -2,6 +2,7 @@ import {
   Bell,
   CloudSun,
   History,
+  HeartPulse,
   LayoutDashboard,
   Leaf,
   MapPinned,
@@ -24,17 +25,20 @@ const farmerItems = [
   [routes.diagnosisHistory, "Diagnosis History", History],
   [routes.weather, "Weather & Risk", CloudSun],
   [routes.alerts, "Alerts", Bell],
+  [routes.careCases, "Care Cases", HeartPulse],
 ] as const;
 
 const officerItems = [
   [routes.officer, "Officer Dashboard", LayoutDashboard],
   [routes.officerCases, "Crop Cases", Stethoscope],
+  [routes.officerCareCases, "Care Follow-up", HeartPulse],
 ] as const;
 
 const adminItems = [
   [routes.admin, "Admin Dashboard", ShieldCheck],
   [routes.adminUsers, "Users", Users],
   [routes.adminLocations, "Locations", MapPinned],
+  [routes.adminCareCases, "Care Cases", HeartPulse],
 ] as const;
 
 export function Sidebar() {

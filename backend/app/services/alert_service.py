@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.constants import DiagnosisStatus
+from app.core.constants import CareCaseStatus, DiagnosisStatus
 from app.core.exceptions import NotFoundError
 from app.models.alert import Alert
+from app.models.care_case import CareCase
 from app.models.diagnosis import Diagnosis
 from app.models.farm import Farm
 from app.models.field import Field
@@ -18,6 +19,7 @@ from app.repositories.alert_repository import AlertRepository
 
 WEATHER_ALERT_TITLE = "Weather disease risk"
 DIAGNOSIS_ALERT_TITLE = "Crop disease detected"
+CARE_CASE_ALERT_TITLE = "Crop care follow-up"
 
 
 class AlertService:
@@ -104,6 +106,10 @@ class AlertService:
             )
 
             self._sync_diagnosis_alert(
+                field,
+            )
+
+            self._sync_care_case_alert(
                 field,
             )
 
@@ -268,6 +274,62 @@ class AlertService:
             message=message,
             risk_level=risk_level,
             source_time=diagnosis.created_at,
+        )
+
+    def _sync_care_case_alert(
+        self,
+        field: Field,
+    ) -> None:
+        care_case = self.db.scalar(
+            select(CareCase)
+            .where(
+                CareCase.field_id == field.id,
+                CareCase.status != CareCaseStatus.RESOLVED,
+            )
+            .order_by(CareCase.updated_at.desc())
+            .limit(1)
+        )
+
+        if care_case is None:
+            return
+
+        now = datetime.now(timezone.utc)
+        due_soon = (
+            care_case.next_follow_up_at is not None
+            and self._as_utc(care_case.next_follow_up_at)
+            <= now + timedelta(hours=6)
+        )
+
+        if care_case.status != CareCaseStatus.ESCALATED and not due_soon:
+            return
+
+        readable_label = (
+            (care_case.current_label or "crop-health condition")
+            .split("___", 1)[-1]
+            .replace("_", " ")
+        )
+
+        if care_case.status == CareCaseStatus.ESCALATED:
+            risk_level = "high"
+            message = (
+                f"{field.name}: {readable_label} care case is escalated. "
+                f"Latest farmer trend: {care_case.trend.value}. "
+                "Continue follow-up and use extension-officer guidance when available."
+            )
+        else:
+            risk_level = "moderate"
+            message = (
+                f"{field.name}: follow-up is due soon for the {readable_label} "
+                "care case. Add an Improving / Same / Worse update and a new photo "
+                "when convenient."
+            )
+
+        self._upsert_source_alert(
+            field_id=field.id,
+            title=CARE_CASE_ALERT_TITLE,
+            message=message,
+            risk_level=risk_level,
+            source_time=care_case.updated_at,
         )
 
     def _upsert_source_alert(

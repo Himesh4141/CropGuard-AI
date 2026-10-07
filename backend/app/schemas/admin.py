@@ -18,6 +18,8 @@ class AdminSummary(BaseModel):
     alerts: int
     unread_alerts: int
     high_risk_fields: int
+    open_care_cases: int
+    escalated_care_cases: int
 
 
 class AdminUserItem(BaseModel):
@@ -66,4 +68,6 @@ class AdminLocationItem(BaseModel):
     fields: int
     diagnoses: int
     high_risk_fields: int
+    open_care_cases: int
+    escalated_care_cases: int
     assigned_officers: int

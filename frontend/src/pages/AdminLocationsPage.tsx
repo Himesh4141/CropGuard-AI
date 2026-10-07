@@ -146,6 +146,8 @@ export default function AdminLocationsPage() {
                 <span>{location.fields} fields</span>
                 <span>{location.diagnoses} diagnoses</span>
                 <span>{location.high_risk_fields} high-risk</span>
+                <span>{location.open_care_cases} open care cases</span>
+                <span>{location.escalated_care_cases} escalated</span>
               </div>
             </article>
           ))}

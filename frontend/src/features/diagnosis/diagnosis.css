@@ -549,3 +549,50 @@
     align-items: flex-start;
   }
 }
+
+
+.diagnosis-care-case-link {
+  margin-top: 16px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid rgba(21, 155, 120, 0.16);
+  border-radius: 16px;
+  background: rgba(232, 247, 242, 0.72);
+}
+
+.diagnosis-care-case-link > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.diagnosis-care-case-link strong,
+.diagnosis-care-case-link span {
+  display: block;
+}
+
+.diagnosis-care-case-link strong {
+  color: var(--primary-strong);
+  font-size: 11px;
+}
+
+.diagnosis-care-case-link span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .diagnosis-care-case-link {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .diagnosis-care-case-link .button {
+    width: 100%;
+  }
+}

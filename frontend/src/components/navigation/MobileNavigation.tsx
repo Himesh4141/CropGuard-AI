@@ -1,5 +1,5 @@
 import {
-  Bell,
+  HeartPulse,
   LayoutDashboard,
   MapPinned,
   Microscope,
@@ -17,18 +17,20 @@ const farmerItems = [
   [routes.dashboard, "Home", LayoutDashboard],
   [routes.farms, "Farms", Sprout],
   [routes.diagnose, "Detect", Microscope],
-  [routes.alerts, "Alerts", Bell],
+  [routes.careCases, "Care", HeartPulse],
 ] as const;
 
 const officerItems = [
   [routes.officer, "Overview", LayoutDashboard],
   [routes.officerCases, "Cases", Stethoscope],
+  [routes.officerCareCases, "Care", HeartPulse],
 ] as const;
 
 const adminItems = [
   [routes.admin, "Admin", ShieldCheck],
   [routes.adminUsers, "Users", Users],
   [routes.adminLocations, "Areas", MapPinned],
+  [routes.adminCareCases, "Care", HeartPulse],
 ] as const;
 
 export function MobileNavigation() {
@@ -43,7 +45,12 @@ export function MobileNavigation() {
   return (
     <nav className="mobile-nav" aria-label="Primary navigation">
       {items.map(([path, label, Icon]) => (
-        <NavLink key={path} to={path} className={({ isActive }) => (isActive ? "active" : undefined)}>
+        <NavLink
+          key={path}
+          to={path}
+          end={path === routes.admin || path === routes.officer}
+          className={({ isActive }) => (isActive ? "active" : undefined)}
+        >
           <Icon size={18} />
           <span>{label}</span>
         </NavLink>

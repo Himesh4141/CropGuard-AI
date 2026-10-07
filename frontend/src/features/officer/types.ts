@@ -14,6 +14,8 @@ export interface OfficerSummary {
   diagnoses: number;
   unread_alerts: number;
   high_risk_fields: number;
+  open_care_cases: number;
+  escalated_care_cases: number;
   service_area: OfficerServiceArea;
 }
 

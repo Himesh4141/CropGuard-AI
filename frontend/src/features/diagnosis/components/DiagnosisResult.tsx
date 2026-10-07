@@ -2,9 +2,18 @@ import {
   AlertTriangle,
   CheckCircle2,
   Gauge,
+  HeartPulse,
   Microscope,
   Sprout,
 } from "lucide-react";
+
+import {
+  Link,
+} from "react-router-dom";
+
+import {
+  routes,
+} from "@/config/routes";
 
 import type {
   Diagnosis,
@@ -91,6 +100,19 @@ export function DiagnosisResult({
       : successful
         ? "Screening completed"
         : "Screening unavailable";
+
+  const label = diagnosis.predicted_label ?? "";
+  const technicalResult = [
+    "unsupported_crop",
+    "crop_mismatch",
+    "image_quality_check_failed",
+    "limited_crop_coverage",
+  ].includes(label);
+
+  const hasCareCase =
+    successful
+    && !technicalResult
+    && !label.toLowerCase().includes("healthy");
 
   return (
     <article
@@ -239,15 +261,34 @@ export function DiagnosisResult({
         </p>
       </div>
 
+
+      {hasCareCase && (
+        <div className="diagnosis-care-case-link">
+          <div>
+            <HeartPulse size={18} />
+            <div>
+              <strong>Care case started</strong>
+              <span>CropGuard will keep this issue under follow-up until it improves or is resolved.</span>
+            </div>
+          </div>
+
+          <Link
+            to={routes.careCases}
+            className="button secondary"
+          >
+            Open care case
+          </Link>
+        </div>
+      )}
+
       <p className="diagnosis-disclaimer">
         {realModel
           ? (
-            "CropGuard Multi-Crop v1 was trained on 54,305 PlantVillage "
-            + "images across 38 classes and 14 crops. Its held-out PlantVillage "
-            + "test accuracy was 99.57% (macro-F1 99.41%), but those controlled "
-            + "images do not establish equivalent accuracy in real farms. "
-            + "Low-confidence, mismatched and insufficient-coverage cases are "
-            + "flagged instead of treated as certain diagnoses."
+            "CropGuard Field-Robust v2 achieved 99.85% accuracy on the untouched "
+            + "PlantVillage test split and 98.99% on a deterministic degraded-phone "
+            + "stress proxy. The stress proxy is not independent real-field validation, "
+            + "so uncertain, mismatched and insufficient-coverage cases remain reviewable "
+            + "instead of being treated as certain diagnoses."
           )
           : (
             "This historical result was produced by the earlier development "

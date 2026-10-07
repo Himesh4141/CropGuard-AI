@@ -4,6 +4,7 @@ from app.api.v1.endpoints import (
     admin,
     alerts,
     auth,
+    care_cases,
     diagnoses,
     farms,
     fields,
@@ -61,6 +62,15 @@ router.include_router(
     prefix="/diagnoses",
     tags=[
         "diagnoses",
+    ],
+)
+
+
+router.include_router(
+    care_cases.router,
+    prefix="/care-cases",
+    tags=[
+        "care-cases",
     ],
 )
 

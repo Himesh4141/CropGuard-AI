@@ -17,4 +17,5 @@ def health(
     return {
         "status": "healthy",
         "diagnosis_pipeline": "field-robust-v4",
+        "care_cases": "v1",
     }

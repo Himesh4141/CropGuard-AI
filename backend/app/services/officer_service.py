@@ -14,6 +14,7 @@ from app.schemas.officer import (
     OfficerServiceArea,
     OfficerSummary,
 )
+from app.services.care_case_service import CareCaseService
 from app.services.location_access import farm_is_accessible
 
 
@@ -72,6 +73,8 @@ class OfficerService:
                 diagnoses=0,
                 unread_alerts=0,
                 high_risk_fields=0,
+                open_care_cases=0,
+                escalated_care_cases=0,
                 service_area=self._service_area(),
             )
 
@@ -96,6 +99,8 @@ class OfficerService:
             or 0
         ) if field_ids else 0
 
+        open_cases, escalated_cases = CareCaseService(self.db).counts_for_actor(self.actor)
+
         return OfficerSummary(
             farmers=len(farmer_ids),
             farms=len(farm_ids),
@@ -103,6 +108,8 @@ class OfficerService:
             diagnoses=diagnoses,
             unread_alerts=unread_alerts,
             high_risk_fields=len(self.high_risk_fields(limit=500)),
+            open_care_cases=open_cases,
+            escalated_care_cases=escalated_cases,
             service_area=self._service_area(),
         )
 

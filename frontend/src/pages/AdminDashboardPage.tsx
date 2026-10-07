@@ -201,6 +201,16 @@ export default function AdminDashboardPage() {
               icon={<ShieldCheck size={17} />}
             />
             <MetricRow
+              label="Open care cases"
+              value={data.open_care_cases}
+              icon={<Activity size={17} />}
+            />
+            <MetricRow
+              label="Escalated care cases"
+              value={data.escalated_care_cases}
+              icon={<Bell size={17} />}
+            />
+            <MetricRow
               label="All alerts"
               value={data.alerts}
             />

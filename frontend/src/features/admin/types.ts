@@ -12,6 +12,8 @@ export interface AdminSummary {
   alerts: number;
   unread_alerts: number;
   high_risk_fields: number;
+  open_care_cases: number;
+  escalated_care_cases: number;
 }
 
 export interface AdminUserItem {
@@ -48,5 +50,7 @@ export interface AdminLocationItem {
   fields: number;
   diagnoses: number;
   high_risk_fields: number;
+  open_care_cases: number;
+  escalated_care_cases: number;
   assigned_officers: number;
 }

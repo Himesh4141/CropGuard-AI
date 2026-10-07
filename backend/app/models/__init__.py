@@ -1,4 +1,5 @@
 from app.models.alert import Alert
+from app.models.care_case import CareCase, CareCaseUpdate
 from app.models.diagnosis import Diagnosis
 from app.models.farm import Farm
 from app.models.field import Field
@@ -8,6 +9,8 @@ from app.models.weather_record import WeatherRecord
 
 __all__ = [
     "Alert",
+    "CareCase",
+    "CareCaseUpdate",
     "Diagnosis",
     "Farm",
     "Field",

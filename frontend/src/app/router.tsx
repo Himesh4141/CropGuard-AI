@@ -29,7 +29,9 @@ import {
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import AdminUsersPage from "@/pages/AdminUsersPage";
 import AdminLocationsPage from "@/pages/AdminLocationsPage";
+import AdminCareCasesPage from "@/pages/AdminCareCasesPage";
 import AlertsPage from "@/pages/AlertsPage";
+import CareCasesPage from "@/pages/CareCasesPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DiagnosePage from "@/pages/DiagnosePage";
 import DiagnosisHistoryPage from "@/pages/DiagnosisHistoryPage";
@@ -38,6 +40,7 @@ import FieldsPage from "@/pages/FieldsPage";
 import LandingPage from "@/pages/LandingPage";
 import LoginPage from "@/pages/LoginPage";
 import OfficerCasesPage from "@/pages/OfficerCasesPage";
+import OfficerCareCasesPage from "@/pages/OfficerCareCasesPage";
 import OfficerDashboardPage from "@/pages/OfficerDashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import RegisterPage from "@/pages/RegisterPage";
@@ -174,6 +177,20 @@ export const router =
 
         {
           path:
+            routes.careCases,
+          element: (
+            <RoleRoute
+              roles={[
+                "farmer",
+              ]}
+            >
+              <CareCasesPage />
+            </RoleRoute>
+          ),
+        },
+
+        {
+          path:
             routes.profile,
           element:
             <ProfilePage />,
@@ -205,6 +222,21 @@ export const router =
               ]}
             >
               <OfficerCasesPage />
+            </RoleRoute>
+          ),
+        },
+
+        {
+          path:
+            routes.officerCareCases,
+          element: (
+            <RoleRoute
+              roles={[
+                "extension_officer",
+                "admin",
+              ]}
+            >
+              <OfficerCareCasesPage />
             </RoleRoute>
           ),
         },
@@ -243,6 +275,16 @@ export const router =
           element: (
             <RoleRoute roles={["admin"]}>
               <AdminLocationsPage />
+            </RoleRoute>
+          ),
+        },
+
+        {
+          path:
+            routes.adminCareCases,
+          element: (
+            <RoleRoute roles={["admin"]}>
+              <AdminCareCasesPage />
             </RoleRoute>
           ),
         },
