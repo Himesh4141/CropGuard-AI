@@ -79,7 +79,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[*settings.cors_origins, "https://himesh4141.github.io"],
+    allow_origins=[
+        *settings.cors_origins,
+        "https://himesh4141.github.io",
+        "https://localhost",
+        "http://localhost",
+        "capacitor://localhost",
+    ],
     allow_credentials=True,
     allow_methods=[
         "GET",

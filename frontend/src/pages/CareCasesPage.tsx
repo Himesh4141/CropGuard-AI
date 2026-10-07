@@ -16,6 +16,7 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  useEffect,
   useState,
 } from "react";
 
@@ -32,6 +33,10 @@ import type {
   CareCaseTrend,
   FarmerFollowUpPayload,
 } from "@/features/careCases/types";
+
+import {
+  syncCareCaseReminders,
+} from "@/services/nativeNotifications";
 
 import "@/features/careCases/careCases.css";
 
@@ -122,6 +127,16 @@ export default function CareCasesPage() {
       });
     },
   });
+
+  useEffect(() => {
+    if (casesQuery.data) {
+      void syncCareCaseReminders(
+        casesQuery.data,
+      );
+    }
+  }, [
+    casesQuery.data,
+  ]);
 
   const cases = casesQuery.data ?? [];
 
