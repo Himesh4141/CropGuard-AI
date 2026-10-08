@@ -1,4 +1,4 @@
-﻿import {
+import {
   useState,
   type FormEvent,
 } from "react";
@@ -60,6 +60,8 @@ export default function LoginPage() {
     setLoading,
   ] = useState(false);
 
+  const [connectionMessage, setConnectionMessage] = useState("");
+
 
   async function handleSubmit(
     event:
@@ -73,6 +75,10 @@ export default function LoginPage() {
 
     setError("");
     setLoading(true);
+    // cropguard:mobile-login-message
+    setConnectionMessage(
+      "Connecting securely… Free hosting may take up to a minute to wake up."
+    );
 
     try {
       const data =
@@ -111,7 +117,9 @@ export default function LoginPage() {
         ApiClientError
       ) {
         setError(
-          caughtError.message,
+          caughtError.status === 0
+            ? "Can't reach the CropGuard server. Check internet access and try again. If the website signs in but the Android app cannot, the backend's Android-origin access must be deployed."
+            : caughtError.message,
         );
       } else {
         setError(
@@ -119,6 +127,7 @@ export default function LoginPage() {
         );
       }
     } finally {
+      setConnectionMessage("");
       setLoading(false);
     }
   }
@@ -188,6 +197,12 @@ export default function LoginPage() {
           >
             {error}
           </div>
+        ) : null}
+
+        {loading && connectionMessage ? (
+          <p role="status" aria-live="polite" style={{ fontSize: "0.875rem", color: "#25616b" }}>
+            {connectionMessage}
+          </p>
         ) : null}
 
         <button
