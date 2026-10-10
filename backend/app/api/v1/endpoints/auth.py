@@ -22,6 +22,8 @@ from app.core.security import (
 from app.db.session import get_db
 from app.schemas.auth import (
     LoginRequest,
+    MobileRefreshRequest,
+    MobileTokenResponse,
     RegisterRequest,
     TokenResponse,
 )
@@ -292,3 +294,90 @@ def logout(
     return MessageResponse(
         message="Signed out",
     )
+
+# Native apps do not rely on third-party refresh cookies. Mobile refresh tokens
+# are returned once over HTTPS and MUST be stored in Android Keystore-backed
+# storage, never localStorage, app preferences plaintext, or logs.
+def _mobile_response(user, tokens: TokenPair) -> MobileTokenResponse:
+    return MobileTokenResponse(
+        access_token=tokens.access_token,
+        refresh_token=tokens.refresh_token,
+        expires_in=tokens.expires_in,
+        user=user,
+    )
+
+
+@router.post("/mobile/login", response_model=MobileTokenResponse)
+def mobile_login(
+    payload: LoginRequest,
+    db: Session = Depends(get_db),
+) -> MobileTokenResponse:
+    try:
+        user = AuthService(db).authenticate(
+            email=payload.email, password=payload.password,
+        )
+    except AuthenticationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        ) from exc
+    tokens = AuthService(db).issue_tokens(user)
+    return _mobile_response(user, tokens)
+
+
+@router.post(
+    "/mobile/register",
+    response_model=MobileTokenResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def mobile_register(
+    payload: RegisterRequest,
+    db: Session = Depends(get_db),
+) -> MobileTokenResponse:
+    try:
+        service = AuthService(db)
+        user = service.register(
+            email=payload.email,
+            full_name=payload.full_name,
+            password=payload.password,
+        )
+    except (ConflictError, ValueError) as exc:
+        raise HTTPException(
+            status_code=(409 if isinstance(exc, ConflictError) else 400),
+            detail=str(exc),
+        ) from exc
+    return _mobile_response(user, service.issue_tokens(user))
+
+
+@router.post("/mobile/refresh", response_model=MobileTokenResponse)
+def mobile_refresh(
+    payload: MobileRefreshRequest,
+    db: Session = Depends(get_db),
+) -> MobileTokenResponse:
+    try:
+        claims = decode_token(payload.refresh_token, expected_type="refresh")
+        user_id = UUID(str(claims["sub"]))
+        jti = str(claims["jti"])
+        user, tokens = AuthService(db).rotate_refresh(
+            user_id=user_id, jti=jti,
+        )
+    except (TokenDecodeError, AuthenticationError, ValueError, KeyError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh session is invalid",
+        ) from exc
+    return _mobile_response(user, tokens)
+
+
+@router.post("/mobile/logout", response_model=MessageResponse)
+def mobile_logout(
+    payload: MobileRefreshRequest,
+    db: Session = Depends(get_db),
+) -> MessageResponse:
+    # Idempotent logout; never expose token validity to clients.
+    try:
+        claims = decode_token(payload.refresh_token, expected_type="refresh")
+        AuthService(db).revoke_refresh(str(claims["jti"]))
+    except (TokenDecodeError, KeyError):
+        pass
+    return MessageResponse(message="Signed out")
