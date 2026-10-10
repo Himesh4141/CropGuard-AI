@@ -17,6 +17,7 @@ import {
 } from "@/services/tokenStorage";
 
 
+
 interface RetriableRequestConfig
   extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -28,7 +29,7 @@ export const apiClient =
     baseURL:
       env.API_BASE_URL,
 
-    timeout: 90_000,
+    timeout: 75_000,
 
     withCredentials: true,
 
@@ -44,7 +45,7 @@ const refreshClient =
     baseURL:
       env.API_BASE_URL,
 
-    timeout: 90_000,
+    timeout: 75_000,
 
     withCredentials: true,
 
@@ -71,6 +72,10 @@ function isAuthEndpoint(
     "/auth/register",
     "/auth/refresh",
     "/auth/logout",
+    "/auth/mobile/login",
+    "/auth/mobile/register",
+    "/auth/mobile/refresh",
+    "/auth/mobile/logout",
   ].some(
     (path) =>
       url.includes(path),
@@ -89,13 +94,20 @@ function notifyAuthExpired(): void {
 
 async function refreshAccessToken():
   Promise<string> {
-  const response =
-    await refreshClient.post<AuthResponse>(
-      "/auth/refresh",
+  const { secureSession } = await import("@/services/secureSession");
+  let token: string;
+  if (secureSession.isNative()) {
+    const refreshToken = await secureSession.read();
+    if (!refreshToken) throw new Error("No stored mobile session");
+    const response = await refreshClient.post<AuthResponse & { refresh_token: string }>(
+      "/auth/mobile/refresh", { refresh_token: refreshToken },
     );
-
-  const token =
-    response.data.access_token;
+    await secureSession.save(response.data.refresh_token);
+    token = response.data.access_token;
+  } else {
+    const response = await refreshClient.post<AuthResponse>("/auth/refresh");
+    token = response.data.access_token;
+  }
 
   tokenStorage.set(
     token,
@@ -164,10 +176,13 @@ apiClient.interceptors.response.use(
           return apiClient(
             originalRequest,
           );
-        } catch {
-          tokenStorage.clear();
-
-          notifyAuthExpired();
+        } catch (refreshError) {
+          // A sleeping Render service is not an invalid session.
+          // Keep the encrypted refresh credential for the next app start.
+          if (axios.isAxiosError(refreshError) && refreshError.response?.status === 401) {
+            tokenStorage.clear();
+            notifyAuthExpired();
+          }
         }
       }
     }

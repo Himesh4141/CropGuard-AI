@@ -1,4 +1,4 @@
-﻿import {
+import {
   create,
 } from "zustand";
 
@@ -13,6 +13,8 @@ import {
 import type {
   User,
 } from "@/types/user";
+import { secureSession } from "@/services/secureSession";
+import { ApiClientError } from "@/services/apiError";
 
 
 const EXPLICIT_SIGNOUT_KEY =
@@ -62,6 +64,10 @@ interface AuthState {
 
   initializing: boolean;
 
+  restoreNeedsNetwork: boolean;
+
+  retryRestore: () => Promise<void>;
+
   setSession: (
     user: User,
     token: string,
@@ -87,6 +93,12 @@ export const useAuthStore =
       initialized: false,
 
       initializing: false,
+      restoreNeedsNetwork: false,
+
+      retryRestore: async () => {
+        set({ initialized: false, initializing: false, restoreNeedsNetwork: false });
+        await get().initialize();
+      },
 
       setSession: (
         user,
@@ -102,6 +114,7 @@ export const useAuthStore =
           user,
           initialized: true,
           initializing: false,
+          restoreNeedsNetwork: false,
         });
       },
 
@@ -120,6 +133,7 @@ export const useAuthStore =
           user: null,
           initialized: true,
           initializing: false,
+          restoreNeedsNetwork: false,
         });
       },
 
@@ -153,6 +167,10 @@ export const useAuthStore =
         });
 
         try {
+          if (secureSession.isNative() && !(await secureSession.read())) {
+            set({ user: null, initialized: true, initializing: false });
+            return;
+          }
           const data =
             await authApi.refresh();
 
@@ -170,13 +188,18 @@ export const useAuthStore =
             initializing:
               false,
           });
-        } catch {
+        } catch (error) {
           tokenStorage.clear();
-
+          const invalid = error instanceof ApiClientError && error.status === 401;
+          if (invalid) {
+            void secureSession.clear();
+          }
+          // Show a retry option; do not imply the mobile account was logged out.
           set({
             user: null,
             initialized: true,
             initializing: false,
+            restoreNeedsNetwork: secureSession.isNative() && !invalid,
           });
         }
       },
@@ -197,6 +220,7 @@ export const useAuthStore =
           user: null,
           initialized: true,
           initializing: false,
+          restoreNeedsNetwork: false,
         });
 
         void authApi

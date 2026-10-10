@@ -5,10 +5,11 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.himesh4141.cropguard"
-        minSdkVersion rootProject.ext.minSdkVersion
+        // AES-GCM keys in Android Keystore require Android API 23 or newer.
+        minSdkVersion Math.max(rootProject.ext.minSdkVersion, 23)
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,11 +17,39 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+
+    // CropGuard security: secrets supplied only through process environment.
+    // Never commit keys/passwords or store them in gradle.properties.
+    signingConfigs {
+        release {
+            def cgKeyPath = System.getenv('CROPGUARD_RELEASE_KEYSTORE')
+            def cgStorePass = System.getenv('CROPGUARD_RELEASE_STORE_PASSWORD')
+            def cgAlias = System.getenv('CROPGUARD_RELEASE_KEY_ALIAS')
+            def cgKeyPass = System.getenv('CROPGUARD_RELEASE_KEY_PASSWORD')
+            if (cgKeyPath && cgStorePass && cgAlias && cgKeyPass) {
+                storeFile file(cgKeyPath)
+                storePassword cgStorePass
+                keyAlias cgAlias
+                keyPassword cgKeyPass
+            }
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+            // Prevent debug signing or unsigned distribution.
+            if (!System.getenv('CROPGUARD_RELEASE_KEYSTORE') ||
+                !System.getenv('CROPGUARD_RELEASE_STORE_PASSWORD') ||
+                !System.getenv('CROPGUARD_RELEASE_KEY_ALIAS') ||
+                !System.getenv('CROPGUARD_RELEASE_KEY_PASSWORD')) {
+                throw new GradleException('CropGuard release signing credentials are missing')
+            }
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+}
     }
 }
 

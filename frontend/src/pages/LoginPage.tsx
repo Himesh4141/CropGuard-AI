@@ -1,10 +1,12 @@
 import {
+  useEffect,
   useState,
   type FormEvent,
 } from "react";
 
 import {
   Link,
+  Navigate,
   useLocation,
   useNavigate,
 } from "react-router-dom";
@@ -24,6 +26,7 @@ import {
 import {
   ApiClientError,
 } from "@/services/apiError";
+import { secureSession } from "@/services/secureSession";
 
 
 interface LoginLocationState {
@@ -43,6 +46,11 @@ export default function LoginPage() {
       (state) =>
         state.setSession,
     );
+  const currentUser = useAuthStore((state) => state.user);
+  const initialized = useAuthStore((state) => state.initialized);
+  const initializing = useAuthStore((state) => state.initializing);
+  const restoreNeedsNetwork = useAuthStore((state) => state.restoreNeedsNetwork);
+  const retryRestore = useAuthStore((state) => state.retryRestore);
 
   const [email, setEmail] =
     useState("");
@@ -62,6 +70,16 @@ export default function LoginPage() {
 
   const [connectionMessage, setConnectionMessage] = useState("");
 
+
+  useEffect(() => {
+    if (!loading) return;
+    const handle = window.setTimeout(() => {
+      setConnectionMessage(
+        "The free API server is waking up. Your login is still being processed securely…",
+      );
+    }, 12_000);
+    return () => window.clearTimeout(handle);
+  }, [loading]);
 
   async function handleSubmit(
     event:
@@ -133,6 +151,19 @@ export default function LoginPage() {
   }
 
 
+  if (secureSession.isNative() && initializing) {
+    return (
+      <div className="auth-card" role="status" aria-live="polite">
+        <h2>Restoring your secure session…</h2>
+        <p>Connecting to CropGuard. Free hosting can take a minute to wake up.</p>
+      </div>
+    );
+  }
+
+  if (initialized && currentUser) {
+    return <Navigate to={routes.dashboard} replace />;
+  }
+
   return (
     <div className="auth-card">
       <span className="eyebrow">
@@ -148,6 +179,17 @@ export default function LoginPage() {
         diagnoses and crop-health
         alerts.
       </p>
+
+      {restoreNeedsNetwork ? (
+        <div role="status" className="error-box">
+          Your saved secure session is still on this device, but the server
+          couldn't be reached. You can retry without entering your password.
+          <button type="button" className="button secondary full"
+            onClick={() => { void retryRestore(); }}>
+            Retry saved session
+          </button>
+        </div>
+      ) : null}
 
       <form
         onSubmit={
