@@ -9,6 +9,7 @@ from app.api.v1.endpoints import (
     farms,
     fields,
     health,
+    home_planters,
     officer,
     risk,
     users,
@@ -114,3 +115,5 @@ router.include_router(
         "admin",
     ],
 )
+
+router.include_router(home_planters.router, prefix="/home-planters", tags=["home-planters"])

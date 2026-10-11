@@ -84,6 +84,9 @@ class Settings(BaseSettings):
         le=1.0,
     )
 
+    # Optional server-side PlantNet recognition. Keep key on Render, never in Vite.
+    plantnet_api_key: str | None = None
+
     weather_provider: Literal[
         "open_meteo",
         "development",
