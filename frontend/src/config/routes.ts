@@ -6,6 +6,7 @@ export const routes = {
   farms: "/farms",
   fields: "/fields",
   diagnose: "/diagnose",
+  homePlanters: "/home-planters",
   diagnosisHistory:
     "/diagnosis-history",
   weather: "/weather",

@@ -2,6 +2,7 @@ import {
   AlertTriangle,
   Bell,
   CloudSun,
+  HeartPulse,
   Leaf,
   Microscope,
   Sprout,
@@ -221,6 +222,16 @@ function FarmerDashboard() {
             <Sprout size={19} />
             <span>
               Manage farms
+            </span>
+          </Link>
+
+          <Link
+            className="quick-action"
+            to={routes.careCases}
+          >
+            <HeartPulse size={19} />
+            <span>
+              Care cases
             </span>
           </Link>
         </div>

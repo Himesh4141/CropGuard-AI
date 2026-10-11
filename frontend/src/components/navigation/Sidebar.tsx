@@ -3,6 +3,7 @@ import {
   CloudSun,
   History,
   HeartPulse,
+  Flower2,
   LayoutDashboard,
   Leaf,
   MapPinned,
@@ -79,6 +80,17 @@ export function Sidebar() {
             <span>{label}</span>
           </NavLink>
         ))}
+      </nav>
+
+      <div className="sidebar-section-label">Home Garden</div>
+      <nav>
+        <NavLink
+          to={routes.homePlanters}
+          className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+        >
+          <Flower2 size={18} />
+          <span>Home Planters</span>
+        </NavLink>
       </nav>
 
       <div className="platform-status"><span />Cloud services connected</div>

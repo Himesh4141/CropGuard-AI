@@ -10,6 +10,7 @@ import { AppProviders } from "@/app/providers";
 import "@/styles/variables.css";
 import "@/styles/globals.css";
 import "@/styles/responsive.css";
+import "@/styles/mobile-polish.css";
 void initializeNativeNotifications();
 installAndroidNavigation();
 

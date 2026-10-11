@@ -1,5 +1,6 @@
 import {
   HeartPulse,
+  Flower2,
   LayoutDashboard,
   MapPinned,
   Microscope,
@@ -18,12 +19,14 @@ const farmerItems = [
   [routes.farms, "Farms", Sprout],
   [routes.diagnose, "Detect", Microscope],
   [routes.careCases, "Care", HeartPulse],
+  [routes.homePlanters, "Plants", Flower2],
 ] as const;
 
 const officerItems = [
   [routes.officer, "Overview", LayoutDashboard],
   [routes.officerCases, "Cases", Stethoscope],
   [routes.officerCareCases, "Care", HeartPulse],
+  [routes.homePlanters, "Plants", Flower2],
 ] as const;
 
 const adminItems = [
@@ -31,6 +34,7 @@ const adminItems = [
   [routes.adminUsers, "Users", Users],
   [routes.adminLocations, "Areas", MapPinned],
   [routes.adminCareCases, "Care", HeartPulse],
+  [routes.homePlanters, "Plants", Flower2],
 ] as const;
 
 export function MobileNavigation() {
@@ -43,7 +47,7 @@ export function MobileNavigation() {
         : farmerItems;
 
   return (
-    <nav className="mobile-nav" aria-label="Primary navigation">
+    <nav className="mobile-nav" aria-label="Primary navigation" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
       {items.map(([path, label, Icon]) => (
         <NavLink
           key={path}

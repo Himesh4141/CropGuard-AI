@@ -190,6 +190,13 @@ export const router =
         },
 
         {
+          path: routes.homePlanters,
+          lazy: async () => ({
+            Component: (await import("@/pages/HomePlantersPage")).default,
+          }),
+        },
+
+        {
           path:
             routes.profile,
           element:
