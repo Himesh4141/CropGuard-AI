@@ -108,6 +108,10 @@ export default function AdminUsersPage() {
         </section>
       )}
 
+      {mutation.isError && (
+        <section className="error-box" role="alert">Account update failed. Check your connection or permissions and retry.</section>
+      )}
+
       {!usersQuery.isLoading
         && !usersQuery.isError
         && (
@@ -128,17 +132,7 @@ export default function AdminUsersPage() {
                 return (
                   <article
                     key={user.id}
-                    className="panel"
-                    style={{
-                      display:
-                        "grid",
-                      gridTemplateColumns:
-                        "minmax(220px, 1.4fr) minmax(170px, .8fr) minmax(180px, .9fr) auto",
-                      gap:
-                        "18px",
-                      alignItems:
-                        "center",
-                    }}
+                    className="panel cg-admin-user-row"
                   >
                     <div>
                       <strong>

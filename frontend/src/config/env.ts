@@ -1,6 +1,6 @@
 import { z } from "zod";
 const schema = z.object({
-  VITE_APP_NAME: z.string().min(1).default("CropGuard AI"),
+  VITE_APP_NAME: z.string().min(1).default("CropGuard"),
   VITE_API_BASE_URL: z.string().url().default("http://localhost:8000/api/v1")
 });
 const result = schema.safeParse(import.meta.env);

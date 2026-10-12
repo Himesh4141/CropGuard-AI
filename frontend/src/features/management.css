@@ -248,3 +248,9 @@
     justify-content: flex-start;
   }
 }
+
+/* Role-management cards need to fit narrow Android WebViews. */
+.cg-admin-user-row{display:grid;grid-template-columns:minmax(175px,1.4fr) minmax(130px,.8fr) minmax(150px,.9fr) auto;gap:18px;align-items:center}
+.cg-admin-user-row p,.cg-admin-user-row strong{overflow-wrap:anywhere}
+@media(max-width:900px){.cg-admin-user-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cg-admin-user-row button{justify-self:start}}
+@media(max-width:480px){.cg-admin-user-row{grid-template-columns:1fr}.cg-admin-user-row button{width:100%;justify-content:center}}

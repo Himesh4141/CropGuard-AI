@@ -6,6 +6,7 @@ calibrated guarantees. Never assign a label if confidence is inadequate.
 from __future__ import annotations
 
 import json
+import math
 import uuid
 from urllib import error, parse, request
 
@@ -18,7 +19,7 @@ def candidate_kind(scientific: str, common: str) -> str:
     name = f"{scientific} {common}".lower()
     if any(value in name for value in ("ocimum tenuiflorum", "ocimum sanctum", "holy basil", "tulsi")):
         return "tulsi"
-    if any(value in name for value in ("epipremnum aureum", "devil's ivy", "golden pothos", "money plant")):
+    if any(value in name for value in ("epipremnum aureum", "epipremnum pinnatum", "devil's ivy", "golden pothos", "money plant", "pothos")):
         return "pothos"
     return "unknown"
 
@@ -36,18 +37,38 @@ def parse_identity(payload: dict) -> dict:
     scientific = str(species.get("scientificNameWithoutAuthor") or species.get("scientificName") or "").strip()
     raw_names = species.get("commonNames") or []
     common = next((str(n).strip() for n in raw_names if isinstance(n,str) and n.strip()), "") if isinstance(raw_names,list) else ""
-    try: score = float(best.get("score",0))
-    except (ValueError,TypeError): score = 0
-    if not (0 <= score <= 1): score = 0
-    # Only strong species predictions are displayed as identified.
-    credible = score >= 0.45 and bool(scientific)
-    return {"status": "identified" if credible else "uncertain",
-            "plant": candidate_kind(scientific,common) if credible else "unknown",
-            "confidence": round(score,4),
-            "scientific_name": scientific or None,
-            "common_name": common or None,
-            "message": ("Plant recognised by Pl@ntNet. Confirm unusual results before acting."
-                        if credible else "Species confidence is low. Retake a clear photo showing several leaves.")}
+    try:
+        score = float(best.get("score", 0))
+    except (ValueError, TypeError):
+        score = 0.0
+    if not math.isfinite(score) or not (0 <= score <= 1):
+        score = 0.0
+
+    # A provider score is not a calibrated probability of species correctness.
+    # Require both a strong top match and separation from the runner-up.
+    runner_up = 0.0
+    if len(results) > 1 and isinstance(results[1], dict):
+        try:
+            runner_up = float(results[1].get("score", 0))
+        except (ValueError, TypeError):
+            runner_up = 0.0
+        if not math.isfinite(runner_up) or runner_up < 0:
+            runner_up = 0.0
+    credible = bool(scientific) and score >= 0.70 and (score - runner_up) >= 0.10
+    if credible:
+        message = "Plant identification is a strong provider suggestion, not a verified botanical determination."
+    elif score >= 0.20 and scientific:
+        message = "Possible plant match only; confidence or separation is insufficient. Retake a clear photo showing several leaves."
+    else:
+        message = "Plant identification is inconclusive. Retake a clear photo showing several leaves."
+    return {
+        "status": "identified" if credible else "uncertain" if scientific and score >= 0.20 else "unknown",
+        "plant": candidate_kind(scientific, common) if credible else "unknown",
+        "confidence": round(score, 4),
+        "scientific_name": scientific or None,
+        "common_name": common or None,
+        "message": message,
+    }
 
 
 def identify_with_plantnet(photo: bytes, mime: str, api_key: str) -> dict:
