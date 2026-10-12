@@ -63,3 +63,19 @@ The latest terminal screenshot confirms a **signed v1.0.6 Android APK and AAB** 
 ## Project purpose
 
 CropGuard is an educational portfolio / hackathon-style prototype intended to demonstrate full-stack architecture, useful user workflows, careful ML uncertainty handling and mobile delivery. It should not be described as independently certified for clinical, agronomic, or commercial decision-making.
+
+<!-- CROPGUARD RELEASE START -->
+## Download and try CropGuard
+
+**Live web application:** https://himesh4141.github.io/CropGuard-AI/
+
+**Android APK v1.0.6:** [Download signed CropGuard APK](https://github.com/Himesh4141/CropGuard-AI/releases/download/v1.0.6/CropGuard-v1.0.6.apk)
+
+**User instructions:** [Usage Guide](docs/USAGE.md)
+
+**Release details:** [Release Status](docs/RELEASE_STATUS.md)
+
+Features include farmer crop management, ML-assisted crop screening, Home Planters automatic identification, care-report history, and role-based Officer/Admin interfaces.
+
+The APK is a test release. Disease predictions are advisory, and live Officer/Admin end-to-end verification remains pending.
+<!-- CROPGUARD RELEASE END -->
