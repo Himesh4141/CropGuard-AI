@@ -18,6 +18,7 @@ import {
 import type {
   Diagnosis,
 } from "@/features/diagnosis/types";
+import { buildCropCareSteps } from "@/features/diagnosis/careSteps";
 
 import "@/features/diagnosis/diagnosis.css";
 
@@ -261,6 +262,12 @@ export function DiagnosisResult({
         </p>
       </div>
 
+
+      <section className="diagnosis-care-plan" aria-label="Actionable field care steps">
+        <h3>Recommended field follow-up</h3>
+        <p>{uncertain ? "Identification is uncertain — use the review steps below." : "Crop-specific care actions based on the screening pattern:"}</p>
+        <ol>{buildCropCareSteps(diagnosis).map(step => <li key={step}>{step}</li>)}</ol>
+      </section>
 
       {hasCareCase && (
         <div className="diagnosis-care-case-link">

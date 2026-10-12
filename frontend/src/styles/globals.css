@@ -1416,3 +1416,16 @@ svg {
 }
 .brand-icon:has(.cropguard-brand-image)::after { display: none; }
 .cropguard-brand-image { display: block; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+
+/* Dashboard tiles are navigable, accessible actions (not decorative article cards). */
+.metrics .dashboard-metric-link {
+  display: flex; flex-direction: column; position: relative; min-width: 0;
+  padding: 21px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: rgba(255,255,255,.86); box-shadow: var(--shadow-xs);
+  color: inherit; text-decoration: none; overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.metrics .dashboard-metric-link:hover, .dashboard-insight-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.dashboard-insight-link { color: inherit; text-decoration: none; }
+.dashboard-metric-link:focus-visible, .dashboard-insight-link:focus-visible { outline: 3px solid var(--secondary); outline-offset: 3px; }
+@media (max-width: 480px) { .metrics .dashboard-metric-link { padding: 13px; border-radius: 17px; } }

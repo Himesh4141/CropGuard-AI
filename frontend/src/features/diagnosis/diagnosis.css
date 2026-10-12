@@ -596,3 +596,9 @@
     width: 100%;
   }
 }
+
+.diagnosis-care-plan{margin-top:20px;padding:18px;border:1px solid var(--border);border-radius:16px;background:var(--bg-soft)}
+.diagnosis-care-plan h3{font-size:18px;margin:0 0 8px;color:var(--text)}
+.diagnosis-care-plan p,.diagnosis-care-plan li{color:var(--text-soft);line-height:1.65}
+.diagnosis-care-plan ol{padding-left:22px;margin-bottom:0}
+.diagnosis-care-plan li+li{margin-top:8px}

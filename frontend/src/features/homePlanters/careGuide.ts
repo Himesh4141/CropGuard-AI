@@ -52,3 +52,16 @@ export function buildCareGuide(plant: PlantChoice, symptoms: Symptom[], image: I
   suggestions.push("Seek local horticultural advice if damage spreads, leaves drop rapidly or the plant declines. Do not select pesticides or fungicides from this screening alone.");
   return suggestions;
 }
+
+/** A differential observation based ONLY on user-reported symptoms, not an image diagnosis. */
+export function possibleCareConcern(symptoms: Symptom[], image: ImageAssessment): string {
+  if (!image.usable) return "Unable to assess the photograph reliably; retake a clearer image.";
+  const flags = new Set(symptoms);
+  if (flags.has("whiteCoating")) return "Reported powdery coating: powdery mildew is one possibility, but dust or residue can look similar. Check both leaf surfaces before treatment.";
+  if (flags.has("holes")) return "Reported feeding holes: inspect for chewing insects or snails before choosing any pest control.";
+  if (flags.has("spots")) return "Reported leaf spots: could result from infection, sun scorch or physical damage. Look for spreading lesions across new leaves.";
+  if (flags.has("wilting")) return "Reported wilting: first rule out underwatering and waterlogged roots; wilting alone cannot identify a disease.";
+  if (flags.has("yellowing")) return "Reported yellowing: investigate watering, light and older leaves first; uneven yellow-green patterns may be normal variegation.";
+  if (flags.has("curling")) return "Reported leaf curling: look for pests underneath leaves and sudden changes in light, heat or watering.";
+  return "No specific symptoms confirmed. The photo screening checks quality and color patterns, not pathogens. Observe new growth over several days.";
+}
