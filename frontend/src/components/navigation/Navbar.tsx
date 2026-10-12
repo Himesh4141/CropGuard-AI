@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Leaf, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
+import approvedIcon from "@/assets/images/cropguard-approved-icon.png";
 import { applyPreferences, loadAvatar, loadPreferences } from "@/features/profile/localPreferences";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routes } from "@/config/routes";
@@ -40,12 +41,12 @@ export function Navbar() {
 
   return (
     <header className="topbar">
-      <div className="topbar-context" aria-label={`CropGuard AI · ${context}`}>
+      <div className="topbar-context" aria-label={`CropGuard · ${context}`}>
         <span className="topbar-context-badge" aria-hidden="true">
-          <Leaf size={17} />
+          <img className="cropguard-brand-image" src={approvedIcon} alt="" />
         </span>
         <div className="topbar-brand-copy">
-          <strong>CropGuard AI</strong>
+          <strong>CropGuard</strong>
           <span>{context}</span>
         </div>
       </div>

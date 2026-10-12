@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   CloudSun,
-  Leaf,
   Microscope,
   ShieldCheck,
   Sparkles,
@@ -15,6 +14,7 @@ import {
 import {
   routes,
 } from "@/config/routes";
+import approvedIcon from "@/assets/images/cropguard-approved-icon.png";
 
 
 export default function LandingPage() {
@@ -26,7 +26,7 @@ export default function LandingPage() {
           to={routes.home}
         >
           <span className="brand-icon">
-            <Leaf size={20} />
+            <img className="cropguard-brand-image" src={approvedIcon} alt="" />
           </span>
 
           <div>
@@ -34,9 +34,6 @@ export default function LandingPage() {
               CropGuard
             </strong>
 
-            <small>
-              AI
-            </small>
           </div>
         </Link>
 

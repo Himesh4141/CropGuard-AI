@@ -32,16 +32,23 @@ export function buildCareGuide(plant: PlantChoice, symptoms: Symptom[], image: I
     suggestions.push("Confirm the plant species before acting on species-specific watering, light or treatment advice.");
   }
   const flags = new Set(symptoms);
-  if (image.signals.includes("yellow_tones")) flags.add("yellowing");
-  if (image.signals.includes("brown_tones")) flags.add("spots");
-  if (image.signals.includes("pale_tones")) flags.add("whiteCoating");
-  if (flags.has("yellowing")) suggestions.push("For leaf yellowing, check soil moisture, drainage, recent repotting and whether only older leaves are affected. Yellowing is not specific to infection.");
+  // Color screening only detects nearby pixels. Do not turn image signals into
+  // user-confirmed symptoms (especially golden/cream natural variegation).
+  if (image.signals.includes("yellow_tones")) {
+    suggestions.push(plant === "pothos"
+      ? "Golden or cream patterns on Pothos leaves can be natural variegation. Compare the same pattern on healthy new growth before treating it as yellowing or disease."
+      : "Yellow-looking areas in a photo can be natural variegation or lighting. Check the actual leaves before calling it yellowing.");
+  }
+  if (image.signals.includes("brown_tones")) suggestions.push("Brown-colored areas detected in the photo may be pots, shadows or stems rather than leaf lesions; inspect the leaf surface.");
+  if (image.signals.includes("pale_tones")) suggestions.push("Pale areas may be naturally patterned leaves, highlights or residue; do not infer a fungal coating from color alone.");
+  if (flags.has("yellowing")) suggestions.push("If leaves are truly turning yellow compared with their normal pattern, check soil moisture, drainage, recent repotting and whether only older leaves are affected. Yellowing alone does not diagnose infection.");
   if (flags.has("spots")) suggestions.push("If spots are on the leaves, photograph both surfaces, increase airflow and avoid routinely wetting the foliage. Separate the plant from nearby plants if lesions are spreading.");
   if (flags.has("whiteCoating")) suggestions.push("Pale regions may be dust, residue or a fungus-like coating. Inspect the leaf closely before cleaning or treating anything.");
   if (flags.has("holes")) suggestions.push("Look under leaves at different times for snails, caterpillars and chewing insects. Remove visible pests manually where practical.");
   if (flags.has("wilting")) suggestions.push("Feel the soil below the surface. Both dry soil and persistently wet roots can produce wilting; do not automatically add more water.");
   if (flags.has("curling")) suggestions.push("Inspect tender growth and the underside of curled leaves for insects; also check sudden heat or watering changes.");
-  if (!flags.size) suggestions.push("No clear concerns were reported or screened. Continue checking new growth and retake photos over the next few days; a normal-looking photo does not prove a plant is disease-free.");
+  if (!flags.size && !image.signals.length) suggestions.push("No strong color patterns or symptoms were reported. Keep monitoring new growth; a normal-looking photo does not prove a plant is disease-free.");
+  if (!flags.size && image.signals.length) suggestions.push("These are photo color observations only, not confirmed damage. Monitor changes over time and compare with normal leaf patterns.");
   suggestions.push("Seek local horticultural advice if damage spreads, leaves drop rapidly or the plant declines. Do not select pesticides or fungicides from this screening alone.");
   return suggestions;
 }

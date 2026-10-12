@@ -248,3 +248,11 @@
 @media (prefers-reduced-motion: reduce) {
   .mobile-nav a, .quick-action { transition: none; }
 }
+
+/* Final release: always leave the last Home Planters controls above the fixed bottom nav. */
+@media (max-width: 820px) {
+  html { scroll-padding-bottom: 152px; }
+  .page.hp-page { padding-bottom: calc(156px + env(safe-area-inset-bottom, 0px)); }
+  .topbar-context-badge:has(.cropguard-brand-image) { background: #fff; overflow: hidden; padding: 1px; }
+  .topbar-context-badge .cropguard-brand-image { border-radius: 8px; }
+}

@@ -145,7 +145,7 @@ export function assessPixels(
   if (usable) {
     if (yellow >= 32 && colorRegions.yellow >= 0.085) {
       signals.push("yellow_tones");
-      observations.push("Yellow-toned areas appear near green foliage. Inspect actual leaves for yellowing.");
+      observations.push("Yellow-toned areas appear near green foliage. Natural variegation, lighting and true yellowing can look alike; inspect the leaves.");
     }
     if (brown >= 24 && colorRegions.brown >= 0.07) {
       signals.push("brown_tones");

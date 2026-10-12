@@ -178,7 +178,7 @@ export default function HomePlantersPage() {
   return (
     <div className="page hp-page">
       <div className="hp-head">
-        <span className="eyebrow">CROPGUARD AI · HOME PLANTERS</span>
+        <span className="eyebrow">CROPGUARD · HOME PLANTERS</span>
         <h1><Flower2 size={30} aria-hidden="true" /> Healthy home plants start with a clearer picture.</h1>
         <p>Take or upload a photo to screen visible foliage patterns and receive practical care guidance. No farm or field is required.</p>
       </div>
@@ -204,9 +204,13 @@ export default function HomePlantersPage() {
           <div className="hp-section-title"><Leaf size={20} aria-hidden="true" /><h2 id="hp-identity-title">2. Automatic plant recognition</h2></div>
           <p className="hp-muted">Upload or photograph a plant, then tap Analyze. CropGuard requests an identification from the Pl@ntNet plant recognition service. No manual plant selection or farm is required.</p>
           <div className="hp-identity-result" role="status">
-            <strong>{identity?.status === "identified" ? (identity.plant === "unknown" ? (identity.common_name || identity.scientific_name || "Recognized plant") : plantNames[identity.plant]) : "Awaiting a confident identification"}</strong>
-            {identity?.status === "identified" && identity.scientific_name && <span>{identity.scientific_name}</span>}
-            {identity && <span>Provider confidence: {Math.round(identity.confidence * 100)}% · {identity.status}</span>}
+            <strong>{identity?.status === "identified"
+              ? (identity.plant === "unknown" ? (identity.common_name || identity.scientific_name || "Plant match") : plantNames[identity.plant])
+              : identity?.status === "uncertain"
+                ? `Possible match: ${identity.common_name || identity.scientific_name || "unconfirmed plant"}`
+                : identity?.status === "unknown" ? "Plant identity not confirmed" : "Awaiting a confident identification"}</strong>
+            {identity?.scientific_name && <span>{identity.status === "identified" ? "Provider scientific name" : "Possible scientific name"}: <i>{identity.scientific_name}</i></span>}
+            {identity && <span>Pl@ntNet score: {Math.round(identity.confidence * 100)}% · {identity.status === "identified" ? "strong suggestion" : identity.status === "uncertain" ? "uncertain suggestion" : "inconclusive"}</span>}
             {identityMessage && <p>{identityMessage}</p>}
             <small>Photos sent for species recognition are processed by Pl@ntNet; local color screening stays on your device. CropGuard does not attach photos to farms or fields.</small>
           </div>
@@ -220,7 +224,8 @@ export default function HomePlantersPage() {
         <div className="hp-section-title"><ScanSearch size={21} aria-hidden="true" /><h2>Photo analysis and care guidance</h2></div>
         {!assessment ? <p className="hp-muted">Add a photo and tap Analyze to see photo-quality findings, vegetation-adjacent color patterns, and plant-specific care instructions.</p> : <div className="hp-report">
           <div className="hp-report-heading"><span className={assessment.usable ? "hp-status hp-status-ok" : "hp-status hp-status-warn"}>{assessment.usable ? "Photo screened" : "Retake recommended"}</span><span className="hp-report-caption">Visual observations · no pathogen diagnosis</span></div>
-          <p><strong>Plant:</strong> {identity?.status === "identified" && identity.plant === "unknown" ? (identity.common_name || identity.scientific_name || "Recognized plant") : plantNames[plant]} <span className="hp-report-caption">({identity?.status === "identified" ? "automatic provider prediction" : "not identified"})</span></p>
+          <p><strong>Plant:</strong> {identity?.status === "identified" && identity.plant === "unknown" ? (identity.common_name || identity.scientific_name || "Plant match") : plantNames[plant]} <span className="hp-report-caption">({identity?.status === "identified" ? "automatic provider suggestion" : identity?.status === "uncertain" ? "possible species match, not confirmed" : "not identified"})</span></p>
+          {identity?.status === "uncertain" && <p className="hp-confidence-note">Possible match: {identity.common_name || identity.scientific_name || "unknown plant"} ({Math.round(identity.confidence * 100)}% provider score). Care advice below remains general until the species is more certain.</p>}
           <p><strong>Photo quality:</strong> {assessment.brightness} lighting · {assessment.sharpness} detail</p>
           <p><strong>Notes from you:</strong> {symptoms.length ? symptoms.map(key => symptomLabels[key]).join(", ") : "None"}</p>
           <h3>What the image shows</h3>
