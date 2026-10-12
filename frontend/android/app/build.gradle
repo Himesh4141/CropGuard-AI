@@ -8,8 +8,8 @@ android {
         // AES-GCM keys in Android Keystore require Android API 23 or newer.
         minSdkVersion Math.max(rootProject.ext.minSdkVersion, 23)
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 7
+        versionName "1.0.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

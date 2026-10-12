@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     "com.himesh4141.cropguard",
 
   appName:
-    "CropGuard AI",
+    "CropGuard",
 
   webDir:
     "dist",
