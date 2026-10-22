@@ -1,5 +1,6 @@
 import {
   HeartPulse,
+  Flower2,
   LayoutDashboard,
   MapPinned,
   Microscope,
@@ -9,21 +10,26 @@ import {
   Users,
 } from "lucide-react";
 
+import { useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { routes } from "@/config/routes";
+import { cgText, useCropGuardLanguage } from "@/features/preferences/preferences";
 import { useAuthStore } from "@/features/auth/store";
+import { trackVisualViewportChrome } from "@/services/visualViewportChrome";
 
 const farmerItems = [
   [routes.dashboard, "Home", LayoutDashboard],
   [routes.farms, "Farms", Sprout],
   [routes.diagnose, "Detect", Microscope],
   [routes.careCases, "Care", HeartPulse],
+  [routes.homePlanters, "Plants", Flower2],
 ] as const;
 
 const officerItems = [
   [routes.officer, "Overview", LayoutDashboard],
   [routes.officerCases, "Cases", Stethoscope],
   [routes.officerCareCases, "Care", HeartPulse],
+  [routes.homePlanters, "Plants", Flower2],
 ] as const;
 
 const adminItems = [
@@ -31,10 +37,18 @@ const adminItems = [
   [routes.adminUsers, "Users", Users],
   [routes.adminLocations, "Areas", MapPinned],
   [routes.adminCareCases, "Care", HeartPulse],
+  [routes.homePlanters, "Plants", Flower2],
 ] as const;
 
 export function MobileNavigation() {
+  const navRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    return trackVisualViewportChrome(nav, "navigation");
+  }, []);
   const user = useAuthStore((state) => state.user);
+  const language = useCropGuardLanguage();
   const items =
     user?.role === "admin"
       ? adminItems
@@ -43,7 +57,7 @@ export function MobileNavigation() {
         : farmerItems;
 
   return (
-    <nav className="mobile-nav" aria-label="Primary navigation">
+    <nav ref={navRef} className="mobile-nav" aria-label="Primary navigation" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
       {items.map(([path, label, Icon]) => (
         <NavLink
           key={path}
@@ -52,7 +66,7 @@ export function MobileNavigation() {
           className={({ isActive }) => (isActive ? "active" : undefined)}
         >
           <Icon size={18} />
-          <span>{label}</span>
+          <span>{cgText(label, language)}</span>
         </NavLink>
       ))}
     </nav>

@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { useCropGuardLanguage } from "@/features/preferences/preferences";
+import { t, type TranslationKey } from "@/i18n";
+import { localizeCondition, localizedCareSteps } from "@/i18n/diagnosis";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -19,6 +23,7 @@ import type {
   Diagnosis,
 } from "@/features/diagnosis/types";
 
+import { DiagnosisFeedback } from "@/features/reliability/DiagnosisFeedback";
 import "@/features/diagnosis/diagnosis.css";
 
 
@@ -47,32 +52,23 @@ function humanize(
 }
 
 
-function confidenceTone(
-  diagnosis: Diagnosis,
-): string {
-  if (diagnosis.is_uncertain) {
-    return "Needs review";
-  }
-
-  switch (
-    diagnosis.confidence_level
-  ) {
-    case "high":
-      return "High";
-    case "moderate":
-      return "Moderate";
-    case "low":
-      return "Low";
-    default:
-      return "Measured";
-  }
-}
 
 
 export function DiagnosisResult({
   diagnosis,
   fieldName,
 }: DiagnosisResultProps) {
+  const selectedLanguage = useCropGuardLanguage();
+  const [showEnglish, setShowEnglish] = useState(false);
+  const language = showEnglish ? "en" : selectedLanguage;
+  const tr = (key: TranslationKey) => t(key, language);
+  const diagnosisTerm = diagnosis.predicted_label
+    ? localizeCondition(diagnosis.predicted_label, language)
+    : { value: tr("unavailable"), translated: true };
+  const unknownMedicalText = language !== "en" && (
+    !diagnosisTerm.translated || Boolean(diagnosis.advisory) || Boolean(diagnosis.rejection_reason) ||
+    Boolean(diagnosis.top_predictions?.length)
+  );
   const confidence =
     diagnosis.confidence !== null
       ? Math.round(
@@ -96,10 +92,10 @@ export function DiagnosisResult({
 
   const headline =
     uncertain
-      ? "Screening needs review"
+      ? tr("needsReview")
       : successful
-        ? "Screening completed"
-        : "Screening unavailable";
+        ? tr("screeningCompleted")
+        : tr("screeningUnavailable");
 
   const label = diagnosis.predicted_label ?? "";
   const technicalResult = [
@@ -109,10 +105,8 @@ export function DiagnosisResult({
     "limited_crop_coverage",
   ].includes(label);
 
-  const hasCareCase =
-    successful
-    && !technicalResult
-    && !label.toLowerCase().includes("healthy");
+  // A diagnosis response is NOT proof that a care case was created.
+  const followUpRecommended = successful && !uncertain && !diagnosis.rejection_reason && !technicalResult && Boolean(label) && !label.toLowerCase().includes("healthy");
 
   return (
     <article
@@ -122,10 +116,16 @@ export function DiagnosisResult({
           : "panel diagnosis-result"
       }
     >
+      {selectedLanguage !== "en" ? <div className="cg-translation-controls">
+        <button type="button" className="button secondary" onClick={() => setShowEnglish(value => !value)}>
+          {showEnglish ? t("showTranslation", selectedLanguage) : t("showOriginalEnglish", selectedLanguage)}
+        </button>
+        {unknownMedicalText ? <p role="note">{t("sourceEnglishOnly", selectedLanguage)}</p> : null}
+      </div> : null}
       <div className="diagnosis-result-head">
         <div>
           <span className="eyebrow">
-            SCREENING RESULT
+            {tr("screenResult")}
           </span>
 
           <h2>
@@ -144,7 +144,7 @@ export function DiagnosisResult({
       <div className="development-result-badge">
         {realModel
           ? `${diagnosis.model_display_name} · ${diagnosis.model_version ?? "v1"}`
-          : "LEGACY DEVELOPMENT SIMULATION"}
+          : tr("legacySimulation")}
       </div>
 
       {diagnosis.rejection_reason ? (
@@ -157,22 +157,20 @@ export function DiagnosisResult({
         </div>
       ) : null}
 
+      <div className="cropguard-signal-note" role="status">
+        {tr(uncertain || !successful ? "uncertainExplanation" : "modelExplanation")}
+      </div>
+
       <div className="diagnosis-result-grid">
         <div>
           <Microscope size={18} />
 
           <span>
-            {uncertain
-              ? "Current assessment"
-              : "Likely diagnosis"}
+            {tr(uncertain ? "currentAssessment" : "leadingModelMatch")}
           </span>
 
           <strong>
-            {diagnosis.predicted_label
-              ? humanize(
-                  diagnosis.predicted_label,
-                )
-              : "Unavailable"}
+            {diagnosis.predicted_label ? (language === "en" ? humanize(diagnosis.predicted_label) : diagnosisTerm.value) : tr("unavailable")}
           </strong>
         </div>
 
@@ -180,12 +178,12 @@ export function DiagnosisResult({
           <Gauge size={18} />
 
           <span>
-            Calibrated confidence
+            {tr("modelScore")}
           </span>
 
           <strong>
             {confidence !== null
-              ? `${confidence}% · ${confidenceTone(diagnosis)}`
+              ? `${confidence}% · ${tr(diagnosis.is_uncertain ? "review" : diagnosis.confidence_level === "high" ? "high" : diagnosis.confidence_level === "moderate" ? "moderate" : diagnosis.confidence_level === "low" ? "low" : "measured")}`
               : "-"}
           </strong>
         </div>
@@ -194,12 +192,12 @@ export function DiagnosisResult({
           <Sprout size={18} />
 
           <span>
-            Crop consistency
+            {tr("cropConsistency")}
           </span>
 
           <strong>
             {diagnosis.predicted_crop ??
-              "Not determined"}
+              tr("notDetermined")}
           </strong>
         </div>
       </div>
@@ -207,11 +205,11 @@ export function DiagnosisResult({
       {topPredictions.length > 0 ? (
         <div className="diagnosis-top-predictions">
           <span className="diagnosis-block-label">
-            TOP MODEL SIGNALS
+            {tr("topModelSignals")}
           </span>
 
           <div className="diagnosis-prediction-list">
-            {topPredictions.map(
+            {topPredictions.slice(0, 3).map(
               (prediction, index) => (
                 <div
                   key={`${prediction.raw_label}-${index}`}
@@ -219,7 +217,7 @@ export function DiagnosisResult({
                 >
                   <div>
                     <strong>
-                      {prediction.disease}
+                      {localizeCondition(prediction.disease, language).value}
                     </strong>
 
                     <span>
@@ -242,7 +240,7 @@ export function DiagnosisResult({
 
       <div className="diagnosis-context">
         <span>
-          Field
+            {tr("field")}
         </span>
 
         <strong>
@@ -252,23 +250,29 @@ export function DiagnosisResult({
 
       <div className="diagnosis-advisory">
         <span>
-          Advisory
+            {tr("advisory")}
         </span>
 
         <p>
           {diagnosis.advisory ??
-            "No advisory is available for this screening."}
+            tr("noAdvisory")}
         </p>
       </div>
 
 
-      {hasCareCase && (
+      <section className="diagnosis-care-plan" aria-label={tr("recommendedFollowUp")}>
+        <h3>{tr("recommendedFollowUp")}</h3>
+        <p>{tr(uncertain ? "uncertainFollowUp" : "cropFollowUp")}</p>
+        <ol>{localizedCareSteps(diagnosis, language).map(step => <li key={step}>{step}</li>)}</ol>
+      </section>
+
+      {followUpRecommended && (
         <div className="diagnosis-care-case-link">
           <div>
             <HeartPulse size={18} />
             <div>
-              <strong>Care case started</strong>
-              <span>CropGuard will keep this issue under follow-up until it improves or is resolved.</span>
+              <strong>{tr("considerFollowUp")}</strong>
+              <span>{tr("caseNotGuaranteed")}</span>
             </div>
           </div>
 
@@ -276,25 +280,25 @@ export function DiagnosisResult({
             to={routes.careCases}
             className="button secondary"
           >
-            Open care case
+            {tr("checkCases")}
           </Link>
         </div>
       )}
 
+      <div className="cropguard-evidence-panel" aria-label={tr("evidenceTitle")}>
+        <strong>{tr("evidenceTitle")}</strong>
+        <p>{realModel
+          ? tr("realModelEvidence") : tr("historicalEvidence")}</p>
+        <strong>{tr("confirmTitle")}</strong>
+        <p>{tr("confirmDetail")}</p>
+        <strong>{tr("actNow")}</strong>
+        <p>{tr("actNowDetail")}</p>
+      </div>
       <p className="diagnosis-disclaimer">
         {realModel
-          ? (
-            "CropGuard Field-Robust v2 achieved 99.85% accuracy on the untouched "
-            + "PlantVillage test split and 98.99% on a deterministic degraded-phone "
-            + "stress proxy. The stress proxy is not independent real-field validation, "
-            + "so uncertain, mismatched and insufficient-coverage cases remain reviewable "
-            + "instead of being treated as certain diagnoses."
-          )
-          : (
-            "This historical result was produced by the earlier development "
-            + "simulator and should not be interpreted as a trained-model prediction."
-          )}
+          ? tr("realModelDisclaimer") : tr("historicDisclaimer")}
       </p>
+      <DiagnosisFeedback diagnosis={diagnosis} />
     </article>
   );
 }

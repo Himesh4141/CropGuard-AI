@@ -1,4 +1,7 @@
-﻿import {
+import { GoogleSignIn } from "@/components/auth/GoogleSignIn";
+import { useCropGuardLanguage } from "@/features/preferences/preferences";
+import { t } from "@/i18n";
+import {
   useState,
   type FormEvent,
 } from "react";
@@ -26,6 +29,7 @@ import {
 
 
 export default function RegisterPage() {
+  const language = useCropGuardLanguage();
   const navigate =
     useNavigate();
 
@@ -105,7 +109,7 @@ export default function RegisterPage() {
         );
       } else {
         setError(
-          "Unable to create your account. Please try again.",
+          t("registerError", language),
         );
       }
     } finally {
@@ -117,17 +121,15 @@ export default function RegisterPage() {
   return (
     <div className="auth-card">
       <span className="eyebrow">
-        CREATE ACCOUNT
+        {t("createHeading", language)}
       </span>
 
       <h2>
-        Join CropGuard
+        {t("registerTitle", language)}
       </h2>
 
       <p>
-        Create a farmer account
-        to start monitoring your
-        fields.
+        {t("registerIntro", language)}
       </p>
 
       <form
@@ -136,7 +138,7 @@ export default function RegisterPage() {
         }
       >
         <label>
-          Full name
+          {t("fullName", language)}
 
           <input
             type="text"
@@ -155,7 +157,7 @@ export default function RegisterPage() {
         </label>
 
         <label>
-          Email
+          {t("email", language)}
 
           <input
             type="email"
@@ -171,7 +173,7 @@ export default function RegisterPage() {
         </label>
 
         <label>
-          Password
+          {t("password", language)}
 
           <input
             type="password"
@@ -203,18 +205,20 @@ export default function RegisterPage() {
           disabled={loading}
         >
           {loading
-            ? "Creating account…"
-            : "Create account"}
+            ? t("creatingAccount", language)
+            : t("createAccount", language)}
         </button>
       </form>
 
+      <GoogleSignIn />
+
       <p className="auth-footer">
-        Already registered?{" "}
+        {t("registered", language)}{" "}
 
         <Link
           to={routes.login}
         >
-          Sign in
+          {t("signIn", language)}
         </Link>
       </p>
     </div>

@@ -1,0 +1,146 @@
+/* CropGuard AI 1.1.7 — targeted authentication contrast repair.
+ * Loaded LAST, after globals/responsive/mobile and v1.1.6 UX repair.
+ * No authentication/session/API logic changes. */
+:root,
+:root[data-cg-theme="light"] {
+  --cg117-auth-bg: #f3f8f5;
+  --cg117-auth-visual: #e8f4ee;
+  --cg117-auth-panel: #ffffff;
+  --cg117-auth-field: #f5faf6;
+  --cg117-auth-preview: #e8f3eb;
+  --cg117-auth-ink: #153629;
+  --cg117-auth-muted: #3b5c4c;
+  --cg117-auth-line: #9abbaa;
+  --cg117-auth-accent: #106443;
+  --cg117-auth-button: #116a48;
+  --cg117-auth-button-ink: #ffffff;
+  --cg117-auth-error-bg: #fff0f0;
+  --cg117-auth-error-ink: #852b30;
+}
+:root[data-cg-theme="dark"] {
+  --cg117-auth-bg: #081b15;
+  --cg117-auth-visual: #102c22;
+  --cg117-auth-panel: #17382b;
+  --cg117-auth-field: #0f291f;
+  --cg117-auth-preview: #224839;
+  --cg117-auth-ink: #f4fff7;
+  --cg117-auth-muted: #d0ebd9;
+  --cg117-auth-line: #6e9a7e;
+  --cg117-auth-accent: #b2f8cd;
+  --cg117-auth-button: #9af1bd;
+  --cg117-auth-button-ink: #09291b;
+  --cg117-auth-error-bg: #49282d;
+  --cg117-auth-error-ink: #ffdadb;
+}
+/* Globals previously used pale, hard-coded backgrounds regardless of theme. */
+:root .auth-layout {
+  background: var(--cg117-auth-bg) !important;
+  color: var(--cg117-auth-ink) !important;
+}
+:root .auth-visual {
+  background: var(--cg117-auth-visual) !important;
+  border-color: var(--cg117-auth-line) !important;
+  color: var(--cg117-auth-ink) !important;
+}
+:root .auth-content {
+  background: var(--cg117-auth-bg) !important;
+  color: var(--cg117-auth-ink) !important;
+}
+:root .auth-card {
+  background: var(--cg117-auth-panel) !important;
+  color: var(--cg117-auth-ink) !important;
+  border: 1px solid var(--cg117-auth-line) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .12);
+  color-scheme: light;
+}
+:root[data-cg-theme="dark"] .auth-card { color-scheme: dark; }
+:root .auth-card h2,
+:root .auth-story h1,
+:root .auth-visual .brand,
+:root .auth-visual .brand strong,
+:root .auth-preview-item strong,
+:root .auth-card label {
+  color: var(--cg117-auth-ink) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+:root .auth-card > p,
+:root .auth-story > p,
+:root .auth-footer,
+:root .auth-preview-item span {
+  color: var(--cg117-auth-muted) !important;
+  opacity: 1 !important;
+}
+:root .auth-preview,
+:root .auth-preview-item {
+  background: var(--cg117-auth-preview) !important;
+  color: var(--cg117-auth-ink) !important;
+  border-color: var(--cg117-auth-line) !important;
+}
+:root .auth-preview-item svg { color: var(--cg117-auth-accent) !important; }
+/* Form controls, including keyboard focus, must never turn white in dark mode. */
+:root .auth-card input:not([type="checkbox"]),
+:root .auth-card input:not([type="checkbox"]):hover,
+:root .auth-card input:not([type="checkbox"]):focus,
+:root .auth-card input:not([type="checkbox"]):active {
+  color: var(--cg117-auth-ink) !important;
+  background: var(--cg117-auth-field) !important;
+  border: 1.5px solid var(--cg117-auth-line) !important;
+  -webkit-text-fill-color: var(--cg117-auth-ink) !important;
+  caret-color: var(--cg117-auth-ink) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+:root .auth-card input::placeholder {
+  color: var(--cg117-auth-muted) !important;
+  -webkit-text-fill-color: var(--cg117-auth-muted) !important;
+  opacity: 1 !important;
+}
+:root .auth-card input:focus-visible,
+:root .auth-card button:focus-visible,
+:root .auth-card a:focus-visible {
+  outline: 3px solid #e7ad44 !important;
+  outline-offset: 2px !important;
+}
+/* Android WebView/Chrome autofill has its own input paint and text color. */
+:root .auth-card input:-webkit-autofill,
+:root .auth-card input:-webkit-autofill:hover,
+:root .auth-card input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--cg117-auth-ink) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--cg117-auth-field) inset !important;
+  caret-color: var(--cg117-auth-ink) !important;
+  border-color: var(--cg117-auth-line) !important;
+}
+:root .auth-card .button.primary {
+  background: var(--cg117-auth-button) !important;
+  color: var(--cg117-auth-button-ink) !important;
+  opacity: 1 !important;
+}
+:root .auth-card .button.primary:disabled { opacity: .68 !important; cursor: wait; }
+:root .auth-card .button.secondary {
+  background: var(--cg117-auth-field) !important;
+  color: var(--cg117-auth-ink) !important;
+  border-color: var(--cg117-auth-line) !important;
+}
+:root .auth-card :is(.auth-footer a, a:not(.button)),
+:root .auth-visual a:not(.button) { color: var(--cg117-auth-accent) !important; }
+:root .auth-card a:not(.button) { text-decoration: underline; text-underline-offset: 3px; }
+:root .auth-card .error-box {
+  color: var(--cg117-auth-error-ink) !important;
+  background: var(--cg117-auth-error-bg) !important;
+  border: 1px solid var(--cg117-auth-line) !important;
+}
+:root .auth-card .success-box {
+  color: var(--cg117-auth-ink) !important;
+  background: var(--cg117-auth-preview) !important;
+}
+:root .auth-card .cg117-login-status,
+:root .auth-card [role="status"]:not(.error-box) {
+  color: var(--cg117-auth-muted) !important;
+  font-size: .875rem;
+}
+@media (max-width: 620px) {
+  :root .auth-content { padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); }
+  :root .auth-card { padding: 22px 19px; }
+  :root .auth-card input { min-height: 48px; }
+}

@@ -15,6 +15,7 @@ import type {
 } from "@/types/user";
 import { secureSession } from "@/services/secureSession";
 import { ApiClientError } from "@/services/apiError";
+import { recordAuthTiming, type AuthTimingOutcome } from "@/services/authTiming";
 
 
 const EXPLICIT_SIGNOUT_KEY =
@@ -165,10 +166,13 @@ export const useAuthStore =
         set({
           initializing: true,
         });
+        const startedAt = performance.now();
+        let outcome: AuthTimingOutcome = "error";
 
         try {
           if (secureSession.isNative() && !(await secureSession.read())) {
             set({ user: null, initialized: true, initializing: false });
+            outcome = "no-session";
             return;
           }
           const data =
@@ -188,6 +192,7 @@ export const useAuthStore =
             initializing:
               false,
           });
+          outcome = "success";
         } catch (error) {
           tokenStorage.clear();
           const invalid = error instanceof ApiClientError && error.status === 401;
@@ -201,6 +206,8 @@ export const useAuthStore =
             initializing: false,
             restoreNeedsNetwork: secureSession.isNative() && !invalid,
           });
+        } finally {
+          recordAuthTiming("session-restore", startedAt, outcome);
         }
       },
 

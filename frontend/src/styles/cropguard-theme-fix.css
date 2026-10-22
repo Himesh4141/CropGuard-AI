@@ -1,0 +1,29 @@
+/* CropGuard mobile contrast repair. Imported AFTER existing premium styles. */
+:root[data-cg-theme="light"]{color-scheme:light;--bg:#f4f8f3;--surface:#fff;--surface-strong:#fff;--surface-soft:#edf5ee;--border:rgba(17,65,44,.18);--border-strong:rgba(17,65,44,.29);--text:#142b22;--text-soft:#244739;--muted:#405c50;--muted2:#526b5d;--primary:#176e49;--primary-strong:#105b3b;--primary-soft:#e4f3e9;--danger:#b22b31;--danger-soft:#ffe9e9;--accent-soft:#fff2d9;}
+:root[data-cg-theme="dark"]{color-scheme:dark;--bg:#091b16;--bg-soft:#0f2920;--surface:#123427;--surface-strong:#153629;--surface-soft:#1b4031;--surface-tint:#1e4936;--border:rgba(214,246,224,.22);--border-strong:rgba(214,246,224,.36);--text:#f5fff7;--text-soft:#def5e6;--muted:#bfdcca;--muted2:#bed4c6;--primary:#75e7ae;--primary-strong:#92f7c5;--primary-soft:#1d4935;--danger:#ffacaa;--danger-soft:#47272a;--accent:#ffd087;--accent-soft:#4b3921;--secondary:#a7d2ff;--gradient-primary:linear-gradient(115deg,#176344,#267956);--gradient-hero:linear-gradient(140deg,#15392c,#112d25);}
+:root[data-cg-theme] body{background:var(--bg)!important;color:var(--text)!important;}
+:root[data-cg-theme] .topbar{background:var(--surface-strong)!important;border-bottom:1px solid var(--border-strong)!important;color:var(--text)!important;}
+:root[data-cg-theme] .topbar-context,.topbar-brand-copy strong{color:var(--text)!important;}
+:root[data-cg-theme] .topbar-brand-copy>span{color:var(--muted)!important;}
+:root[data-cg-theme] .hp-head,:root[data-cg-theme] .hp-head h1,:root[data-cg-theme] .hp-section-title h2,:root[data-cg-theme] .page-header h1{color:var(--text)!important;opacity:1!important;}
+:root[data-cg-theme] .hp-head>p,:root[data-cg-theme] .hp-muted,:root[data-cg-theme] .hp-privacy{color:var(--muted)!important;opacity:1!important;}
+:root[data-cg-theme] .hp-panel,:root[data-cg-theme] .card,:root[data-cg-theme] .dashboard-card,:root[data-cg-theme] .cg-care-journal{background:var(--surface-strong)!important;color:var(--text)!important;border-color:var(--border)!important;}
+:root[data-cg-theme] .hp-photo{background:var(--surface-soft)!important;color:var(--text)!important;}
+:root[data-cg-theme] .hp-choice,:root[data-cg-theme] .button.secondary,:root[data-cg-theme] .button.ghost,:root[data-cg-theme] .hp-history-item{background:var(--surface-soft)!important;color:var(--text)!important;border-color:var(--border-strong)!important;}
+:root[data-cg-theme] .hp-choice.hp-selected{background:var(--primary-soft)!important;color:var(--primary-strong)!important;outline:2px solid var(--primary-strong)!important;}
+:root[data-cg-theme] .hp-status-ok{background:var(--primary-soft)!important;color:var(--primary-strong)!important;}
+:root[data-cg-theme] .hp-status-warn{background:var(--accent-soft)!important;color:var(--text)!important;}
+:root[data-cg-theme] .hp-error{background:var(--danger-soft)!important;color:var(--danger)!important;}
+:root[data-cg-theme] .hp-disclaimer{background:var(--accent-soft)!important;color:var(--text)!important;}
+:root[data-cg-theme] .mobile-nav{background:var(--surface-strong)!important;color:var(--text)!important;border:1px solid var(--border-strong)!important;}
+:root[data-cg-theme] .mobile-nav a{color:var(--muted)!important;}
+:root[data-cg-theme] .mobile-nav a.active{background:var(--primary-soft)!important;color:var(--primary-strong)!important;}
+:root[data-cg-theme] a,:root[data-cg-theme] button,:root[data-cg-theme] select{opacity:1;}
+:root[data-cg-theme] .eyebrow,:root[data-cg-theme] .hp-section-title{color:var(--primary-strong)!important;}
+:root[data-cg-theme] .button.primary{background:#16754e!important;color:white!important;}
+:root[data-cg-theme="dark"] .button.primary{background:#9cf0bf!important;color:#092518!important;}
+:root[data-cg-theme] p,:root[data-cg-theme] small{line-height:1.55;}
+:root[data-cg-theme] :focus-visible{outline:3px solid #f4b757!important;outline-offset:3px;}
+/* This dock was the overlapping popup in the phone screenshot. Settings is now reached from the top-right. */
+.cg-trust-dock{display:none!important;}
+@media(max-width:620px){:root[data-cg-theme] .hp-panel{padding:16px!important}:root[data-cg-theme] .topbar{min-height:calc(62px + env(safe-area-inset-top));}:root[data-cg-theme] .page{padding-bottom:calc(110px + env(safe-area-inset-bottom));}:root[data-cg-theme] .hp-head h1{font-size:clamp(23px,6.6vw,31px);line-height:1.2}:root[data-cg-theme] .topbar-profile-copy{display:none}}

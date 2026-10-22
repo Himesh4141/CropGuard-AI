@@ -1,7 +1,10 @@
+import { useCropGuardLanguage } from "@/features/preferences/preferences";
+import { screenText as tr } from "@/i18n/screenText";
 import {
   AlertTriangle,
   Bell,
   CloudSun,
+  HeartPulse,
   Leaf,
   Microscope,
   Sprout,
@@ -82,6 +85,7 @@ export default function DashboardPage() {
 
 
 function FarmerDashboard() {
+  const lang = useCropGuardLanguage();
   const user =
     useAuthStore(
       (state) =>
@@ -171,25 +175,23 @@ function FarmerDashboard() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow="FIELD OVERVIEW"
-        title="Crop health, at a glance"
-        description="A calm view of your fields, screenings, alerts and environmental signals."
+        eyebrow={tr("FIELD OVERVIEW", lang)}
+        title={tr("Crop health, at a glance", lang)}
+        description={tr("A calm view of your fields, screenings, alerts and environmental signals.", lang)}
       />
 
       <section className="dashboard-hero">
         <div className="dashboard-hero-copy">
           <span className="eyebrow">
-            Good to see you, {firstName}
+            {tr("Good to see you", lang)}, {firstName}
           </span>
 
           <h2>
-            Your farm intelligence is ready.
+            {tr("Your farm intelligence is ready.", lang)}
           </h2>
 
           <p>
-            Screen an affected leaf, check weather pressure or review
-            alerts without jumping between tools. CropGuard keeps the
-            important signals together.
+            {tr("Screen an affected leaf, check weather pressure or review alerts without jumping between tools. CropGuard keeps the important signals together.", lang)}
           </p>
         </div>
 
@@ -200,7 +202,7 @@ function FarmerDashboard() {
           >
             <Microscope size={19} />
             <span>
-              Screen leaf
+              {tr("Screen leaf", lang)}
             </span>
           </Link>
 
@@ -210,7 +212,7 @@ function FarmerDashboard() {
           >
             <CloudSun size={19} />
             <span>
-              Check risk
+              {tr("Check risk", lang)}
             </span>
           </Link>
 
@@ -220,80 +222,47 @@ function FarmerDashboard() {
           >
             <Sprout size={19} />
             <span>
-              Manage farms
+              {tr("Manage farms", lang)}
+            </span>
+          </Link>
+
+          <Link
+            className="quick-action"
+            to={routes.careCases}
+          >
+            <HeartPulse size={19} />
+            <span>
+              {tr("Care cases", lang)}
             </span>
           </Link>
         </div>
       </section>
 
-      <section className="metrics">
-        <article>
-          <Leaf />
-
-          <span>
-            Active fields
-          </span>
-
-          <strong>
-            {fields.length}
-          </strong>
-
-          <small>
-            Fields under monitoring
-          </small>
-        </article>
-
-        <article>
-          <Microscope />
-
-          <span>
-            Diagnoses
-          </span>
-
-          <strong>
-            {diagnoses.length}
-          </strong>
-
-          <small>
-            Saved screening records
-          </small>
-        </article>
-
-        <article>
-          <CloudSun />
-
-          <span>
-            Priority signals
-          </span>
-
-          <strong>
-            {highPriorityAlerts.length}
-          </strong>
-
-          <small>
-            High or critical alerts
-          </small>
-        </article>
-
-        <article>
-          <Bell />
-
-          <span>
-            Unread alerts
-          </span>
-
-          <strong>
-            {unreadAlerts.length}
-          </strong>
-
-          <small>
-            {alerts.length} total alerts
-          </small>
-        </article>
+      <section className="metrics" aria-label="Dashboard shortcuts">
+        <Link className="dashboard-metric-link" to={routes.fields} aria-label={`Open ${fields.length} active fields`}>
+          <Leaf aria-hidden="true" />
+          <span>{tr("Active fields", lang)}</span><strong>{fields.length}</strong>
+          <small>{tr("Open your monitored fields \u2192", lang)}</small>
+        </Link>
+        <Link className="dashboard-metric-link" to={routes.diagnosisHistory} aria-label={`Open ${diagnoses.length} diagnosis records`}>
+          <Microscope aria-hidden="true" />
+          <span>{tr("Diagnoses", lang)}</span><strong>{diagnoses.length}</strong>
+          <small>{tr("Review diagnosis history \u2192", lang)}</small>
+        </Link>
+        <Link className="dashboard-metric-link" to={routes.alerts} aria-label={`Review ${highPriorityAlerts.length} priority signals`}>
+          <CloudSun aria-hidden="true" />
+          <span>{tr("Priority signals", lang)}</span><strong>{highPriorityAlerts.length}</strong>
+          <small>{tr("Review priority alerts \u2192", lang)}</small>
+        </Link>
+        <Link className="dashboard-metric-link" to={routes.alerts} aria-label={`Open ${unreadAlerts.length} unread alerts`}>
+          <Bell aria-hidden="true" />
+          <span>{tr("Unread alerts", lang)}</span><strong>{unreadAlerts.length}</strong>
+          <small>{alerts.length} {tr("total · open alerts →", lang)}</small>
+        </Link>
       </section>
 
       <section className="two-col">
-        <div className="panel dashboard-insight">
+        <Link className="panel dashboard-insight dashboard-insight-link" to={routes.farms} aria-label="Open connected farms">
           <div className="dashboard-insight-icon">
             <Sprout size={22} />
           </div>
@@ -315,9 +284,9 @@ function FarmerDashboard() {
                 : "Add farm and field details to unlock monitoring and diagnosis workflows."}
             </p>
           </div>
-        </div>
+        </Link>
 
-        <div className="panel dashboard-insight">
+        <Link className="panel dashboard-insight dashboard-insight-link" to={routes.alerts} aria-label="Open attention queue and alerts">
           <div className="dashboard-insight-icon">
             <AlertTriangle size={22} />
           </div>
@@ -339,7 +308,7 @@ function FarmerDashboard() {
                 : "CropGuard will surface significant diagnosis and weather-risk events here."}
             </p>
           </div>
-        </div>
+        </Link>
       </section>
     </div>
   );

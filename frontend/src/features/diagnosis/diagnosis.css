@@ -596,3 +596,50 @@
     width: 100%;
   }
 }
+
+.diagnosis-care-plan{margin-top:20px;padding:18px;border:1px solid var(--border);border-radius:16px;background:var(--bg-soft)}
+.diagnosis-care-plan h3{font-size:18px;margin:0 0 8px;color:var(--text)}
+.diagnosis-care-plan p,.diagnosis-care-plan li{color:var(--text-soft);line-height:1.65}
+.diagnosis-care-plan ol{padding-left:22px;margin-bottom:0}
+.diagnosis-care-plan li+li{margin-top:8px}
+
+/* Phase 1A: explainable preflight and model-result states */
+.cropguard-leaf-frame {
+  position: absolute;
+  inset: 14% 23%;
+  border: 2px dashed rgba(21, 155, 120, 0.9);
+  border-radius: 38% 55% 38% 55%;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(5, 16, 9, 0.07);
+}
+.cropguard-photo-preflight, .cropguard-evidence-panel {
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid var(--border-strong);
+  background: var(--primary-soft);
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.cropguard-photo-preflight > strong, .cropguard-evidence-panel > strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+.cropguard-photo-preflight > span { display: block; font-size: 12px; color: var(--muted); }
+.cropguard-photo-preflight p, .cropguard-evidence-panel p { margin: 7px 0 11px; }
+.cropguard-photo-override { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; }
+.cropguard-photo-override input { width: 18px; height: 18px; flex: 0 0 18px; }
+.cropguard-signal-note {
+  margin-top: 15px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--primary);
+  background: var(--primary-soft);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+.cropguard-evidence-panel { margin-top: 20px; }
+@media (prefers-reduced-motion: reduce) {
+  .diagnosis-dropzone, .diagnosis-card { transition: none; transform: none; }
+}

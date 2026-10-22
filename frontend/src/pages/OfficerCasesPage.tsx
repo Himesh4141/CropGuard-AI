@@ -23,10 +23,7 @@ function readableLabel(
   }
 
   return value
-    .replace(
-      "Tomato___",
-      "",
-    )
+    .replace(/^[A-Za-z0-9]+___/, "")
     .replaceAll(
       "_",
       " ",

@@ -1,6 +1,5 @@
 import {
   CloudSun,
-  Leaf,
   Microscope,
   ShieldCheck,
 } from "lucide-react";
@@ -24,7 +23,7 @@ export function AuthLayout() {
           to={routes.home}
         >
           <span className="brand-icon">
-            <Leaf size={20} />
+            <img className="cropguard-brand-image" src={`${import.meta.env.BASE_URL}brand/cropguard-unified-v115-96.png`} alt="" />
           </span>
 
           <div>
@@ -32,9 +31,6 @@ export function AuthLayout() {
               CropGuard
             </strong>
 
-            <small>
-              AI
-            </small>
           </div>
         </Link>
 
