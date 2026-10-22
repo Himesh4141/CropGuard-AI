@@ -7,6 +7,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    google_sign_in_enabled: bool = False
+    google_web_client_id: str = "520759216755-0fjb86mbuehgvh52v3rhcgh2qq8cvlv4.apps.googleusercontent.com"
+    google_android_client_id: str = "520759216755-k3lfcip1jgro1b5ug3rou169760mbk03.apps.googleusercontent.com"
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

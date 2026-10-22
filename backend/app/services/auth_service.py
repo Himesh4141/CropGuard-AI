@@ -57,14 +57,33 @@ class AuthService:
         return TokenPair(access_token=access, refresh_token=refresh, expires_in=settings.access_token_minutes * 60)
 
     def rotate_refresh(self, *, user_id: UUID, jti: str) -> tuple[User, TokenPair]:
-        token_record = self.tokens.get_active(jti)
-        if token_record is None or token_record.user_id != user_id:
-            raise AuthenticationError("Refresh token is invalid or has been revoked")
-        self.tokens.revoke(token_record)
+        """Consume old jti and issue its replacement in ONE transaction.
+
+        The conditional UPDATE permits only one successful consumer of an
+        active jti. A failure to persist the replacement rolls back revocation.
+        """
         user = self.users.get_by_id(user_id)
         if user is None or not user.is_active:
             raise AuthenticationError("Account is unavailable")
-        return user, self.issue_tokens(user)
+
+        new_jti = token_urlsafe(32)
+        expires_at = datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_days)
+        tokens = TokenPair(
+            access_token=create_access_token(user_id=user.id, role=user.role.value),
+            refresh_token=create_refresh_token(user_id=user.id, role=user.role.value, jti=new_jti),
+            expires_in=settings.access_token_minutes * 60,
+        )
+        replacement = RefreshToken(user_id=user.id, jti=new_jti, expires_at=expires_at)
+
+        try:
+            if not self.tokens.revoke_if_active(user_id=user_id, jti=jti):
+                raise AuthenticationError("Refresh token is invalid or has been revoked")
+            self.tokens.add_pending(replacement)
+            self.tokens.commit()
+        except Exception:
+            self.tokens.rollback()
+            raise
+        return user, tokens
 
     def revoke_refresh(self, jti: str) -> None:
         token_record = self.tokens.get_active(jti)

@@ -21,6 +21,7 @@ from app.core.security import (
 )
 from app.db.session import get_db
 from app.schemas.auth import (
+    GoogleIdTokenRequest,
     LoginRequest,
     MobileRefreshRequest,
     MobileTokenResponse,
@@ -28,6 +29,7 @@ from app.schemas.auth import (
     TokenResponse,
 )
 from app.schemas.common import MessageResponse
+from app.services.google_identity import GoogleIdentityError, authenticate_google
 from app.services.auth_service import (
     AuthService,
     TokenPair,
@@ -381,3 +383,82 @@ def mobile_logout(
     except (TokenDecodeError, KeyError):
         pass
     return MessageResponse(message="Signed out")
+
+
+@router.post("/google", response_model=TokenResponse)
+def google_login_web(
+    payload: GoogleIdTokenRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> TokenResponse:
+    if not settings.google_sign_in_enabled:
+        raise HTTPException(status_code=503, detail="Google sign-in requires a backend update")
+    try:
+        user = authenticate_google(db, payload.id_token)
+    except GoogleIdentityError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    tokens = AuthService(db).issue_tokens(user)
+    _set_refresh_cookie(response, tokens.refresh_token)
+    return _response(user, tokens)
+
+
+@router.post("/mobile/google", response_model=MobileTokenResponse)
+def google_login_mobile(
+    payload: GoogleIdTokenRequest,
+    db: Session = Depends(get_db),
+) -> MobileTokenResponse:
+    if not settings.google_sign_in_enabled:
+        raise HTTPException(status_code=503, detail="Google sign-in requires a backend update")
+    try:
+        user = authenticate_google(db, payload.id_token)
+    except GoogleIdentityError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    tokens = AuthService(db).issue_tokens(user)
+    return _mobile_response(user, tokens)
+
+
+# Firebase session exchange is deliberately OFF until the complete
+# frontend/backend integration is tested and explicitly enabled on Render.
+# These routes do NOT replace /login, /mobile/login, or legacy /google routes.
+import os as _firebase_os
+
+from app.services.firebase_account import resolve_firebase_user
+from app.services.firebase_identity import verify_firebase_identity
+
+
+def _firebase_exchange_enabled() -> bool:
+    return _firebase_os.environ.get("CROPGUARD_FIREBASE_AUTH_ENABLED", "false").strip().lower() in {"true", "1"}
+
+
+def _exchange_firebase_identity(db: Session, raw_token: str):
+    try:
+        verified = verify_firebase_identity(raw_token)
+        user = resolve_firebase_user(db, verified)
+        tokens = AuthService(db).issue_tokens(user)
+    except (ValueError, AuthenticationError) as exc:
+        raise HTTPException(status_code=401, detail="Firebase sign-in denied") from exc
+    return user, tokens
+
+
+@router.post("/firebase", response_model=TokenResponse)
+def firebase_login_web(
+    payload: GoogleIdTokenRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> TokenResponse:
+    if not _firebase_exchange_enabled():
+        raise HTTPException(status_code=503, detail="Firebase sign-in is not enabled")
+    user, tokens = _exchange_firebase_identity(db, payload.id_token)
+    _set_refresh_cookie(response, tokens.refresh_token)
+    return _response(user, tokens)
+
+
+@router.post("/mobile/firebase", response_model=MobileTokenResponse)
+def firebase_login_mobile(
+    payload: GoogleIdTokenRequest,
+    db: Session = Depends(get_db),
+) -> MobileTokenResponse:
+    if not _firebase_exchange_enabled():
+        raise HTTPException(status_code=503, detail="Firebase sign-in is not enabled")
+    user, tokens = _exchange_firebase_identity(db, payload.id_token)
+    return _mobile_response(user, tokens)
