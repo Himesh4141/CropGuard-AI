@@ -17,3 +17,5 @@ pillow>=11.0,<12
 httpx>=0.28,<0.29
 numpy>=2.0,<3
 onnxruntime>=1.23,<2
+google-auth>=2.35,<3
+requests>=2.31,<3

@@ -9,6 +9,10 @@ class RegisterRequest(BaseModel):
     password: str = Field(min_length=8, max_length=72)
 
 
+class GoogleIdTokenRequest(BaseModel):
+    id_token: str = Field(min_length=30, max_length=8192)
+
+
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=72)

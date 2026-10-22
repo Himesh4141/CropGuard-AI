@@ -64,6 +64,35 @@ class TokenRepository:
 
         self.db.commit()
 
+    def revoke_if_active(self, *, user_id: UUID, jti: str) -> bool:
+        """Compare-and-swap a live refresh row without committing.
+
+        A concurrent request using the same jti will update zero rows.
+        The caller must commit this change and the replacement row together.
+        """
+        now = datetime.now(timezone.utc)
+        result = self.db.execute(
+            update(RefreshToken)
+            .where(
+                RefreshToken.jti == jti,
+                RefreshToken.user_id == user_id,
+                RefreshToken.revoked_at.is_(None),
+                RefreshToken.expires_at > now,
+            )
+            .values(revoked_at=now)
+        )
+        return result.rowcount == 1
+
+    def add_pending(self, token: RefreshToken) -> None:
+        """Queue a replacement refresh row in the caller's transaction."""
+        self.db.add(token)
+
+    def commit(self) -> None:
+        self.db.commit()
+
+    def rollback(self) -> None:
+        self.db.rollback()
+
     def revoke_all_for_user(
         self,
         user_id: UUID,
