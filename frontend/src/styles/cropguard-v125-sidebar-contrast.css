@@ -1,0 +1,51 @@
+/* CropGuard desktop sidebar contrast repair, shared by every dashboard route.
+   The legacy .sidebar uses a translucent white surface even in dark mode.
+   Scope overrides to the dark theme, rather than changing page content or auth. */
+:root[data-cg-theme="dark"] .dashboard-shell > .sidebar,
+:root[data-cg-theme="dark"] .sidebar {
+  background: #142f25 !important;
+  border-right: 1px solid #446b56 !important;
+  color: #f3fff6 !important;
+  box-shadow: 8px 0 24px rgba(0, 0, 0, .20) !important;
+}
+:root[data-cg-theme="dark"] .sidebar .brand,
+:root[data-cg-theme="dark"] .sidebar .brand strong {
+  color: #f3fff6 !important;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .sidebar .sidebar-section-label {
+  color: #b4d5c0 !important;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .sidebar nav .nav-link {
+  color: #d6f0df !important;
+  background: transparent;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .sidebar nav .nav-link svg,
+:root[data-cg-theme="dark"] .sidebar nav .nav-link span {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .sidebar nav .nav-link:hover {
+  background: #24513b !important;
+  color: #ffffff !important;
+}
+:root[data-cg-theme="dark"] .sidebar nav .nav-link.active {
+  background: #285840 !important;
+  color: #c2ffdb !important;
+  box-shadow: inset 0 0 0 1px #6bb78a !important;
+}
+:root[data-cg-theme="dark"] .sidebar nav .nav-link.active::before {
+  background: #95f4ba !important;
+}
+:root[data-cg-theme="dark"] .sidebar nav .nav-link:focus-visible {
+  outline: 3px solid #f4c169 !important;
+  outline-offset: 2px;
+}
+:root[data-cg-theme="dark"] .sidebar .platform-status {
+  background: #1c4030 !important;
+  border-color: #517d61 !important;
+  color: #dbf5e2 !important;
+  opacity: 1 !important;
+}
