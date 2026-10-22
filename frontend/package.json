@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
-    "lint": "eslint . --max-warnings=0 --ignore-pattern android/**"
+    "lint": "eslint . --max-warnings=0 --ignore-pattern \"android/**\""
   },
   "dependencies": {
     "@capacitor/android": "^6.2.2",
