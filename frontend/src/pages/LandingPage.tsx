@@ -14,7 +14,7 @@ import {
 import {
   routes,
 } from "@/config/routes";
-import approvedIcon from "@/assets/images/cropguard-approved-icon.png";
+
 
 
 export default function LandingPage() {
@@ -26,7 +26,7 @@ export default function LandingPage() {
           to={routes.home}
         >
           <span className="brand-icon">
-            <img className="cropguard-brand-image" src={approvedIcon} alt="" />
+            <img className="cropguard-brand-image" src={`${import.meta.env.BASE_URL}brand/cropguard-unified-v115-96.png`} alt="" />
           </span>
 
           <div>

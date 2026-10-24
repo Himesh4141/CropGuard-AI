@@ -1,3 +1,5 @@
+import { useCropGuardLanguage } from "@/features/preferences/preferences";
+import { screenText as tr } from "@/i18n/screenText";
 import {
   Microscope,
 } from "lucide-react";
@@ -27,6 +29,7 @@ export function DiagnosisHistory({
   diagnoses,
   fields,
 }: DiagnosisHistoryProps) {
+  const lang = useCropGuardLanguage();
   const fieldNames =
     new Map(
       fields.map(
@@ -45,12 +48,11 @@ export function DiagnosisHistory({
         <Microscope size={38} />
 
         <h2>
-          No screening history yet
+          {tr("No screening history yet", lang)}
         </h2>
 
         <p>
-          Completed crop-image
-          screenings will appear here.
+          {tr("Completed crop-image screenings will appear here.", lang)}
         </p>
       </div>
     );
@@ -67,7 +69,7 @@ export function DiagnosisHistory({
               fieldNames.get(
                 diagnosis.field_id,
               ) ??
-              "Unknown field"
+              tr("Unknown field", lang)
             }
           />
         ),

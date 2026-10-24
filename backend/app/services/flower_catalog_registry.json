@@ -1,0 +1,348 @@
+[
+  {
+    "id": "rose",
+    "name": "Rose",
+    "scientific_names": [
+      "Rosa × hybrida",
+      "Rosa chinensis",
+      "Rosa"
+    ]
+  },
+  {
+    "id": "hibiscus",
+    "name": "Hibiscus / Gudhal",
+    "scientific_names": [
+      "Hibiscus rosa-sinensis"
+    ]
+  },
+  {
+    "id": "jasmine",
+    "name": "Arabian Jasmine / Mogra",
+    "scientific_names": [
+      "Jasminum sambac"
+    ]
+  },
+  {
+    "id": "marigold",
+    "name": "Marigold / Genda",
+    "scientific_names": [
+      "Tagetes erecta",
+      "Tagetes patula"
+    ]
+  },
+  {
+    "id": "bougainvillea",
+    "name": "Bougainvillea",
+    "scientific_names": [
+      "Bougainvillea glabra",
+      "Bougainvillea spectabilis"
+    ]
+  },
+  {
+    "id": "chrysanthemum",
+    "name": "Chrysanthemum / Guldaudi",
+    "scientific_names": [
+      "Chrysanthemum morifolium"
+    ]
+  },
+  {
+    "id": "orchid",
+    "name": "Moth Orchid",
+    "scientific_names": [
+      "Phalaenopsis amabilis",
+      "Phalaenopsis"
+    ]
+  },
+  {
+    "id": "peace-lily",
+    "name": "Peace Lily",
+    "scientific_names": [
+      "Spathiphyllum wallisii",
+      "Spathiphyllum"
+    ]
+  },
+  {
+    "id": "anthurium",
+    "name": "Anthurium / Flamingo Flower",
+    "scientific_names": [
+      "Anthurium andraeanum"
+    ]
+  },
+  {
+    "id": "geranium",
+    "name": "Zonal Geranium",
+    "scientific_names": [
+      "Pelargonium × hortorum",
+      "Pelargonium zonale"
+    ]
+  },
+  {
+    "id": "petunia",
+    "name": "Petunia",
+    "scientific_names": [
+      "Petunia × atkinsiana",
+      "Petunia hybrida"
+    ]
+  },
+  {
+    "id": "zinnia",
+    "name": "Zinnia",
+    "scientific_names": [
+      "Zinnia elegans"
+    ]
+  },
+  {
+    "id": "sunflower",
+    "name": "Sunflower",
+    "scientific_names": [
+      "Helianthus annuus"
+    ]
+  },
+  {
+    "id": "dahlia",
+    "name": "Dahlia",
+    "scientific_names": [
+      "Dahlia pinnata",
+      "Dahlia"
+    ]
+  },
+  {
+    "id": "lily",
+    "name": "True Lily",
+    "scientific_names": [
+      "Lilium longiflorum",
+      "Lilium asiaticum",
+      "Lilium orientalis",
+      "Lilium"
+    ]
+  },
+  {
+    "id": "tulip",
+    "name": "Tulip",
+    "scientific_names": [
+      "Tulipa gesneriana",
+      "Tulipa"
+    ]
+  },
+  {
+    "id": "gerbera",
+    "name": "Gerbera Daisy",
+    "scientific_names": [
+      "Gerbera jamesonii"
+    ]
+  },
+  {
+    "id": "carnation",
+    "name": "Carnation",
+    "scientific_names": [
+      "Dianthus caryophyllus"
+    ]
+  },
+  {
+    "id": "cosmos",
+    "name": "Cosmos",
+    "scientific_names": [
+      "Cosmos bipinnatus",
+      "Cosmos sulphureus"
+    ]
+  },
+  {
+    "id": "pansy",
+    "name": "Pansy",
+    "scientific_names": [
+      "Viola × wittrockiana"
+    ]
+  },
+  {
+    "id": "calendula",
+    "name": "Pot Marigold",
+    "scientific_names": [
+      "Calendula officinalis"
+    ]
+  },
+  {
+    "id": "morning-glory",
+    "name": "Morning Glory",
+    "scientific_names": [
+      "Ipomoea purpurea"
+    ]
+  },
+  {
+    "id": "hydrangea",
+    "name": "Bigleaf Hydrangea",
+    "scientific_names": [
+      "Hydrangea macrophylla"
+    ]
+  },
+  {
+    "id": "lavender",
+    "name": "English Lavender",
+    "scientific_names": [
+      "Lavandula angustifolia"
+    ]
+  },
+  {
+    "id": "gardenia",
+    "name": "Gardenia",
+    "scientific_names": [
+      "Gardenia jasminoides"
+    ]
+  },
+  {
+    "id": "ixora",
+    "name": "Ixora / Rangan",
+    "scientific_names": [
+      "Ixora coccinea"
+    ]
+  },
+  {
+    "id": "plumeria",
+    "name": "Frangipani / Champa",
+    "scientific_names": [
+      "Plumeria rubra",
+      "Plumeria obtusa"
+    ]
+  },
+  {
+    "id": "adenium",
+    "name": "Desert Rose",
+    "scientific_names": [
+      "Adenium obesum"
+    ]
+  },
+  {
+    "id": "vinca",
+    "name": "Madagascar Periwinkle / Sadabahar",
+    "scientific_names": [
+      "Catharanthus roseus"
+    ]
+  },
+  {
+    "id": "lotus",
+    "name": "Sacred Lotus",
+    "scientific_names": [
+      "Nelumbo nucifera"
+    ]
+  },
+  {
+    "id": "water-lily",
+    "name": "Water Lily",
+    "scientific_names": [
+      "Nymphaea nouchali",
+      "Nymphaea alba",
+      "Nymphaea"
+    ]
+  },
+  {
+    "id": "impatiens",
+    "name": "Busy Lizzie / Impatiens",
+    "scientific_names": [
+      "Impatiens walleriana"
+    ]
+  },
+  {
+    "id": "begonia",
+    "name": "Wax Begonia",
+    "scientific_names": [
+      "Begonia semperflorens",
+      "Begonia cucullata"
+    ]
+  },
+  {
+    "id": "azalea",
+    "name": "Azalea",
+    "scientific_names": [
+      "Rhododendron simsii",
+      "Rhododendron indicum"
+    ]
+  },
+  {
+    "id": "camellia",
+    "name": "Camellia",
+    "scientific_names": [
+      "Camellia japonica"
+    ]
+  },
+  {
+    "id": "verbena",
+    "name": "Garden Verbena",
+    "scientific_names": [
+      "Verbena × hybrida",
+      "Glandularia × hybrida"
+    ]
+  },
+  {
+    "id": "salvia",
+    "name": "Scarlet Sage",
+    "scientific_names": [
+      "Salvia splendens"
+    ]
+  },
+  {
+    "id": "snapdragon",
+    "name": "Snapdragon",
+    "scientific_names": [
+      "Antirrhinum majus"
+    ]
+  },
+  {
+    "id": "celosia",
+    "name": "Cockscomb / Celosia",
+    "scientific_names": [
+      "Celosia argentea",
+      "Celosia cristata"
+    ]
+  },
+  {
+    "id": "butterfly-pea",
+    "name": "Butterfly Pea / Aparajita",
+    "scientific_names": [
+      "Clitoria ternatea"
+    ]
+  },
+  {
+    "id": "tuberose",
+    "name": "Tuberose / Rajnigandha",
+    "scientific_names": [
+      "Agave amica",
+      "Polianthes tuberosa"
+    ]
+  },
+  {
+    "id": "crossandra",
+    "name": "Crossandra / Kanakambaram",
+    "scientific_names": [
+      "Crossandra infundibuliformis"
+    ]
+  },
+  {
+    "id": "allamanda",
+    "name": "Golden Trumpet",
+    "scientific_names": [
+      "Allamanda cathartica"
+    ]
+  },
+  {
+    "id": "ranunculus",
+    "name": "Persian Buttercup",
+    "scientific_names": [
+      "Ranunculus asiaticus"
+    ]
+  },
+  {
+    "id": "fuchsia",
+    "name": "Fuchsia",
+    "scientific_names": [
+      "Fuchsia hybrida",
+      "Fuchsia magellanica"
+    ]
+  },
+  {
+    "id": "clematis",
+    "name": "Clematis",
+    "scientific_names": [
+      "Clematis × jackmanii",
+      "Clematis florida"
+    ]
+  }
+]

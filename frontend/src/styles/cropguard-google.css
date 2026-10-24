@@ -1,0 +1,7 @@
+.cg-google-signin { margin: 1rem 0; display: flex; flex-direction: column; gap: .65rem; color: var(--text-primary, currentColor); }
+.cg-google-gis { display:flex; justify-content:center; min-height:44px; }
+.cg-google-signin .button { min-height:48px; }
+[data-cg-theme="dark"] .cg-google-signin .button.secondary { color:#f2fff8; border:1px solid #9adab8; background:#194736; }
+.cg-translation-controls { display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.65rem 0; }
+.cg-translation-controls p { max-width:48rem; line-height:1.5; }
+[lang^="hi"], [lang^="te"] { overflow-wrap:anywhere; }

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "seed": 26033,
+  "ready_for_experimental_training": false,
+  "production_approved": false,
+  "data_root": "C:\\Users\\himes\\Projects\\CropGuard\\ml\\data\\expansion_labeled",
+  "review_file_hashes": {
+    "C:\\Users\\himes\\Projects\\CropGuard\\ml\\expansion\\candidate_plants.json": "e5cbf535b76dbc1f5fe8f90d175f548544aa3c21c4d7483bf7c2c08dfe246dc3",
+    "C:\\Users\\himes\\Projects\\CropGuard\\ml\\expansion\\v3\\label_reviews.csv": "b8ea791c870507ae1c241602df017104e909d937813e3094849eb556015174d4",
+    "C:\\Users\\himes\\Projects\\CropGuard\\ml\\expansion\\v3\\source_reviews.csv": "2ca1326ce2229f6d5a0e2c9ce32edcae9adffed8e347306e71cb577802786ed2"
+  },
+  "samples": [],
+  "blockers": [
+    "Missing file: provenance.csv",
+    "No new verified plant photos exist. Do not train v3 yet.",
+    "No approved image classes; review the proposed labels and image sources."
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "520759216755",
+    "project_id": "cropguard-ai-512310",
+    "storage_bucket": "cropguard-ai-512310.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520759216755:android:ffe6a09c6a66b97d527806",
+        "android_client_info": {
+          "package_name": "com.himesh4141.cropguard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "520759216755-k3lfcip1jgro1b5ug3rou169760mbk03.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.himesh4141.cropguard",
+            "certificate_hash": "f3ce055e9989c4477eb9f9e23e19b28ef2db9b73"
+          }
+        },
+        {
+          "client_id": "520759216755-61oqc7b3gnb0ghschp98nhaussf2505o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2X_BMWgTgXJ5xHj_NBtEKBI9xKhRlev4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520759216755-0fjb86mbuehgvh52v3rhcgh2qq8cvlv4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,3 +1,6 @@
+import { useCropGuardLanguage } from "@/features/preferences/preferences";
+import { localizeCondition } from "@/i18n/diagnosis";
+import { screenText as tr, hasScreenTranslation } from "@/i18n/screenText";
 import {
   Camera,
   CheckCircle2,
@@ -41,27 +44,6 @@ import {
 import "@/features/careCases/careCases.css";
 
 
-function readableLabel(
-  value: string | null,
-): string {
-  if (!value) {
-    return "Crop-health condition";
-  }
-
-  const withoutCrop = value.includes("___")
-    ? value.split("___")[1] ?? value
-    : value;
-
-  return withoutCrop
-    .replaceAll("_", " ")
-    .replace(/\s+/g, " ")
-    .replace(
-      /\b\w/g,
-      (letter) => letter.toUpperCase(),
-    );
-}
-
-
 function formatDate(
   value: string | null,
 ): string {
@@ -80,6 +62,7 @@ function formatDate(
 
 
 export default function CareCasesPage() {
+  const lang = useCropGuardLanguage();
   const queryClient = useQueryClient();
 
   const casesQuery = useQuery({
@@ -155,55 +138,55 @@ export default function CareCasesPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow="CROP CARE"
-        title="Care cases"
-        description="Keep each crop-health issue under follow-up until it improves, is reviewed by an officer when needed, and is finally resolved."
+        eyebrow={tr("CROP CARE", lang)}
+        title={tr("Care cases", lang)}
+        description={tr("Keep each crop-health issue under follow-up until it improves, is reviewed by an officer when needed, and is finally resolved.", lang)}
       />
 
       <section className="metrics care-case-metrics">
         <article>
           <HeartPulse />
-          <span>Active cases</span>
+          <span>{tr("Active cases", lang)}</span>
           <strong>{activeCases.length}</strong>
-          <small>Still being monitored</small>
+          <small>{tr("Still being monitored", lang)}</small>
         </article>
 
         <article>
           <ShieldAlert />
-          <span>Escalated</span>
+          <span>{tr("Escalated", lang)}</span>
           <strong>{escalatedCases.length}</strong>
-          <small>Visible to your area officer</small>
+          <small>{tr("Visible to your area officer", lang)}</small>
         </article>
 
         <article>
           <TrendingUp />
-          <span>Improving</span>
+          <span>{tr("Improving", lang)}</span>
           <strong>{improvingCases.length}</strong>
-          <small>Latest farmer status</small>
+          <small>{tr("Latest farmer status", lang)}</small>
         </article>
 
         <article>
           <CheckCircle2 />
-          <span>Resolved</span>
+          <span>{tr("Resolved", lang)}</span>
           <strong>
             {cases.length - activeCases.length}
           </strong>
-          <small>Closed care journeys</small>
+          <small>{tr("Closed care journeys", lang)}</small>
         </article>
       </section>
 
       {casesQuery.isLoading && (
         <section className="panel empty">
           <div className="spinner" />
-          <p>Loading crop-care cases...</p>
+          <p>{tr("Loading crop-care cases...", lang)}</p>
         </section>
       )}
 
       {casesQuery.isError && (
         <section className="panel empty">
           <HeartPulse size={36} />
-          <h2>Care cases could not be loaded</h2>
-          <p>Check your connection and try again.</p>
+          <h2>{tr("Care cases could not be loaded", lang)}</h2>
+          <p>{tr("Check your connection and try again.", lang)}</p>
         </section>
       )}
 
@@ -213,10 +196,9 @@ export default function CareCasesPage() {
         && (
           <section className="panel empty">
             <HeartPulse size={36} />
-            <h2>No active crop-care cases</h2>
+            <h2>{tr("No active crop-care cases", lang)}</h2>
             <p>
-              When a disease screening finds a condition that needs monitoring,
-              CropGuard will create a care case automatically.
+              {tr("When a disease screening finds a condition that needs monitoring, CropGuard will create a care case automatically.", lang)}
             </p>
           </section>
         )}
@@ -267,6 +249,7 @@ function FarmerCareCaseCard({
   onFollowUp: (payload: FarmerFollowUpPayload) => void;
   onResolve: (note?: string) => void;
 }) {
+  const lang = useCropGuardLanguage();
   const [trend, setTrend] = useState<Exclude<CareCaseTrend, "new">>("same");
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -283,14 +266,14 @@ function FarmerCareCaseCard({
         <div>
           <div className="care-case-kicker">
             <span className={`care-case-status care-case-status--${careCase.status}`}>
-              {careCase.status.replaceAll("_", " ")}
+              {tr(careCase.status, lang)}
             </span>
-            <span className={`care-case-priority care-case-priority--${careCase.priority}`}>
-              {careCase.priority} priority
-            </span>
+            {!resolved && <span className={`care-case-priority care-case-priority--${careCase.priority}`}>
+              {tr(careCase.priority, lang)} {tr("priority", lang)}
+            </span>}
           </div>
 
-          <h2>{readableLabel(careCase.current_label)}</h2>
+          <h2>{careCase.current_label ? localizeCondition(careCase.current_label, lang).value : tr("Crop-health condition", lang)}</h2>
 
           <p>
             {careCase.field_name} · {careCase.farm_name} · {careCase.crop_name}
@@ -301,7 +284,7 @@ function FarmerCareCaseCard({
           <strong>
             {confidence == null ? "—" : `${confidence}%`}
           </strong>
-          <span>latest confidence</span>
+          <span>{tr("latest confidence", lang)}</span>
         </div>
       </div>
 
@@ -310,35 +293,35 @@ function FarmerCareCaseCard({
         <div>
           <strong>
             {resolved
-              ? "Case resolved"
-              : "Next follow-up"}
+              ? tr("Case resolved", lang)
+              : tr("Next follow-up", lang)}
           </strong>
           <span>
             {resolved
-              ? formatDate(careCase.resolved_at)
-              : formatDate(careCase.next_follow_up_at)}
+              ? tr(formatDate(careCase.resolved_at), lang)
+              : tr(formatDate(careCase.next_follow_up_at), lang)}
           </span>
         </div>
       </div>
 
       <div className="care-plan-grid">
         <CarePlanSection
-          title="Do now"
+          title={tr("Do now", lang)}
           items={careCase.action_plan.immediate_actions}
         />
 
         <CarePlanSection
-          title="Monitor for"
+          title={tr("Monitor for", lang)}
           items={careCase.action_plan.monitor_for}
         />
 
         <CarePlanSection
-          title="Prevention"
+          title={tr("Prevention", lang)}
           items={careCase.action_plan.prevention}
         />
 
         <CarePlanSection
-          title="Escalate if"
+          title={tr("Escalate if", lang)}
           items={careCase.action_plan.escalation_triggers}
           danger
         />
@@ -348,7 +331,7 @@ function FarmerCareCaseCard({
         <details className="care-case-timeline">
           <summary>
             <MessageSquareText size={16} />
-            Case timeline · {careCase.updates.length} updates
+            {tr("Case timeline", lang)} · {careCase.updates.length} {tr("updates", lang)}
           </summary>
 
           <div className="care-case-timeline-list">
@@ -360,7 +343,7 @@ function FarmerCareCaseCard({
                   <div>
                     <strong>
                       {update.actor_name
-                        ?? (update.event_type === "system" ? "CropGuard" : "Care team")}
+                        ?? (update.event_type === "system" ? "CropGuard" : tr("Care team", lang))}
                     </strong>
                     <small>
                       {new Date(update.created_at).toLocaleString()}
@@ -386,7 +369,7 @@ function FarmerCareCaseCard({
             onClick={() => setShowFollowUp((value) => !value)}
           >
             <Camera size={16} />
-            Add follow-up
+            {tr("Add follow-up", lang)}
           </button>
 
           <button
@@ -396,7 +379,7 @@ function FarmerCareCaseCard({
             onClick={() => onResolve("Farmer confirmed the crop-health issue is resolved.")}
           >
             <CheckCircle2 size={16} />
-            Mark resolved
+            {tr("Mark resolved", lang)}
           </button>
         </div>
       )}
@@ -420,7 +403,7 @@ function FarmerCareCaseCard({
               onClick={() => setTrend("improving")}
             >
               <TrendingUp size={17} />
-              Improving
+              {tr("Improving", lang)}
             </button>
 
             <button
@@ -429,7 +412,7 @@ function FarmerCareCaseCard({
               onClick={() => setTrend("same")}
             >
               <HeartPulse size={17} />
-              Same
+              {tr("Same", lang)}
             </button>
 
             <button
@@ -438,22 +421,22 @@ function FarmerCareCaseCard({
               onClick={() => setTrend("worsening")}
             >
               <TrendingDown size={17} />
-              Worse
+              {tr("Worse", lang)}
             </button>
           </div>
 
           <label>
-            What changed?
+            {tr("What changed?", lang)}
             <textarea
               value={note}
               maxLength={1500}
-              placeholder="Example: More leaves are affected, or the spots have stopped spreading."
+              placeholder={tr("Example: More leaves are affected, or the spots have stopped spreading.", lang)}
               onChange={(event) => setNote(event.target.value)}
             />
           </label>
 
           <label>
-            Follow-up photo (optional)
+            {tr("Follow-up photo (optional)", lang)}
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
@@ -467,7 +450,7 @@ function FarmerCareCaseCard({
               className="button primary"
               disabled={followUpPending}
             >
-              {followUpPending ? "Updating case..." : "Save follow-up"}
+              {followUpPending ? tr("Updating case...", lang) : tr("Save follow-up", lang)}
             </button>
 
             <button
@@ -475,7 +458,7 @@ function FarmerCareCaseCard({
               className="button ghost"
               onClick={() => setShowFollowUp(false)}
             >
-              Cancel
+              {tr("Cancel", lang)}
             </button>
           </div>
         </form>
@@ -494,14 +477,17 @@ function CarePlanSection({
   items: string[];
   danger?: boolean;
 }) {
+  const lang = useCropGuardLanguage();
+  const hasUntranslated = lang !== "en" && items.some(item => !hasScreenTranslation(item, lang));
   return (
     <section className={danger ? "care-plan-section care-plan-section--danger" : "care-plan-section"}>
       <strong>{title}</strong>
       <ul>
         {items.map((item) => (
-          <li key={item}>{item}</li>
+          <li key={item}>{tr(item, lang)}</li>
         ))}
       </ul>
+      {hasUntranslated && <small role="note">{tr("English advisory — translation not reviewed", lang)}</small>}
     </section>
   );
 }

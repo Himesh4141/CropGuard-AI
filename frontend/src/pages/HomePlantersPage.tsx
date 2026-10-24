@@ -1,12 +1,16 @@
+import { cgText, useCropGuardLanguage } from "@/features/preferences/preferences";
+import FlowerGardenPanel from "../features/homePlanters/FlowerGardenPanel";
 import { useEffect, useRef, useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Camera, CheckCircle2, Flower2, ImagePlus, Leaf, ScanSearch, ShieldAlert, Trash2, History, Save } from "lucide-react";
 import { buildCareGuide, possibleCareConcern, plantNames, symptomLabels, type PlantChoice, type Symptom } from "@/features/homePlanters/careGuide";
-import { screenPhoto, type ImageAssessment } from "@/features/homePlanters/imageAssessment";
+import { screenPhoto, type ImageAssessment } from "@/features/homePlanters/adaptivePhotoScan";
+import { preparePlantPhoto } from "@/features/homePlanters/smartPhoto";
 import { identifyPlant, type PlantIdentity } from "@/features/homePlanters/plantIdentity";
 import { loadPreferences } from "@/features/profile/localPreferences";
 import { useAuthStore } from "@/features/auth/store";
 import { clearScans, loadScans, saveScan, type CareReport, type ScanRecord } from "@/features/homePlanters/localHistory";
+import { HomeCareTimeline } from "@/features/homePlanters/HomeCareTimeline";
 import "@/features/homePlanters/homePlanters.css";
 
 const allSymptoms = Object.keys(symptomLabels) as Symptom[];
@@ -14,6 +18,7 @@ const maxBytes = 10 * 1024 * 1024;
 const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export default function HomePlantersPage() {
+  const language = useCropGuardLanguage();
   const isAndroid = Capacitor.getPlatform() === "android";
   const userId = useAuthStore(state => state.user?.id);
   const uploadRef = useRef<HTMLInputElement>(null);
@@ -25,6 +30,7 @@ export default function HomePlantersPage() {
   const [plant, setPlant] = useState<PlantChoice>("unknown");
   const [identity, setIdentity] = useState<PlantIdentity | null>(null);
   const [identityMessage, setIdentityMessage] = useState("");
+  const [photoAdjustment, setPhotoAdjustment] = useState("");
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [assessment, setAssessment] = useState<ImageAssessment | null>(null);
   const [scanning, setScanning] = useState(false);
@@ -40,6 +46,11 @@ export default function HomePlantersPage() {
     return () => URL.revokeObjectURL(url);
   }, [photo]);
 
+  useEffect(() => () => {
+    scanSequence.current++;
+    cameraRequest.current++;
+  }, []);
+
   function receivePhoto(next?: File) {
     if (!next) return;
     cameraRequest.current++;
@@ -49,9 +60,11 @@ export default function HomePlantersPage() {
     setPlant("unknown");
     setIdentity(null);
     setIdentityMessage("");
+    setPhotoAdjustment("");
     setSavedId(null);
     setScanning(false);
     setPhoto(null);
+    setSymptoms([]);
     if (!allowedTypes.has(next.type)) { setError("Choose a JPG, PNG or WebP photograph."); return; }
     if (!next.size || next.size > maxBytes) { setError("Photo must be under 10 MB and not empty."); return; }
     setPhoto(next);
@@ -61,10 +74,12 @@ export default function HomePlantersPage() {
     cameraRequest.current++;
     scanSequence.current++;
     setPhoto(null);
+    setSymptoms([]);
     setAssessment(null);
     setPlant("unknown");
     setIdentity(null);
     setIdentityMessage("");
+    setPhotoAdjustment("");
     setScanning(false);
     setError(null);
     setSavedId(null);
@@ -117,12 +132,19 @@ export default function HomePlantersPage() {
     const id = ++scanSequence.current;
     setError(null);
     setAssessment(null);
+    setIdentity(null);
+    setIdentityMessage("");
+    setPhotoAdjustment("");
+    setPlant("unknown");
     setScanning(true);
     setSavedId(null);
     try {
       // Analyze colors locally; species ID is an independent remote workflow.
       // Promise.allSettled keeps care guidance available if recognition is offline.
-      const [visual, identification] = await Promise.allSettled([screenPhoto(photo), identifyPlant(photo)]);
+      const prepared = await preparePlantPhoto(photo);
+      if (scanSequence.current !== id) return;
+      setPhotoAdjustment(prepared.message);
+      const [visual, identification] = await Promise.allSettled([screenPhoto(photo), identifyPlant(prepared.file, true)]);
       if (scanSequence.current !== id) return;
       if (visual.status === "rejected") throw visual.reason;
       setAssessment(visual.value);
@@ -130,8 +152,12 @@ export default function HomePlantersPage() {
       const foundPlant: PlantChoice = found?.status === "identified" ? found.plant : "unknown";
       if (userId && loadPreferences(userId).autoSaveScans) {
         const record = createRecord(foundPlant, found, visual.value, symptoms);
-        setHistory(saveScan(record));
-        setSavedId(record.id);
+        try {
+          setHistory(saveScan(record));
+          setSavedId(record.id);
+        } catch (failure) {
+          setError(failure instanceof Error ? failure.message : "Care report could not be saved.");
+        }
       }
       if (identification.status === "fulfilled") {
         setIdentity(identification.value);
@@ -140,7 +166,7 @@ export default function HomePlantersPage() {
       } else {
         setIdentity(null);
         setPlant("unknown");
-        setIdentityMessage("Automatic plant identification is temporarily unavailable. The photo was still screened for visible concerns. Recognition requires the backend PlantNet service to be configured.");
+        setIdentityMessage("Plant identification is temporarily unavailable. Your photo was still checked for visible observations, and care guidance remains available.");
       }
     } catch (failure) {
       if (scanSequence.current === id) {
@@ -172,14 +198,23 @@ export default function HomePlantersPage() {
   function saveObservation() {
     if (!assessment || savedId) return;
     const record = createRecord(plant, identity, assessment, symptoms);
-    setHistory(saveScan(record));
-    setSavedId(record.id);
-    setOpenReportId(record.id);
+    try {
+      setHistory(saveScan(record));
+      setSavedId(record.id);
+      setOpenReportId(record.id);
+      setError(null);
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "Care report could not be saved.");
+    }
   }
 
   function deleteHistory() {
     if (!window.confirm("Delete all saved Home Planters care reports from this device?")) return;
-    clearScans();
+    try { clearScans(); }
+    catch (failure) {
+      setError(failure instanceof Error ? failure.message : "History could not be deleted.");
+      return;
+    }
     setHistory([]);
     setSavedId(null);
     setOpenReportId(null);
@@ -191,29 +226,29 @@ export default function HomePlantersPage() {
       <div className="hp-head">
         <span className="eyebrow">CROPGUARD · HOME PLANTERS</span>
         <h1><Flower2 size={30} aria-hidden="true" /> Healthy home plants start with a clearer picture.</h1>
-        <p>Take or upload a photo to screen visible foliage patterns and receive practical care guidance. No farm or field is required.</p>
+        <p>{cgText("Take or upload a photo to screen visible foliage patterns and receive practical care guidance. No farm or field is required.", language)}</p>
       </div>
       <div className="hp-grid">
         <section className="hp-panel" aria-labelledby="hp-photo-title">
-          <div className="hp-section-title"><ImagePlus size={20} aria-hidden="true" /><h2 id="hp-photo-title">1. Photograph your plant</h2></div>
+          <div className="hp-section-title"><ImagePlus size={20} aria-hidden="true" /><h2 id="hp-photo-title">{cgText("1. Photograph your plant", language)}</h2></div>
           <div className="hp-photo">
-            {preview ? <img src={preview} alt="Selected home plant photograph" /> : <div className="hp-empty"><Leaf size={37} aria-hidden="true" /><span>Take or upload a clear plant photo</span><small>Show a leaf and its surroundings in natural daylight.</small></div>}
+            {preview ? <img src={preview} alt="Selected home plant photograph" /> : <div className="hp-empty"><Leaf size={37} aria-hidden="true" /><span>Take or upload a plant photo</span><small>Ordinary phone photos work; lighting adjustments run automatically when useful.</small></div>}
           </div>
           <div className="hp-actions">
-            {isAndroid && <button type="button" className="button primary" onClick={() => void captureNativePhoto()}><Camera size={18} /> Take photo</button>}
-            <button type="button" className="button secondary" onClick={() => uploadRef.current?.click()}><ImagePlus size={18} /> Upload image</button>
+            {isAndroid && <button type="button" className="button primary" onClick={() => void captureNativePhoto()}><Camera size={18} /> {cgText("Take photo", language)}</button>}
+            <button type="button" className="button secondary" onClick={() => uploadRef.current?.click()}><ImagePlus size={18} /> {cgText("Upload image", language)}</button>
             {photo && <button type="button" className="button secondary" onClick={clearPhoto} aria-label="Remove photograph"><Trash2 size={18} /></button>}
           </div>
           <input ref={uploadRef} type="file" className="hp-hidden" accept="image/jpeg,image/png,image/webp" aria-label="Upload a plant photo" onChange={event => { receivePhoto(event.target.files?.[0]); event.target.value = ""; }} />
           {isAndroid && <input ref={cameraRef} type="file" className="hp-hidden" capture="environment" accept="image/*" aria-label="Take a plant photo" onChange={event => { receivePhoto(event.target.files?.[0]); event.target.value = ""; }} />}
-          <button className="button primary hp-scan-button" type="button" disabled={!photo || scanning} onClick={() => void analyzePhoto()}><ScanSearch size={19} /> {scanning ? "Analyzing photo…" : "Analyze photo and get care guidance"}</button>
+          <button className="button primary hp-scan-button" type="button" disabled={!photo || scanning} onClick={() => void analyzePhoto()}><ScanSearch size={19} /> {scanning ? cgText("Analyzing photo…", language) : cgText("Analyze photo and get care guidance", language)}</button>
           {error && <p className="hp-error" role="alert">{error}</p>}
           <p className="hp-privacy">Visual screening stays on this device. For automatic species recognition, the photograph is sent through the CropGuard API to Pl@ntNet when the service is configured. No farmer field is required.</p>
         </section>
 
         <section className="hp-panel" aria-labelledby="hp-identity-title">
           <div className="hp-section-title"><Leaf size={20} aria-hidden="true" /><h2 id="hp-identity-title">2. Automatic plant recognition</h2></div>
-          <p className="hp-muted">Upload or photograph a plant, then tap Analyze. CropGuard requests an identification from the Pl@ntNet plant recognition service. No manual plant selection or farm is required.</p>
+          <p className="hp-muted">Analyze a normal phone photograph. CropGuard automatically adjusts difficult lighting when helpful; you do not need a special camera or a farm.</p>
           <div className="hp-identity-result" role="status">
             <strong>{identity?.status === "identified"
               ? (identity.plant === "unknown" ? (identity.common_name || identity.scientific_name || "Plant match") : plantNames[identity.plant])
@@ -221,22 +256,23 @@ export default function HomePlantersPage() {
                 ? `Possible match: ${identity.common_name || identity.scientific_name || "unconfirmed plant"}`
                 : identity?.status === "unknown" ? "Plant identity not confirmed" : "Awaiting a confident identification"}</strong>
             {identity?.scientific_name && <span>{identity.status === "identified" ? "Provider scientific name" : "Possible scientific name"}: <i>{identity.scientific_name}</i></span>}
-            {identity && <span>Pl@ntNet score: {Math.round(identity.confidence * 100)}% · {identity.status === "identified" ? "strong suggestion" : identity.status === "uncertain" ? "uncertain suggestion" : "inconclusive"}</span>}
+            {identity && <span>Species matching score: {Math.round(identity.confidence * 100)}% · {identity.status === "identified" ? "strong suggestion" : identity.status === "uncertain" ? "possible match" : "not identified"} (not a disease-confidence score)</span>}
             {identityMessage && <p>{identityMessage}</p>}
           </div>
-          <div className="hp-section-title hp-section-space"><ShieldAlert size={20} aria-hidden="true" /><h2>3. Add observations (optional)</h2></div>
-          <p className="hp-muted">Tell CropGuard what you see on the real leaves. This helps distinguish visible symptoms from photo backgrounds.</p>
-          <div className="hp-symptoms">{allSymptoms.map(value => <label className="hp-check" key={value}><input type="checkbox" checked={symptoms.includes(value)} onChange={() => toggleSymptom(value)} /><span>{symptomLabels[value]}</span></label>)}</div>
+          <div className="hp-section-title hp-section-space"><ShieldAlert size={20} aria-hidden="true" /><h2>{cgText("3. Add observations (optional)", language)}</h2></div>
+          <p className="hp-muted">{cgText("Tell CropGuard what you see on the real leaves. This helps distinguish visible symptoms from photo backgrounds.", language)}</p>
+          <div className="hp-symptoms">{allSymptoms.map(value => <label className="hp-check" key={value}><input type="checkbox" disabled={scanning} checked={symptoms.includes(value)} onChange={() => toggleSymptom(value)} /><span>{symptomLabels[value]}</span></label>)}</div>
         </section>
       </div>
 
       <section className="hp-panel hp-result" aria-live="polite">
-        <div className="hp-section-title"><ScanSearch size={21} aria-hidden="true" /><h2>Photo analysis and care guidance</h2></div>
+        <div className="hp-section-title"><ScanSearch size={21} aria-hidden="true" /><h2>{cgText("Photo analysis and care guidance", language)}</h2></div>
         {!assessment ? <p className="hp-muted">Add a photo and tap Analyze to see photo-quality findings, vegetation-adjacent color patterns, and plant-specific care instructions.</p> : <div className="hp-report">
-          <div className="hp-report-heading"><span className={assessment.usable ? "hp-status hp-status-ok" : "hp-status hp-status-warn"}>{assessment.usable ? "Photo screened" : "Retake recommended"}</span><span className="hp-report-caption">Visual observations · no pathogen diagnosis</span></div>
+          <div className="hp-report-heading"><span className={assessment.usable ? "hp-status hp-status-ok" : "hp-status hp-status-warn"}>{assessment.usable ? "Photo screened" : "Limited observations"}</span><span className="hp-report-caption">Visual observations · no pathogen diagnosis</span></div>
           <p><strong>Plant:</strong> {identity?.status === "identified" && identity.plant === "unknown" ? (identity.common_name || identity.scientific_name || "Plant match") : plantNames[plant]} <span className="hp-report-caption">({identity?.status === "identified" ? "automatic provider suggestion" : identity?.status === "uncertain" ? "possible species match, not confirmed" : "not identified"})</span></p>
           {identity?.status === "uncertain" && <p className="hp-confidence-note">Possible match: {identity.common_name || identity.scientific_name || "unknown plant"} ({Math.round(identity.confidence * 100)}% provider score). Care advice below remains general until the species is more certain.</p>}
-          <p><strong>Photo quality:</strong> {assessment.brightness} lighting · {assessment.sharpness} detail</p>
+          <p><strong>Original photo quality:</strong> {assessment.brightness} lighting · {assessment.sharpness} detail</p>
+          {photoAdjustment && <p className="hp-muted">{photoAdjustment}</p>}
           <p><strong>Notes from you:</strong> {symptoms.length ? symptoms.map(key => symptomLabels[key]).join(", ") : "None"}</p>
           <h3>Care assessment</h3>
           <p>{possibleCareConcern(symptoms, assessment)}</p>
@@ -245,12 +281,14 @@ export default function HomePlantersPage() {
           <h3>Recommended care and follow-up</h3>
           <ol>{advice.map(line => <li key={line}>{line}</li>)}</ol>
           <div className="hp-button-row"><button type="button" className="button secondary" onClick={saveObservation} disabled={Boolean(savedId)}>{savedId ? <CheckCircle2 size={18} /> : <Save size={18} />}{savedId ? " Saved to this device" : " Save care report"}</button></div>
-          <p className="hp-disclaimer"><ShieldAlert size={18} aria-hidden="true" /><span><strong>Interpretation:</strong> Pl@ntNet predictions can be wrong. A camera photo cannot reliably prove the cause of damage, disease type, or whether a plant is healthy. Color signals may come from the background. Avoid pesticide treatments without a supported diagnosis.</span></p>
+          <p className="hp-disclaimer"><ShieldAlert size={18} aria-hidden="true" /><span><strong>Interpretation:</strong> Automatic species suggestions can be wrong. A camera photo cannot reliably prove the cause of damage, disease type, or whether a plant is healthy. Color signals may come from the background. Avoid pesticide treatments without a supported diagnosis.</span></p>
         </div>}
       </section>
 
+      <FlowerGardenPanel identity={identity} assessment={assessment} symptoms={symptoms} hasPhoto={Boolean(photo)} />
+      <HomeCareTimeline />
       <section className="hp-panel hp-history" aria-labelledby="hp-history-title">
-        <div className="hp-history-header"><div className="hp-section-title"><History size={20} aria-hidden="true" /><h2 id="hp-history-title">Care report history</h2></div>{history.length > 0 && <button type="button" className="button secondary" onClick={deleteHistory}><Trash2 size={16} /> Delete history</button>}</div>
+        <div className="hp-history-header"><div className="hp-section-title"><History size={20} aria-hidden="true" /><h2 id="hp-history-title">Care report history</h2></div>{history.length > 0 && <button type="button" className="button secondary" onClick={deleteHistory}><Trash2 size={16} /> {cgText("Delete history", language)}</button>}</div>
         <p className="hp-privacy">Your last 30 saved reports stay on this device and can be reopened. Photos, credentials, and farm or field details are never saved in this history.</p>
         {!history.length ? <p className="hp-muted">No saved Home Planters reports yet. Analyze a photo and choose Save report, or enable automatic saving in Profile.</p> :
           <div className="hp-history-list">{history.map(record =>

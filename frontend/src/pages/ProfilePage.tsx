@@ -82,7 +82,7 @@ export default function ProfilePage() {
   const serverProfileError = profileMutation.error instanceof ApiClientError ? profileMutation.error.message : profileMutation.isError ? "Unable to save your name." : "";
   const serverPasswordError = passwordMutation.error instanceof ApiClientError ? passwordMutation.error.message : passwordMutation.isError ? "Unable to change your password." : "";
 
-  return <div className="page">
+  return <div className="page cg118-profile-page">
     <PageHeader eyebrow="MY ACCOUNT" title="Your CropGuard profile" description="Customize your experience, protect your account, and manage your saved settings." />
     <div className="profile-grid">
       <article className="panel profile-card">

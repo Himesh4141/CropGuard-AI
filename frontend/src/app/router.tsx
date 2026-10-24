@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import {
   createHashRouter,
 } from "react-router-dom";
@@ -26,25 +27,25 @@ import {
   DashboardLayout,
 } from "@/layouts/DashboardLayout";
 
-import AdminDashboardPage from "@/pages/AdminDashboardPage";
-import AdminUsersPage from "@/pages/AdminUsersPage";
-import AdminLocationsPage from "@/pages/AdminLocationsPage";
-import AdminCareCasesPage from "@/pages/AdminCareCasesPage";
-import AlertsPage from "@/pages/AlertsPage";
-import CareCasesPage from "@/pages/CareCasesPage";
-import DashboardPage from "@/pages/DashboardPage";
-import DiagnosePage from "@/pages/DiagnosePage";
-import DiagnosisHistoryPage from "@/pages/DiagnosisHistoryPage";
-import FarmsPage from "@/pages/FarmsPage";
-import FieldsPage from "@/pages/FieldsPage";
+const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
+const AdminUsersPage = lazy(() => import("@/pages/AdminUsersPage"));
+const AdminLocationsPage = lazy(() => import("@/pages/AdminLocationsPage"));
+const AdminCareCasesPage = lazy(() => import("@/pages/AdminCareCasesPage"));
+const AlertsPage = lazy(() => import("@/pages/AlertsPage"));
+const CareCasesPage = lazy(() => import("@/pages/CareCasesPage"));
+const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
+const DiagnosePage = lazy(() => import("@/pages/DiagnosePage"));
+const DiagnosisHistoryPage = lazy(() => import("@/pages/DiagnosisHistoryPage"));
+const FarmsPage = lazy(() => import("@/pages/FarmsPage"));
+const FieldsPage = lazy(() => import("@/pages/FieldsPage"));
 import LandingPage from "@/pages/LandingPage";
-import LoginPage from "@/pages/LoginPage";
-import OfficerCasesPage from "@/pages/OfficerCasesPage";
-import OfficerCareCasesPage from "@/pages/OfficerCareCasesPage";
-import OfficerDashboardPage from "@/pages/OfficerDashboardPage";
-import ProfilePage from "@/pages/ProfilePage";
-import RegisterPage from "@/pages/RegisterPage";
-import WeatherPage from "@/pages/WeatherPage";
+const LoginPage = lazy(() => import("@/pages/LoginPage"));
+const OfficerCasesPage = lazy(() => import("@/pages/OfficerCasesPage"));
+const OfficerCareCasesPage = lazy(() => import("@/pages/OfficerCareCasesPage"));
+const OfficerDashboardPage = lazy(() => import("@/pages/OfficerDashboardPage"));
+const ProfilePage = lazy(() => import("@/pages/ProfilePage"));
+const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
+const WeatherPage = lazy(() => import("@/pages/WeatherPage"));
 
 
 export const router =

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-10-11T03:41:30.514899+00:00",
+  "project": "CropGuard AI",
+  "stage": "experimental_dataset_preparation_only",
+  "candidate_plants": 20,
+  "proposed_condition_labels": 120,
+  "images_seen": 0,
+  "approved_samples": 0,
+  "classes_with_approved_images": {},
+  "split_counts": {
+    "train": 0,
+    "val": 0,
+    "test": 0
+  },
+  "farm_groups": 0,
+  "min_images_per_class": 30,
+  "min_farm_groups_per_class": 5,
+  "seed": 26033,
+  "ready_for_experimental_training": false,
+  "production_approved": false,
+  "blockers": [
+    "Missing file: provenance.csv",
+    "No new verified plant photos exist. Do not train v3 yet.",
+    "No approved image classes; review the proposed labels and image sources."
+  ],
+  "additional_blocker_count": 0,
+  "disclaimer": "Review fields are human attestations, NOT independently verified rights or agronomic diagnosis. No production approval; field tests/OOD/rejection/calibration required."
+}

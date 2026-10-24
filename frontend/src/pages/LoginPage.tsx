@@ -1,3 +1,7 @@
+import { GoogleSignIn } from "@/components/auth/GoogleSignIn";
+import { useCropGuardLanguage } from "@/features/preferences/preferences";
+import { t } from "@/i18n";
+import { queryClient } from "@/app/queryClient";
 import {
   useEffect,
   useState,
@@ -27,6 +31,7 @@ import {
   ApiClientError,
 } from "@/services/apiError";
 import { secureSession } from "@/services/secureSession";
+import { recordAuthTiming } from "@/services/authTiming";
 
 
 interface LoginLocationState {
@@ -35,6 +40,7 @@ interface LoginLocationState {
 
 
 export default function LoginPage() {
+  const language = useCropGuardLanguage();
   const navigate =
     useNavigate();
 
@@ -81,6 +87,22 @@ export default function LoginPage() {
     return () => window.clearTimeout(handle);
   }, [loading]);
 
+  // Report Render wake-up progress without repeating sign-in POSTs.
+  useEffect(() => {
+    function onWaiting(event: Event) {
+      const detail = (event as CustomEvent<{elapsedSeconds?: number}>).detail;
+      const elapsed = Math.max(0, Math.round(detail?.elapsedSeconds ?? 0));
+      if (loading) setConnectionMessage(`Server is starting (${elapsed}s). Your sign-in request is not repeated. Please wait or retry if it times out.`);
+    }
+    function onReady() { if (loading) setConnectionMessage("Server is responding. Completing your secure sign-in…"); }
+    window.addEventListener("cropguard:backend-waiting", onWaiting);
+    window.addEventListener("cropguard:backend-ready", onReady);
+    return () => {
+      window.removeEventListener("cropguard:backend-waiting", onWaiting);
+      window.removeEventListener("cropguard:backend-ready", onReady);
+    };
+  }, [loading]);
+
   async function handleSubmit(
     event:
       FormEvent<HTMLFormElement>,
@@ -91,11 +113,13 @@ export default function LoginPage() {
       return;
     }
 
+    const startedAt = performance.now();
+    let outcome: "success" | "error" = "error";
     setError("");
     setLoading(true);
     // cropguard:mobile-login-message
     setConnectionMessage(
-      "Connecting securely… Free hosting may take up to a minute to wake up."
+      t("wakeMessage", language)
     );
 
     try {
@@ -123,12 +147,20 @@ export default function LoginPage() {
         state?.from ??
         routes.dashboard;
 
+      // Navigate without waiting for secondary requests. Fetch them in parallel
+      // behind the scenes; an unavailable Render server never blocks routing.
+      if (data.user.role === "farmer") {
+        void import("@/features/farms/api/farmApi").then(({ farmApi }) =>
+          queryClient.prefetchQuery({ queryKey: ["farms"], queryFn: farmApi.list }),
+        ).catch(() => { /* optional prefetch */ });
+      }
       navigate(
         destination,
         {
           replace: true,
         },
       );
+      outcome = "success";
     } catch (caughtError) {
       if (
         caughtError instanceof
@@ -141,10 +173,11 @@ export default function LoginPage() {
         );
       } else {
         setError(
-          "Unable to sign in. Please try again.",
+          t("signInError", language),
         );
       }
     } finally {
+      recordAuthTiming("login-submit-to-route-request", startedAt, outcome);
       setConnectionMessage("");
       setLoading(false);
     }
@@ -167,17 +200,15 @@ export default function LoginPage() {
   return (
     <div className="auth-card">
       <span className="eyebrow">
-        WELCOME BACK
+        {t("welcomeBack", language)}
       </span>
 
       <h2>
-        Sign in to CropGuard
+        {t("loginTitle", language)}
       </h2>
 
       <p>
-        Access your farms,
-        diagnoses and crop-health
-        alerts.
+        {t("loginIntro", language)}
       </p>
 
       {restoreNeedsNetwork ? (
@@ -186,7 +217,7 @@ export default function LoginPage() {
           couldn't be reached. You can retry without entering your password.
           <button type="button" className="button secondary full"
             onClick={() => { void retryRestore(); }}>
-            Retry saved session
+            {t("restoreSession", language)}
           </button>
         </div>
       ) : null}
@@ -197,7 +228,7 @@ export default function LoginPage() {
         }
       >
         <label>
-          Email
+          {t("email", language)}
 
           <input
             type="email"
@@ -215,7 +246,7 @@ export default function LoginPage() {
         </label>
 
         <label>
-          Password
+          {t("password", language)}
 
           <input
             type="password"
@@ -242,7 +273,7 @@ export default function LoginPage() {
         ) : null}
 
         {loading && connectionMessage ? (
-          <p role="status" aria-live="polite" style={{ fontSize: "0.875rem", color: "#25616b" }}>
+          <p role="status" aria-live="polite" className="cg117-login-status">
             {connectionMessage}
           </p>
         ) : null}
@@ -253,18 +284,20 @@ export default function LoginPage() {
           disabled={loading}
         >
           {loading
-            ? "Signing in…"
-            : "Sign in"}
+            ? t("signingIn", language)
+            : t("signIn", language)}
         </button>
       </form>
 
+      <GoogleSignIn />
+
       <p className="auth-footer">
-        New to CropGuard?{" "}
+        {t("newHere", language)}{" "}
 
         <Link
           to={routes.register}
         >
-          Create account
+          {t("createAccount", language)}
         </Link>
       </p>
     </div>

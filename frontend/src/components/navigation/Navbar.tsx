@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { LogOut } from "lucide-react";
-import approvedIcon from "@/assets/images/cropguard-approved-icon.png";
+import { Settings2 } from "lucide-react";
 import { applyPreferences, loadAvatar, loadPreferences } from "@/features/profile/localPreferences";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { routes } from "@/config/routes";
+import { cgText, useCropGuardLanguage } from "@/features/preferences/preferences";
 import { useAuthStore } from "@/features/auth/store";
 
 /** Keep the CropGuard name visible on every screen, including small Android WebViews. */
 export function Navbar() {
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  const language = useCropGuardLanguage();
   const location = useLocation();
-  const navigate = useNavigate();
   const userId = user?.id;
   const [avatar, setAvatar] = useState<string | null>(null);
   useEffect(() => {
@@ -33,21 +32,14 @@ export function Navbar() {
         ? "Administration"
         : "Field intelligence";
 
-  function handleLogout(): void {
-    // Clear the client session immediately; remote refresh-token revocation is asynchronous.
-    void logout();
-    void navigate(routes.login, { replace: true });
-  }
 
   return (
     <header className="topbar">
       <div className="topbar-context" aria-label={`CropGuard · ${context}`}>
-        <span className="topbar-context-badge" aria-hidden="true">
-          <img className="cropguard-brand-image" src={approvedIcon} alt="" />
-        </span>
+        <span className="topbar-context-badge" aria-hidden="true"><img src={`${import.meta.env.BASE_URL}brand/cropguard-unified-v115-64.png`} width={30} height={30} alt="" style={{width:"100%",height:"100%",objectFit:"contain",background:"white",borderRadius:"12px"}} /></span>
         <div className="topbar-brand-copy">
           <strong>CropGuard</strong>
-          <span>{context}</span>
+          <span>{cgText(context, language)}</span>
         </div>
       </div>
 
@@ -68,11 +60,11 @@ export function Navbar() {
         <button
           type="button"
           className="icon-button"
-          onClick={handleLogout}
-          aria-label="Sign out"
-          title="Sign out"
+          onClick={() => window.dispatchEvent(new Event("cropguard:open-settings"))}
+          aria-label="Open settings"
+          title="Open settings"
         >
-          <LogOut size={17} aria-hidden="true" />
+          <Settings2 size={17} aria-hidden="true" />
         </button>
       </div>
     </header>

@@ -1,5 +1,7 @@
 # CropGuard — Release and Verification Status
 
+**Latest verification:** See [18 October 2026 local completion evidence](VERIFICATION_2026-10-18.md). The older notes below describe earlier releases, not the current local build.
+
 **Recorded:** 2026-10-12 · Based on the user's supplied terminal screenshots and code snapshots. This is an evidence-based checklist, **not** independent certification.
 
 | Area | Evidence observed | Still to verify |

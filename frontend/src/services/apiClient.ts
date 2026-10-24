@@ -68,6 +68,8 @@ function isAuthEndpoint(
   }
 
   return [
+    "/auth/google",
+    "/auth/mobile/google",
     "/auth/login",
     "/auth/register",
     "/auth/refresh",

@@ -1,3 +1,5 @@
+import { useCropGuardLanguage } from "@/features/preferences/preferences";
+import { screenText as tr } from "@/i18n/screenText";
 import {
   AlertTriangle,
   Bell,
@@ -83,6 +85,7 @@ export default function DashboardPage() {
 
 
 function FarmerDashboard() {
+  const lang = useCropGuardLanguage();
   const user =
     useAuthStore(
       (state) =>
@@ -172,25 +175,23 @@ function FarmerDashboard() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow="FIELD OVERVIEW"
-        title="Crop health, at a glance"
-        description="A calm view of your fields, screenings, alerts and environmental signals."
+        eyebrow={tr("FIELD OVERVIEW", lang)}
+        title={tr("Crop health, at a glance", lang)}
+        description={tr("A calm view of your fields, screenings, alerts and environmental signals.", lang)}
       />
 
       <section className="dashboard-hero">
         <div className="dashboard-hero-copy">
           <span className="eyebrow">
-            Good to see you, {firstName}
+            {tr("Good to see you", lang)}, {firstName}
           </span>
 
           <h2>
-            Your farm intelligence is ready.
+            {tr("Your farm intelligence is ready.", lang)}
           </h2>
 
           <p>
-            Screen an affected leaf, check weather pressure or review
-            alerts without jumping between tools. CropGuard keeps the
-            important signals together.
+            {tr("Screen an affected leaf, check weather pressure or review alerts without jumping between tools. CropGuard keeps the important signals together.", lang)}
           </p>
         </div>
 
@@ -201,7 +202,7 @@ function FarmerDashboard() {
           >
             <Microscope size={19} />
             <span>
-              Screen leaf
+              {tr("Screen leaf", lang)}
             </span>
           </Link>
 
@@ -211,7 +212,7 @@ function FarmerDashboard() {
           >
             <CloudSun size={19} />
             <span>
-              Check risk
+              {tr("Check risk", lang)}
             </span>
           </Link>
 
@@ -221,7 +222,7 @@ function FarmerDashboard() {
           >
             <Sprout size={19} />
             <span>
-              Manage farms
+              {tr("Manage farms", lang)}
             </span>
           </Link>
 
@@ -231,7 +232,7 @@ function FarmerDashboard() {
           >
             <HeartPulse size={19} />
             <span>
-              Care cases
+              {tr("Care cases", lang)}
             </span>
           </Link>
         </div>
@@ -240,23 +241,23 @@ function FarmerDashboard() {
       <section className="metrics" aria-label="Dashboard shortcuts">
         <Link className="dashboard-metric-link" to={routes.fields} aria-label={`Open ${fields.length} active fields`}>
           <Leaf aria-hidden="true" />
-          <span>Active fields</span><strong>{fields.length}</strong>
-          <small>Open your monitored fields →</small>
+          <span>{tr("Active fields", lang)}</span><strong>{fields.length}</strong>
+          <small>{tr("Open your monitored fields \u2192", lang)}</small>
         </Link>
         <Link className="dashboard-metric-link" to={routes.diagnosisHistory} aria-label={`Open ${diagnoses.length} diagnosis records`}>
           <Microscope aria-hidden="true" />
-          <span>Diagnoses</span><strong>{diagnoses.length}</strong>
-          <small>Review diagnosis history →</small>
+          <span>{tr("Diagnoses", lang)}</span><strong>{diagnoses.length}</strong>
+          <small>{tr("Review diagnosis history \u2192", lang)}</small>
         </Link>
         <Link className="dashboard-metric-link" to={routes.alerts} aria-label={`Review ${highPriorityAlerts.length} priority signals`}>
           <CloudSun aria-hidden="true" />
-          <span>Priority signals</span><strong>{highPriorityAlerts.length}</strong>
-          <small>Review priority alerts →</small>
+          <span>{tr("Priority signals", lang)}</span><strong>{highPriorityAlerts.length}</strong>
+          <small>{tr("Review priority alerts \u2192", lang)}</small>
         </Link>
         <Link className="dashboard-metric-link" to={routes.alerts} aria-label={`Open ${unreadAlerts.length} unread alerts`}>
           <Bell aria-hidden="true" />
-          <span>Unread alerts</span><strong>{unreadAlerts.length}</strong>
-          <small>{alerts.length} total · open alerts →</small>
+          <span>{tr("Unread alerts", lang)}</span><strong>{unreadAlerts.length}</strong>
+          <small>{alerts.length} {tr("total · open alerts →", lang)}</small>
         </Link>
       </section>
 

@@ -5,6 +5,7 @@ import type {
 } from "@/features/auth/types";
 import { apiClient } from "@/services/apiClient";
 import { secureSession } from "@/services/secureSession";
+import { recordAuthTiming } from "@/services/authTiming";
 import type { User } from "@/types/user";
 
 interface MobileAuthResponse extends AuthResponse {
@@ -22,16 +23,72 @@ async function saveNativeResponse(
 
 export const authApi = {
   async login(payload: LoginPayload): Promise<AuthResponse> {
-    if (secureSession.isNative()) {
-      const response = await apiClient.post<MobileAuthResponse>(
-        "/auth/mobile/login", payload,
+    const startedAt = performance.now();
+    let outcome: "success" | "error" = "error";
+    try {
+      if (secureSession.isNative()) {
+        const response = await apiClient.post<MobileAuthResponse>(
+          "/auth/mobile/login", payload,
+        );
+        const saved = await saveNativeResponse(response.data);
+        outcome = "success";
+        return saved;
+      }
+      const response = await apiClient.post<AuthResponse>(
+        "/auth/login", payload,
       );
-      return saveNativeResponse(response.data);
+      outcome = "success";
+      return response.data;
+    } finally {
+      recordAuthTiming("login-api-and-secure-store", startedAt, outcome);
     }
-    const response = await apiClient.post<AuthResponse>(
-      "/auth/login", payload,
-    );
-    return response.data;
+  },
+
+  async google(idToken: string): Promise<AuthResponse> {
+    const startedAt = performance.now();
+    let outcome: "success" | "error" = "error";
+    try {
+      if (secureSession.isNative()) {
+        const response = await apiClient.post<MobileAuthResponse>(
+          "/auth/mobile/google", { id_token: idToken },
+        );
+        const saved = await saveNativeResponse(response.data);
+        outcome = "success";
+        return saved;
+      }
+      const response = await apiClient.post<AuthResponse>(
+        "/auth/google", { id_token: idToken },
+      );
+      outcome = "success";
+      return response.data;
+    } finally {
+      recordAuthTiming("login-api-and-secure-store", startedAt, outcome);
+    }
+  },
+
+  // Firebase ID tokens are exchanged for CropGuard sessions on Render.
+  // The native branch retains Android Keystore-backed refresh token storage.
+  async firebase(idToken: string): Promise<AuthResponse> {
+    if (!idToken.trim()) throw new Error("Firebase ID token is required");
+    const startedAt = performance.now();
+    let outcome: "success" | "error" = "error";
+    try {
+      if (secureSession.isNative()) {
+        const response = await apiClient.post<MobileAuthResponse>(
+          "/auth/mobile/firebase", { id_token: idToken },
+        );
+        const result = await saveNativeResponse(response.data);
+        outcome = "success";
+        return result;
+      }
+      const response = await apiClient.post<AuthResponse>(
+        "/auth/firebase", { id_token: idToken },
+      );
+      outcome = "success";
+      return response.data;
+    } finally {
+      recordAuthTiming("login-api-and-secure-store", startedAt, outcome);
+    }
   },
 
   async register(payload: RegisterPayload): Promise<AuthResponse> {

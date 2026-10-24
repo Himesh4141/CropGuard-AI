@@ -408,3 +408,80 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* CropGuard v1.2.2 targeted Weather contrast repair.
+   Both the parent panel AND every inset use a matching dark palette.
+   A light tile with inherited white text was unreadable on Android. */
+:root[data-cg-theme="dark"] .weather-toolbar,
+:root[data-cg-theme="dark"] .weather-panel,
+:root[data-cg-theme="dark"] .risk-panel {
+  background: #173b2c !important;
+  background-image: none !important;
+  border-color: #668d73 !important;
+  color: #f5fff8 !important;
+}
+:root[data-cg-theme="dark"] .weather-field-select select,
+:root[data-cg-theme="dark"] .weather-metric-grid article,
+:root[data-cg-theme="dark"] .forecast-card,
+:root[data-cg-theme="dark"] .weather-source,
+:root[data-cg-theme="dark"] .risk-disclaimer {
+  background: #234a38 !important;
+  background-image: none !important;
+  border-color: #668d73 !important;
+  color: #f5fff8 !important;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .weather-toolbar :is(label,strong,div),
+:root[data-cg-theme="dark"] .weather-panel :is(h2,p,strong,span,small,label,li),
+:root[data-cg-theme="dark"] .weather-metric-grid article :is(strong,span),
+:root[data-cg-theme="dark"] .forecast-card :is(strong,span,small) {
+  color: #f5fff8 !important;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .weather-field-select label,
+:root[data-cg-theme="dark"] .weather-location,
+:root[data-cg-theme="dark"] .weather-panel-heading p,
+:root[data-cg-theme="dark"] .weather-metric-grid article span,
+:root[data-cg-theme="dark"] .weather-source span,
+:root[data-cg-theme="dark"] .weather-observed,
+:root[data-cg-theme="dark"] .forecast-detail,
+:root[data-cg-theme="dark"] .risk-disclaimer {
+  color: #cdebd8 !important;
+}
+:root[data-cg-theme="dark"] .weather-source strong,
+:root[data-cg-theme="dark"] .weather-metric-grid svg,
+:root[data-cg-theme="dark"] .forecast-detail svg {
+  color: #b4d0ff !important;
+}
+:root[data-cg-theme="dark"] .weather-warning {
+  background: #45341d !important;
+  color: #ffe2ac !important;
+  border-color: #bd9854 !important;
+}
+:root[data-cg-theme="dark"] .weather-warning * {
+  color: #ffe2ac !important;
+}
+:root[data-cg-theme="dark"] .weather-field-select select option {
+  color: #f5fff8;
+  background: #173b2c;
+}
+/* A balanced two-column layout, with the fifth metric taking its own row.
+   Long Hindi/Telugu labels wrap without pushing their neighbor wider. */
+@media (max-width: 760px) {
+  .weather-metric-grid,
+  .forecast-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+  .weather-metric-grid article,
+  .forecast-card {
+    min-width: 0;
+    min-height: 110px;
+    padding: 15px;
+    overflow-wrap: anywhere;
+  }
+  .weather-metric-grid article:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    min-height: 96px;
+  }
+  .weather-metric-grid article span,
+  .forecast-card > strong { font-size: clamp(12px,3.4vw,14px); line-height:1.45; }
+  .weather-metric-grid article strong { font-size: clamp(18px,5vw,22px); }
+  .weather-toolbar, .weather-panel { min-width:0; }
+}

@@ -54,6 +54,10 @@ jobs:
           VITE_API_BASE_URL: https://cropguard-api-himesh4141.onrender.com/api/v1
         run: npx vite build --base=/CropGuard-AI/
 
+      - name: Offline frontend tests
+        working-directory: frontend
+        run: npm test
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

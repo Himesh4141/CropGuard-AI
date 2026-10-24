@@ -61,3 +61,11 @@ cropguard-*.zip
 .cache/
 coverage/
 htmlcov/
+
+# Never commit Android signing keys, credentials or generated releases
+/CropGuard-Releases/
+**/*.keystore
+**/*.jks
+**/*.p12
+**/key.properties
+**/signing.properties

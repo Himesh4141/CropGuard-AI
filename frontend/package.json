@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
-    "lint": "eslint . --max-warnings=0 --ignore-pattern \"android/**\""
+    "lint": "eslint . --max-warnings=0 --ignore-pattern \"android/**\"",
+    "test": "node scripts/run-tests.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^6.2.2",
@@ -20,6 +21,7 @@
     "@tanstack/react-query": "^5.59.16",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
+    "firebase": "^13.1.0",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

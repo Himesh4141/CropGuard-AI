@@ -1,0 +1,136 @@
+/* CropGuard AI v1.1.8 — exact Landing + Account screenshot contrast fix.
+   Must load after v1.1.6 UX and v1.1.7 auth CSS. No API or ML changes. */
+:root[data-cg-theme="dark"] {
+  --cg118-landing-card: #17382c;
+  --cg118-landing-inset: #234735;
+  --cg118-landing-ink: #f5fff6;
+  --cg118-landing-muted: #d0ead7;
+  --cg118-landing-border: #71977f;
+  --cg118-profile-field: #234735;
+  --cg118-profile-ink: #f5fff6;
+  --cg118-profile-muted: #d3eedd;
+  --cg118-profile-border: #71977f;
+}
+:root[data-cg-theme="light"] {
+  --cg118-profile-field: #f3f8f4;
+  --cg118-profile-ink: #183828;
+  --cg118-profile-muted: #385d46;
+  --cg118-profile-border: #a9c8b3;
+}
+/* Public landing screen: old rgba(255,255,255,.82) and white dark-mode text clashed. */
+:root[data-cg-theme="dark"] .landing .hero-badge,
+:root[data-cg-theme="dark"] .landing .health-card,
+:root[data-cg-theme="dark"] .landing .float-chip {
+  background: var(--cg118-landing-card) !important;
+  background-image: none !important;
+  border-color: var(--cg118-landing-border) !important;
+  color: var(--cg118-landing-ink) !important;
+}
+:root[data-cg-theme="dark"] .landing .health-card::before {
+  background: none !important;
+}
+:root[data-cg-theme="dark"] .landing .health-metrics > div,
+:root[data-cg-theme="dark"] .landing .status-pill {
+  background: var(--cg118-landing-inset) !important;
+  border-color: var(--cg118-landing-border) !important;
+  color: var(--cg118-landing-ink) !important;
+}
+:root[data-cg-theme="dark"] .landing .hero-badge,
+:root[data-cg-theme="dark"] .landing .health-head h2,
+:root[data-cg-theme="dark"] .landing .health-score > strong,
+:root[data-cg-theme="dark"] .landing .health-score-copy > strong,
+:root[data-cg-theme="dark"] .landing .health-metrics strong,
+:root[data-cg-theme="dark"] .landing .float-chip strong,
+:root[data-cg-theme="dark"] .landing .status-pill,
+:root[data-cg-theme="dark"] .landing .health-card .eyebrow {
+  color: var(--cg118-landing-ink) !important;
+  -webkit-text-fill-color: currentColor;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+:root[data-cg-theme="dark"] .landing .health-score > span,
+:root[data-cg-theme="dark"] .landing .health-score-copy > span,
+:root[data-cg-theme="dark"] .landing .health-metrics span,
+:root[data-cg-theme="dark"] .landing .float-chip span {
+  color: var(--cg118-landing-muted) !important;
+  -webkit-text-fill-color: currentColor;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .landing .health-metrics svg,
+:root[data-cg-theme="dark"] .landing .float-chip svg {
+  color: #a5f1bf !important;
+  stroke: currentColor !important;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .landing .health-card .eyebrow::before {
+  background: #a5f1bf !important;
+}
+/* Signed-in Profile: legacy CSS forced #fafbfd behind dark theme's pale text. */
+:root[data-cg-theme="dark"] .cg118-profile-page .profile-card:first-child {
+  background: #17382c !important;
+  background-image: none !important;
+  color: var(--cg118-profile-ink) !important;
+}
+:root[data-cg-theme] .cg118-profile-page .profile-detail {
+  background: var(--cg118-profile-field) !important;
+  background-image: none !important;
+  border-color: var(--cg118-profile-border) !important;
+  color: var(--cg118-profile-ink) !important;
+  min-width: 0;
+  align-items: center;
+}
+:root[data-cg-theme] .cg118-profile-page .profile-detail > span {
+  color: var(--cg118-profile-muted) !important;
+  font-size: 12px;
+  opacity: 1 !important;
+}
+:root[data-cg-theme] .cg118-profile-page .profile-detail > strong {
+  color: var(--cg118-profile-ink) !important;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  opacity: 1 !important;
+}
+:root[data-cg-theme] .cg118-profile-page .profile-form input,
+:root[data-cg-theme] .cg118-profile-page .profile-form input:hover,
+:root[data-cg-theme] .cg118-profile-page .profile-form input:focus {
+  background: var(--cg118-profile-field) !important;
+  background-image: none !important;
+  color: var(--cg118-profile-ink) !important;
+  -webkit-text-fill-color: var(--cg118-profile-ink) !important;
+  border-color: var(--cg118-profile-border) !important;
+  caret-color: var(--cg118-profile-ink) !important;
+  opacity: 1 !important;
+}
+:root[data-cg-theme] .cg118-profile-page .profile-form input:focus-visible {
+  outline: 3px solid #f4be58 !important;
+  outline-offset: 2px;
+}
+:root[data-cg-theme] .cg118-profile-page .profile-form label > span {
+  color: var(--cg118-profile-ink) !important;
+  font-size: 12px;
+  opacity: 1 !important;
+}
+:root[data-cg-theme="dark"] .cg118-profile-page .cg-profile-hero small,
+:root[data-cg-theme="dark"] .cg118-profile-page .profile-note {
+  color: var(--cg118-profile-muted) !important;
+}
+@media (max-width: 820px) {
+  html { scroll-padding-top: calc(90px + env(safe-area-inset-top, 0px)); }
+  .cg118-profile-page {
+    padding-top: 26px !important;
+    padding-bottom: calc(172px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .cg118-profile-page .profile-card {
+    scroll-margin-top: calc(90px + env(safe-area-inset-top, 0px));
+  }
+  .cg118-profile-page .profile-detail {
+    flex-wrap: wrap;
+    gap: 5px 12px;
+  }
+  .cg118-profile-page .profile-detail > strong {text-align: left;}
+}
+@media (max-width: 360px) {
+  .cg118-profile-page .profile-card {padding-inline: 14px !important;}
+  :root[data-cg-theme="dark"] .landing .health-card {padding: 16px;}
+}

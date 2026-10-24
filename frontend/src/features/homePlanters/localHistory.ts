@@ -57,9 +57,11 @@ export function loadScans(): ScanRecord[] {
 }
 export function saveScan(record: ScanRecord): ScanRecord[] {
   const updated = [record, ...loadScans()].slice(0, LIMIT);
-  try { localStorage.setItem(KEY, JSON.stringify(updated)); } catch { /* Private browsing or storage full */ }
+  try { localStorage.setItem(KEY, JSON.stringify(updated)); }
+  catch { throw new Error("Care report could not be saved. Device storage is unavailable or full."); }
   return updated;
 }
 export function clearScans(): void {
-  try { localStorage.removeItem(KEY); } catch { /* Private browsing */ }
+  try { localStorage.removeItem(KEY); }
+  catch { throw new Error("Care report history could not be deleted. Device storage is unavailable."); }
 }

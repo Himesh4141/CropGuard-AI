@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "status": "candidates_only_no_new_model_trained",
+  "existing_model": {
+    "version": "field-robust-v2",
+    "crops": 14,
+    "classes": 38,
+    "heldout_dataset": "PlantVillage",
+    "real_field_validated": false
+  },
+  "plants": [
+    {
+      "slug": "tulsi",
+      "common_name": "Tulsi / Holy basil",
+      "scientific_name": "Ocimum tenuiflorum",
+      "candidate_conditions": [
+        "healthy",
+        "leaf spot",
+        "powdery mildew",
+        "downy mildew",
+        "wilt",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "money_plant",
+      "common_name": "Money plant / Pothos",
+      "scientific_name": "Epipremnum aureum",
+      "candidate_conditions": [
+        "healthy",
+        "leaf spot",
+        "bacterial leaf symptoms",
+        "root rot",
+        "sun scorch",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "chilli",
+      "common_name": "Chilli pepper",
+      "scientific_name": "Capsicum annuum",
+      "candidate_conditions": [
+        "healthy",
+        "anthracnose",
+        "bacterial spot",
+        "powdery mildew",
+        "leaf curl symptoms",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "brinjal",
+      "common_name": "Brinjal / Eggplant",
+      "scientific_name": "Solanum melongena",
+      "candidate_conditions": [
+        "healthy",
+        "Phomopsis blight",
+        "bacterial wilt",
+        "leaf spot",
+        "little leaf symptoms",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "okra",
+      "common_name": "Okra",
+      "scientific_name": "Abelmoschus esculentus",
+      "candidate_conditions": [
+        "healthy",
+        "yellow vein mosaic symptoms",
+        "powdery mildew",
+        "leaf spot",
+        "wilt",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "cabbage",
+      "common_name": "Cabbage",
+      "scientific_name": "Brassica oleracea var. capitata",
+      "candidate_conditions": [
+        "healthy",
+        "black rot",
+        "Alternaria leaf spot",
+        "downy mildew",
+        "clubroot symptoms",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "cauliflower",
+      "common_name": "Cauliflower",
+      "scientific_name": "Brassica oleracea var. botrytis",
+      "candidate_conditions": [
+        "healthy",
+        "black rot",
+        "Alternaria leaf spot",
+        "downy mildew",
+        "bacterial soft rot",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "cucumber",
+      "common_name": "Cucumber",
+      "scientific_name": "Cucumis sativus",
+      "candidate_conditions": [
+        "healthy",
+        "powdery mildew",
+        "downy mildew",
+        "angular leaf spot",
+        "anthracnose",
+        "mosaic symptoms"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "bottle_gourd",
+      "common_name": "Bottle gourd",
+      "scientific_name": "Lagenaria siceraria",
+      "candidate_conditions": [
+        "healthy",
+        "powdery mildew",
+        "downy mildew",
+        "anthracnose",
+        "mosaic symptoms",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "bitter_gourd",
+      "common_name": "Bitter gourd",
+      "scientific_name": "Momordica charantia",
+      "candidate_conditions": [
+        "healthy",
+        "powdery mildew",
+        "downy mildew",
+        "leaf spot",
+        "mosaic symptoms",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "pumpkin",
+      "common_name": "Pumpkin",
+      "scientific_name": "Cucurbita spp.",
+      "candidate_conditions": [
+        "healthy",
+        "powdery mildew",
+        "downy mildew",
+        "mosaic symptoms",
+        "bacterial spot",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "french_bean",
+      "common_name": "French bean",
+      "scientific_name": "Phaseolus vulgaris",
+      "candidate_conditions": [
+        "healthy",
+        "bean rust",
+        "anthracnose",
+        "bacterial blight",
+        "mosaic symptoms",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "spinach",
+      "common_name": "Spinach",
+      "scientific_name": "Spinacia oleracea",
+      "candidate_conditions": [
+        "healthy",
+        "downy mildew",
+        "leaf spot",
+        "damping off",
+        "white rust-like symptoms",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "coriander",
+      "common_name": "Coriander",
+      "scientific_name": "Coriandrum sativum",
+      "candidate_conditions": [
+        "healthy",
+        "powdery mildew",
+        "stem gall",
+        "leaf spot",
+        "wilt",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "mint",
+      "common_name": "Mint",
+      "scientific_name": "Mentha spp.",
+      "candidate_conditions": [
+        "healthy",
+        "mint rust",
+        "powdery mildew",
+        "leaf spot",
+        "wilt",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "curry_leaf",
+      "common_name": "Curry leaf",
+      "scientific_name": "Murraya koenigii",
+      "candidate_conditions": [
+        "healthy",
+        "leaf spot",
+        "powdery mildew",
+        "sooty mould",
+        "insect damage",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "lemon",
+      "common_name": "Lemon",
+      "scientific_name": "Citrus limon",
+      "candidate_conditions": [
+        "healthy",
+        "citrus canker",
+        "citrus greening symptoms",
+        "scab",
+        "sooty mould",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "guava",
+      "common_name": "Guava",
+      "scientific_name": "Psidium guajava",
+      "candidate_conditions": [
+        "healthy",
+        "anthracnose",
+        "rust",
+        "leaf spot",
+        "wilt",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "mango",
+      "common_name": "Mango",
+      "scientific_name": "Mangifera indica",
+      "candidate_conditions": [
+        "healthy",
+        "anthracnose",
+        "powdery mildew",
+        "bacterial black spot",
+        "sooty mould",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    },
+    {
+      "slug": "banana",
+      "common_name": "Banana",
+      "scientific_name": "Musa spp.",
+      "candidate_conditions": [
+        "healthy",
+        "Sigatoka leaf spot",
+        "Fusarium wilt symptoms",
+        "bunchy top symptoms",
+        "bacterial wilt symptoms",
+        "nutrient stress"
+      ],
+      "supported_in_production": false,
+      "verified_images": 0,
+      "data_source": null,
+      "license": null
+    }
+  ],
+  "note": "Possible conditions only. Not confirmed labels or diagnosable diseases; do not expose as supported plant classes."
+}

@@ -98,3 +98,12 @@
 .hp-history-details ol, .hp-history-details ul {padding-left:22px;}
 .hp-history-details li+li {margin-top:7px;}
 .hp-history-details p {margin:8px 0;}
+
+/* Keep long provider names and report controls inside narrow phone screens. */
+.hp-identity-result, .hp-report, .hp-history-open > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.hp-section-title svg, .hp-scan-button svg { flex-shrink: 0; }
+@media (max-width: 420px) {
+  .hp-history-open { align-items: flex-start; flex-wrap: wrap; }
+  .hp-history-open > span:last-child { flex-shrink: 1; }
+  .hp-actions .button { min-height: 44px; }
+}

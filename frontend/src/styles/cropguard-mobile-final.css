@@ -1,0 +1,152 @@
+/* CropGuard mobile contrast + Flower Garden repair, v1.1.2.
+ * This stylesheet deliberately loads after the old theme and component CSS.
+ * Never use translucent pale surfaces behind pale dark-mode text.
+ */
+:root[data-cg-theme="light"] {
+  --cgf-bg:#f3f8f4; --cgf-panel:#ffffff; --cgf-tint:#e7f3ea;
+  --cgf-text:#122a20; --cgf-muted:#395747; --cgf-line:#b9cec0;
+  --cgf-strong:#165d3b; --cgf-gold:#84521b;
+}
+:root[data-cg-theme="dark"] {
+  color-scheme: dark;
+  --cgf-bg:#091c16; --cgf-panel:#17372a; --cgf-tint:#234b37;
+  --cgf-text:#f3fff6; --cgf-muted:#c6e3d1; --cgf-line:#5b856a;
+  --cgf-strong:#acffd0; --cgf-gold:#ffdaa0;
+  --bg:var(--cgf-bg); --surface:var(--cgf-panel);
+  --surface-strong:var(--cgf-panel); --surface-soft:var(--cgf-tint);
+  --text:var(--cgf-text); --text-soft:var(--cgf-text);
+  --muted:var(--cgf-muted); --muted2:var(--cgf-muted);
+  --primary-soft:var(--cgf-tint); --primary-strong:var(--cgf-strong);
+  --border:var(--cgf-line);
+}
+:root[data-cg-theme] body,
+:root[data-cg-theme] .dashboard-main,
+:root[data-cg-theme] .page { background-color:var(--cgf-bg)!important; color:var(--cgf-text)!important; }
+:root[data-cg-theme] .page h1,
+:root[data-cg-theme] .page h2,
+:root[data-cg-theme] .page h3,
+:root[data-cg-theme] .page h4 {color:var(--cgf-text)!important;opacity:1!important;}
+:root[data-cg-theme] .page p,
+:root[data-cg-theme] .page small,
+:root[data-cg-theme] .page label {color:var(--cgf-muted);opacity:1!important;}
+:root[data-cg-theme] .dashboard-hero,
+:root[data-cg-theme] .dashboard-insight,
+:root[data-cg-theme] .metrics article,
+:root[data-cg-theme] .metric-card,
+:root[data-cg-theme] .stat-card,
+:root[data-cg-theme] .panel,
+:root[data-cg-theme] .card,
+:root[data-cg-theme] .weather-card,
+:root[data-cg-theme] .risk-card,
+:root[data-cg-theme] .fg-panel,
+:root[data-cg-theme] .fg-care-card,
+:root[data-cg-theme] .fg-care-grid>div,
+:root[data-cg-theme] .fg-symptoms,
+:root[data-cg-theme] .fg-task-panel,
+:root[data-cg-theme] .fg-history {
+  background:var(--cgf-panel)!important;
+  background-image:none!important;
+  border-color:var(--cgf-line)!important;
+  color:var(--cgf-text)!important;
+  opacity:1!important;
+}
+:root[data-cg-theme="dark"] .dashboard-hero {
+  background:radial-gradient(circle at top right,#24583e 0%,#133429 52%,#103025 100%)!important;
+}
+:root[data-cg-theme="dark"] .dashboard-hero-copy h2,
+:root[data-cg-theme="dark"] .dashboard-hero-copy p,
+:root[data-cg-theme="dark"] .dashboard-hero-copy .eyebrow,
+:root[data-cg-theme="dark"] .metrics article *,
+:root[data-cg-theme="dark"] .metric-card *,
+:root[data-cg-theme="dark"] .dashboard-insight *,
+:root[data-cg-theme="dark"] .stat-card *,
+:root[data-cg-theme="dark"] .fg-panel h2,
+:root[data-cg-theme="dark"] .fg-panel h3,
+:root[data-cg-theme="dark"] .fg-care-grid h4 {color:var(--cgf-text)!important;opacity:1!important;}
+:root[data-cg-theme="dark"] .dashboard-hero .eyebrow,
+:root[data-cg-theme="dark"] .fg-heading .eyebrow {color:#b1ffd7!important;}
+:root[data-cg-theme] .quick-action,
+:root[data-cg-theme] .fg-search input,
+:root[data-cg-theme] .fg-filter select,
+:root[data-cg-theme] .fg-export textarea,
+:root[data-cg-theme] .fg-candidate,
+:root[data-cg-theme] .hp-photo,
+:root[data-cg-theme] input:not([type=checkbox]),
+:root[data-cg-theme] select,
+:root[data-cg-theme] textarea {
+  background:var(--cgf-tint)!important;color:var(--cgf-text)!important;
+  border-color:var(--cgf-line)!important;
+  opacity:1!important;
+}
+:root[data-cg-theme] input::placeholder,
+:root[data-cg-theme] textarea::placeholder {color:var(--cgf-muted)!important;opacity:1!important;}
+:root[data-cg-theme] .quick-action span,
+:root[data-cg-theme] .quick-action svg,
+:root[data-cg-theme] .fg-care-grid p,
+:root[data-cg-theme] .fg-heading p,
+:root[data-cg-theme] .fg-muted,
+:root[data-cg-theme] .fg-disclaimer,
+:root[data-cg-theme] .fg-care-title i,
+:root[data-cg-theme] .fg-species {color:var(--cgf-text)!important;opacity:1!important;}
+:root[data-cg-theme] .fg-count,
+:root[data-cg-theme] .fg-type,
+:root[data-cg-theme] .fg-caution,
+:root[data-cg-theme] .fg-photo-context,
+:root[data-cg-theme] .fg-care-warning,
+:root[data-cg-theme] .fg-identity {background:var(--cgf-tint)!important;color:var(--cgf-text)!important;border-color:var(--cgf-line)!important;}
+:root[data-cg-theme] .fg-species {
+  background:var(--cgf-tint)!important;white-space:normal!important;
+  overflow-wrap:anywhere!important;min-height:48px!important;
+  padding:10px 12px!important;font-size:clamp(13px,3.5vw,15px)!important;
+  align-items:center!important;justify-content:flex-start!important;
+  text-align:left!important;border:1px solid var(--cgf-line)!important;
+}
+:root[data-cg-theme] .fg-species.is-selected {
+  border:2px solid var(--cgf-strong)!important;
+  background:var(--cgf-panel)!important;
+  box-shadow:inset 0 0 0 1px var(--cgf-strong)!important;
+}
+:root[data-cg-theme] .fg-search,
+:root[data-cg-theme] .fg-filter,
+:root[data-cg-theme] .fg-toolbar {min-width:0!important;max-width:100%!important;}
+:root[data-cg-theme] .fg-toolbar {display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;margin-bottom:14px!important;}
+:root[data-cg-theme] .fg-search input,
+:root[data-cg-theme] .fg-filter select {min-height:52px!important;font-size:16px!important;width:100%!important;box-sizing:border-box!important;}
+:root[data-cg-theme] .fg-species-list {
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;max-height:268px!important;overflow-y:auto!important;overflow-x:hidden!important;
+  margin:10px 0 18px!important;padding:8px 8px 18px!important;
+  background:var(--cgf-panel)!important;border:1px solid var(--cgf-line)!important;
+  border-radius:15px!important;overscroll-behavior:contain;
+}
+:root[data-cg-theme] .fg-care-card {clear:both!important;margin-top:18px!important;position:relative!important;z-index:0!important;}
+:root[data-cg-theme] .fg-panel {min-width:0!important;overflow:visible!important;}
+:root[data-cg-theme] .fg-candidates {background:var(--cgf-tint)!important;border-color:var(--cgf-line)!important;color:var(--cgf-text)!important;}
+:root[data-cg-theme] .mobile-nav {background:var(--cgf-panel)!important;color:var(--cgf-text)!important;border-color:var(--cgf-line)!important;}
+:root[data-cg-theme] .mobile-nav a {color:var(--cgf-text)!important;}
+:root[data-cg-theme] .mobile-nav a.active {background:var(--cgf-tint)!important;color:var(--cgf-strong)!important;}
+:root[data-cg-theme] .cg-settings-sheet,
+:root[data-cg-theme] .cg-settings-header,
+:root[data-cg-theme] .cg-settings-group {background:var(--cgf-panel)!important;color:var(--cgf-text)!important;border-color:var(--cgf-line)!important;}
+:root[data-cg-theme] .cg-settings-group legend,
+:root[data-cg-theme] .cg-settings-hint,
+:root[data-cg-theme] .cg-settings-label {color:var(--cgf-text)!important;}
+:root[data-cg-theme] .cg-settings-row button,
+:root[data-cg-theme] .cg-settings-action,
+:root[data-cg-theme] .cg-settings-group select {background:var(--cgf-tint)!important;color:var(--cgf-text)!important;border-color:var(--cgf-line)!important;}
+/* Text contrast matters more than translucent visual effects on a small phone. */
+:root[data-cg-theme="dark"] .dashboard-hero *,
+:root[data-cg-theme="dark"] .dashboard-quick-actions *,
+:root[data-cg-theme="dark"] .metrics * {text-shadow:none!important;}
+:root[data-cg-theme] :focus-visible {outline:3px solid #e9a545!important;outline-offset:3px;}
+@media(max-width:620px){
+  :root[data-cg-theme] .dashboard-hero{padding:20px!important;}
+  :root[data-cg-theme] .dashboard-hero-copy p,
+  :root[data-cg-theme] .dashboard-insight-copy p {font-size:14px!important;line-height:1.6!important;}
+  :root[data-cg-theme] .quick-action span{font-size:14px!important;}
+  :root[data-cg-theme] .fg-toolbar{gap:12px!important;}
+  :root[data-cg-theme] .fg-species-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  :root[data-cg-theme] .page {padding-bottom:calc(115px + env(safe-area-inset-bottom))!important;}
+}
+@media(max-width:355px){:root[data-cg-theme] .fg-species-list{grid-template-columns:1fr!important;}}
+@media(prefers-reduced-motion:reduce){:root[data-cg-theme] *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important;}}

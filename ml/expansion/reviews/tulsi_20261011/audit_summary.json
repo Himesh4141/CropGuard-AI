@@ -1,0 +1,38 @@
+{
+  "roboflow": {
+    "entries": {
+      "test": 51,
+      "train": 357,
+      "valid": 102
+    },
+    "total_annotation_records": 510,
+    "local_image_files": 0,
+    "license_in_readme": "CC BY 4.0 (attribution required)",
+    "task": "holy_basil object detection",
+    "contains_disease_names": false
+  },
+  "kaggle": {
+    "total_images": 2328,
+    "original_images": 54,
+    "original_diseased": 39,
+    "original_healthy": 15,
+    "augmented_images": 2274,
+    "augmented_counts_by_class": {
+      "train_aug/bacterial": 204,
+      "train_aug/fungal": 490,
+      "train_aug/healthy": 765,
+      "train_aug/pests": 815
+    },
+    "distinct_augmentation_groups": {
+      "bacterial": 4,
+      "fungal": 19,
+      "healthy": 15,
+      "pests": 16
+    },
+    "independent_sources_claimed": false,
+    "license_in_archive": "Not provided",
+    "pathogen_specific_labels": "Not provided",
+    "money_plant_images": 0
+  },
+  "assessment": "Do not train/deploy disease-type classifier on these unverified labels; only symptom-review and research intake."
+}

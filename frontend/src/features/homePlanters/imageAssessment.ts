@@ -17,7 +17,7 @@ export type ImageAssessment = {
   retakeReasons: string[];
 };
 
-export const IMAGE_EDGE = 192;
+export const IMAGE_EDGE = 256;
 const MAX_PIXELS = IMAGE_EDGE * IMAGE_EDGE;
 
 export function assessPixels(
@@ -131,16 +131,19 @@ export function assessPixels(
     pale: pale / regionTotal,
   };
   const retakeReasons: string[] = [];
-  if (brightness === "too dark" || brightness === "dim") retakeReasons.push("Retake in indirect daylight; the photo is too dark for reliable color observations.");
-  if (brightness === "very bright" || highlightPixels / validCount > 0.29) retakeReasons.push("Avoid harsh flash or direct glare on leaves.");
-  if (sharpness === "possibly blurry") retakeReasons.push("Move closer and hold the camera steady so leaf details are clear.");
-  if (vegetationCoverage < 0.06 || greenCount < 100) retakeReasons.push("Very little green foliage was found. Center a real leaf against a simple background.");
-  if (darkPixels / validCount > 0.60) retakeReasons.push("Shadows hide much of the photograph.");
-  if (saturatedCount / validCount < 0.04) retakeReasons.push("The image appears to contain little color information.");
-  const usable = retakeReasons.length === 0;
+  if (brightness === "too dark" || brightness === "dim") retakeReasons.push("Lighting is limited. Exposure can be adjusted automatically; check uncertain colors on actual leaves.");
+  if (brightness === "very bright" || highlightPixels / validCount > 0.29) retakeReasons.push("Some highlights may hide leaf details. Avoid flash glare when practical.");
+  if (sharpness === "possibly blurry") retakeReasons.push("Fine lesion details may be unavailable due to blur; available color observations are still shown.");
+  if (vegetationCoverage < 0.06 || greenCount < 100) retakeReasons.push("Little green foliage was detected; brown or variegated leaves can still be real leaves.");
+  if (darkPixels / validCount > 0.60) retakeReasons.push("Shadows reduce visible detail. Brightness adjustment may help without restoring lost detail.");
+  if (saturatedCount / validCount < 0.04) retakeReasons.push("Limited color information; use observed symptoms before taking action.");
+  // Advisory only: imperfect low-cost phone photos still provide observable
+  // color patterns; never make brightness or edge sharpness a hard gate.
+  const usable = validCount >= 64 && vegetationCoverage >= 0.06 &&
+    brightness !== "too dark" && darkPixels / validCount <= 0.60 && highlightPixels / validCount <= 0.60;
   const signals: ImageAssessment["signals"] = [];
   const observations: string[] = [];
-  // A signal is returned only for usable photos. Ratios are pixels in a
+  // Signals are possible nearby colors, NEVER disease conclusions. Ratios are pixels in a
   // green-adjacent region; not measured disease severity or leaf area.
   if (usable) {
     if (yellow >= 32 && colorRegions.yellow >= 0.085) {
@@ -157,7 +160,7 @@ export function assessPixels(
     }
     if (!signals.length) observations.push("No strong color-pattern signals detected near green foliage. This does not establish that a plant is healthy.");
   } else {
-    observations.push("Photo-quality limitations prevent useful visual screening; please retake the picture.");
+    observations.push("The image could not be screened reliably; general plant care guidance is still available.");
   }
   return {
     version: 3,

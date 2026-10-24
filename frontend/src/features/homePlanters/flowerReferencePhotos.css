@@ -1,0 +1,13 @@
+.fg-ref { margin-top: 1rem; border: 1px solid #cbded1; background: var(--surface, #fff); border-radius: 14px; padding: .9rem; min-width: 0; }
+.fg-ref-header h4 { display: flex; align-items: center; gap: .4rem; margin: 0 0 .35rem; color: var(--text, #205a3b); }
+.fg-ref-header p,.fg-ref-small { font-size: .84rem; color: var(--text-muted, #576c60); line-height: 1.5; margin: .4rem 0 .65rem; }
+.fg-ref-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.fg-ref-actions button { border: 1px solid #4b8a63; border-radius: 10px; padding: .58rem .8rem; background: var(--surface, #f7fbf8); color: var(--text, #1a5d35); font: inherit; font-size: .83rem; cursor: pointer; }
+.fg-ref-actions button:focus-visible,.fg-ref-grid a:focus-visible { outline: 3px solid #63ad80; outline-offset: 2px; }
+.fg-ref-warning { padding: .55rem .7rem; border-left: 3px solid #b18032; background: #fff4dd; color: #50320c; font-size: .82rem; }
+.fg-ref-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(min(100%,150px),1fr)); gap: .7rem; margin-top: .75rem; }
+.fg-ref-grid figure { margin: 0; min-width: 0; border-radius: 10px; overflow: hidden; border: 1px solid #dae6da; }
+.fg-ref-grid img { width: 100%; height: 148px; object-fit: cover; background: #e0e8df; display: block; }
+.fg-ref-grid figcaption { padding: .5rem; display: grid; gap: .35rem; font-size: .73rem; overflow-wrap: anywhere; }
+.fg-ref-grid a { display: inline-flex; gap: .2rem; align-items: center; color: var(--text, #116340); font-weight: 700; }
+.fg-ref-grid figcaption span { font-size: .7rem; color: var(--text-muted,#516152); }

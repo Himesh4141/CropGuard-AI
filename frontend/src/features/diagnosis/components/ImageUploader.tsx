@@ -35,6 +35,8 @@ import {
   ApiClientError,
 } from "@/services/apiError";
 
+import { inspectCropPhoto, type PhotoQualityResult } from "@/features/diagnosis/photoQuality";
+
 import "@/features/diagnosis/diagnosis.css";
 
 
@@ -122,6 +124,28 @@ export function ImageUploader({
     dragging,
     setDragging,
   ] = useState(false);
+
+  const [photoQuality, setPhotoQuality] = useState<PhotoQualityResult | null>(null);
+  const [qualityPending, setQualityPending] = useState(false);
+  const [continueAnyway, setContinueAnyway] = useState(false);
+
+  useEffect(() => {
+    let canceled = false;
+    setPhotoQuality(null);
+    setContinueAnyway(false);
+    if (!selectedFile) {
+      setQualityPending(false);
+      return;
+    }
+    setQualityPending(true);
+    void inspectCropPhoto(selectedFile).then((result) => {
+      if (!canceled) {
+        setPhotoQuality(result);
+        setQualityPending(false);
+      }
+    });
+    return () => { canceled = true; };
+  }, [selectedFile]);
 
 
   useEffect(() => {
@@ -216,6 +240,9 @@ export function ImageUploader({
     }
 
     setLocalError("");
+    setPhotoQuality(null);
+    setQualityPending(true);
+    setContinueAnyway(false);
     setSelectedFile(
       file,
     );
@@ -259,7 +286,10 @@ export function ImageUploader({
     if (
       !fieldId ||
       !selectedFile ||
-      mutation.isPending
+      mutation.isPending ||
+      qualityPending ||
+      !photoQuality ||
+      (photoQuality.status === "retake" && !continueAnyway)
     ) {
       return;
     }
@@ -309,12 +339,11 @@ export function ImageUploader({
           </strong>
 
           <span>
-            CropGuard now screens supported
-            PlantVillage crop classes with a
-            calibrated 38-class MobileNetV3
-            ONNX model. Low-confidence and
-            crop-mismatch cases are flagged
-            for review rather than forced.
+            Supported crops are screened using
+            the existing ONNX model. Calibration has not been
+            independently confirmed for this model.
+            Low-confidence and crop-mismatch cases
+            should be reviewed, not forced.
           </span>
         </div>
       </div>
@@ -390,6 +419,7 @@ export function ImageUploader({
                 src={previewUrl}
                 alt="Selected crop preview"
               />
+              <div className="cropguard-leaf-frame" aria-hidden="true" />
 
               <button
                 type="button"
@@ -448,6 +478,24 @@ export function ImageUploader({
           </div>
         ) : null}
 
+        {selectedFile && (
+          <section className="cropguard-photo-preflight" aria-label="Photo quality check" aria-live="polite">
+            <strong>Photo check · {qualityPending ? "Checking…" : photoQuality?.status === "ready" ? "Basic checks passed" : photoQuality?.status === "retake" ? "Retake recommended" : "Review recommended"}</strong>
+            {photoQuality?.width ? (
+              <span>{photoQuality.width} × {photoQuality.height} pixels · local precheck only</span>
+            ) : null}
+            {photoQuality?.hints.map((hint) => <p key={hint}>{hint}</p>)}
+            <p>For the clearest result: capture one whole plant, a focused leaf top and the underside separately. This release sends only the selected image; it does not combine three images yet.</p>
+            <p>Keep the affected leaf large in the frame, avoid multiple plants and tap the leaf to focus.</p>
+            {photoQuality?.status === "retake" && (
+              <label className="cropguard-photo-override">
+                <input type="checkbox" checked={continueAnyway} onChange={(event) => setContinueAnyway(event.target.checked)} />
+                I understand the photo may not provide a useful result; continue anyway.
+              </label>
+            )}
+          </section>
+        )}
+
         {errorMessage ? (
           <div
             className="error-box"
@@ -463,7 +511,10 @@ export function ImageUploader({
           disabled={
             !selectedFile ||
             !fieldId ||
-            mutation.isPending
+            mutation.isPending ||
+            qualityPending ||
+            !photoQuality ||
+            (photoQuality.status === "retake" && !continueAnyway)
           }
         >
           {mutation.isPending

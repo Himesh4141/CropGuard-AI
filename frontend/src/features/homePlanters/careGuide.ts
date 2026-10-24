@@ -19,10 +19,8 @@ export const symptomLabels: Record<Symptom, string> = {
 
 /** Plant care, not an image-verified pathogen diagnosis. */
 export function buildCareGuide(plant: PlantChoice, symptoms: Symptom[], image: ImageAssessment): string[] {
-  if (!image.usable) return [
-    "Take another close photograph in indirect daylight with the leaf in focus.",
-    "Meanwhile, check soil moisture and drainage. Avoid applying chemicals based on a poor-quality photo.",
-  ];
+  // Guidance must not disappear just because an inexpensive phone photo is dim
+  // or blurry. Give safe care actions while clearly labeling uncertainty.
   const suggestions: string[] = [];
   if (plant === "tulsi") {
     suggestions.push("Tulsi: provide appropriate direct sunlight, good airflow and a container with drainage. Water when the upper soil begins drying; do not leave roots standing in water.");
@@ -55,7 +53,7 @@ export function buildCareGuide(plant: PlantChoice, symptoms: Symptom[], image: I
 
 /** A differential observation based ONLY on user-reported symptoms, not an image diagnosis. */
 export function possibleCareConcern(symptoms: Symptom[], image: ImageAssessment): string {
-  if (!image.usable) return "Unable to assess the photograph reliably; retake a clearer image.";
+  if (!image.usable) return "Photo observations are limited, but reported symptoms can still guide safe checks.";
   const flags = new Set(symptoms);
   if (flags.has("whiteCoating")) return "Reported powdery coating: powdery mildew is one possibility, but dust or residue can look similar. Check both leaf surfaces before treatment.";
   if (flags.has("holes")) return "Reported feeding holes: inspect for chewing insects or snails before choosing any pest control.";

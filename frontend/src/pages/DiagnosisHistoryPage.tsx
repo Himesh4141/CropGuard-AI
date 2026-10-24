@@ -1,3 +1,6 @@
+import { screenText as tr } from "@/i18n/screenText";
+import { useCropGuardLanguage } from "@/features/preferences/preferences";
+import { t } from "@/i18n";
 import {
   useQuery,
 } from "@tanstack/react-query";
@@ -22,6 +25,7 @@ import "@/features/diagnosis/diagnosis.css";
 
 
 export default function DiagnosisHistoryPage() {
+  const language = useCropGuardLanguage();
   const diagnosesQuery =
     useQuery({
       queryKey: [
@@ -45,20 +49,20 @@ export default function DiagnosisHistoryPage() {
   return (
     <div className="page">
       <PageHeader
-        eyebrow="SCREENING RECORDS"
-        title="Diagnosis history"
-        description="Review crop-image screening records saved against your fields."
+        eyebrow={tr("SCREENING RECORDS", language)}
+        title={t("diagnosisHistory", language)}
+        description={tr("Review crop-image screening records saved against your fields.", language)}
       />
 
       {diagnosesQuery.isLoading ||
       fieldsQuery.isLoading ? (
         <div className="panel">
-          Loading diagnosis history…
+          {t("loadingHistory", language)}
         </div>
       ) : diagnosesQuery.isError ||
         fieldsQuery.isError ? (
         <div className="panel error-box">
-          Unable to load diagnosis history.
+          {t("historyUnavailable", language)}
         </div>
       ) : (
         <DiagnosisHistory

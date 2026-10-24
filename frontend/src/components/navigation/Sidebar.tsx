@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
-import approvedIcon from "@/assets/images/cropguard-approved-icon.png";
+
 import { routes } from "@/config/routes";
 import { useAuthStore } from "@/features/auth/store";
 
@@ -63,7 +63,7 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <NavLink className="brand" to={home}>
-        <span className="brand-icon"><img className="cropguard-brand-image" src={approvedIcon} alt="" /></span>
+        <span className="brand-icon"><img className="cropguard-brand-image" src={`${import.meta.env.BASE_URL}brand/cropguard-unified-v115-96.png`} alt="" /></span>
         <div><strong>CropGuard</strong></div>
       </NavLink>
 
@@ -94,7 +94,7 @@ export function Sidebar() {
         </NavLink>
       </nav>
 
-      <div className="platform-status"><span />Cloud services connected</div>
+      <div className="platform-status">Connection status not checked</div>
     </aside>
   );
 }
