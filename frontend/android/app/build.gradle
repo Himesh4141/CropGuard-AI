@@ -8,8 +8,8 @@ android {
         // AES-GCM keys in Android Keystore require Android API 23 or newer.
         minSdkVersion Math.max(rootProject.ext.minSdkVersion, 23)
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 25
+        versionName "1.2.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -49,6 +49,14 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
+            // Release credentials are checked against the actual task graph below.
+            // Do not require the private signing key during debug compilation.
+
+
+
+            // Debug-only Java compilation must not require the private release key.
+            // Actual release tasks still fail closed in taskGraph.whenReady below,
+            // and secure_apk_verified.py additionally verifies signer continuity.
 }
     }
 }
@@ -65,6 +73,7 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
@@ -72,6 +81,20 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
+
+// Allow IDE sync and debug CI without private release credentials. Every
+// release task still fails closed before execution if credentials are absent.
+gradle.taskGraph.whenReady { graph ->
+    def buildsRelease = graph.allTasks.any {
+        it.project == project && it.name.toLowerCase().contains('release')
+    }
+    if (buildsRelease && ['CROPGUARD_RELEASE_KEYSTORE',
+                         'CROPGUARD_RELEASE_STORE_PASSWORD',
+                         'CROPGUARD_RELEASE_KEY_ALIAS',
+                         'CROPGUARD_RELEASE_KEY_PASSWORD'].any { !System.getenv(it) }) {
+        throw new GradleException('CropGuard release signing credentials are missing')
+    }
+}
 
 try {
     def servicesJSON = file('google-services.json')

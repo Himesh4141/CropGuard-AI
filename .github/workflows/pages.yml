@@ -55,6 +55,10 @@ jobs:
           VITE_CROPGUARD_FIREBASE_AUTH: 'true'
         run: npx vite build --base=/CropGuard-AI/
 
+      - name: Offline frontend tests
+        working-directory: frontend
+        run: npm test
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

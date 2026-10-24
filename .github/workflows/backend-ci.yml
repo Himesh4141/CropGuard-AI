@@ -23,6 +23,8 @@ jobs:
 
     env:
       ENVIRONMENT: test
+      DATABASE_URL: sqlite://
+      WEATHER_PROVIDER: development
       SECRET_KEY: cropguard-ci-only-secret-key-not-for-production
 
     steps:

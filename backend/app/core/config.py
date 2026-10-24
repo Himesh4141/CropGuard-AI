@@ -87,6 +87,11 @@ class Settings(BaseSettings):
         le=1.0,
     )
 
+    # OAuth IDs are public; the feature remains disabled until Render explicitly enables it.
+    google_sign_in_enabled: bool = False
+    google_web_client_id: str = "520759216755-0fjb86mbuehgvh52v3rhcgh2qq8cvlv4.apps.googleusercontent.com"
+    google_android_client_id: str = "520759216755-k3lfcip1jgro1b5ug3rou169760mbk03.apps.googleusercontent.com"
+
     # Optional server-side PlantNet recognition. Keep key on Render, never in Vite.
     plantnet_api_key: str | None = None
 
