@@ -20,6 +20,7 @@ import "@/styles/cropguard-google.css";
 import "@/styles/cropguard-v121-visual.css";
 import "@/styles/cropguard-v123-mobile-layout.css";
 import "@/styles/cropguard-v125-chrome.css";
+import "@/styles/cropguard-v125-sidebar-contrast.css";
 void initializeNativeNotifications();
 installAndroidNavigation();
 

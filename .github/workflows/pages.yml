@@ -52,6 +52,7 @@ jobs:
           VITE_APP_NAME: CropGuard AI
           VITE_APP_ENV: production
           VITE_API_BASE_URL: https://cropguard-api-himesh4141.onrender.com/api/v1
+          VITE_CROPGUARD_FIREBASE_AUTH: 'true'
         run: npx vite build --base=/CropGuard-AI/
 
       - name: Offline frontend tests
