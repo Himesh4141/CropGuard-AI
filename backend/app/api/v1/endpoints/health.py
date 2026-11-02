@@ -10,6 +10,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.core.config import settings
+from app.ml.onnx_classifier import OnnxMultiCropDiseaseClassifier
 
 router = APIRouter()
 
@@ -26,7 +27,11 @@ def ready(db: Session = Depends(get_db)) -> dict[str, str]:
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                             detail="Database is not ready") from exc
-    model = Path(settings.ml_model_path)
+    # Use the inference path resolver: Render starts inside backend, while the
+    # repository model lives in its sibling ml directory. Do not load ONNX here.
+    model = OnnxMultiCropDiseaseClassifier._resolve_artifact(
+        Path(__file__).resolve().parents[4], settings.ml_model_path
+    )
     if not model.is_file():
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                             detail="Configured crop model artifact is unavailable")
