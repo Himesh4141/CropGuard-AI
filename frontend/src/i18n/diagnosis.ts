@@ -54,7 +54,9 @@ export function localizedCareSteps(diagnosis: Diagnosis, language: Language): st
   const s = language === "hi" ? careHi : careTe;
   const label = (diagnosis.predicted_label ?? "").toLowerCase().replaceAll("_", " ");
   const uncertain = diagnosis.is_uncertain || diagnosis.status !== "analyzed" || diagnosis.inference_mode !== "onnx_model" || diagnosis.confidence === null || diagnosis.confidence < .7 || /(unsupported|mismatch|quality|coverage)/.test(label);
-  if (uncertain) return [...s.uncertain];
+  if (uncertain) return [diagnosis.predicted_label === "image_quality_check_failed" ? s.uncertain[0]! : language === "hi"
+    ? "सुझाए गए लक्षणों की असली पौधे से तुलना करें और चुनी गई फसल की पुष्टि करें। रोग एक जैसे दिखने या मॉडल में उदाहरण कम होने पर साफ़ फ़ोटो में भी अनिश्चितता हो सकती है।"
+    : "సూచించిన లక్షణాలను నిజమైన మొక్కతో పోల్చి, ఎంచుకున్న పంటను నిర్ధారించండి. వ్యాధులు ఒకేలా కనిపించినా లేదా నమూనాలో ఉదాహరణలు తక్కువగా ఉన్నా స్పష్టమైన ఫోటోలో కూడా అనిశ్చితి ఉండవచ్చు.", ...s.uncertain.slice(1)];
   let kind: keyof typeof careHi = "other";
   if (/healthy/.test(label)) kind = "healthy";
   else if (/blight/.test(label)) kind = "blight";

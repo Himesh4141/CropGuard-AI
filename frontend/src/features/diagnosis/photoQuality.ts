@@ -31,30 +31,30 @@ export function evaluatePhotoMetrics(metrics: PhotoMetrics): PhotoQualityResult 
   const requestReview = () => { if (status === "ready") status = "review"; };
   const requestRetake = () => { status = "retake"; };
 
-  if (minSide < 240) {
-    hints.push("This photo is very small. Move closer and capture a higher-resolution leaf image.");
+  if (minSide < 64) {
+    hints.push("This image is smaller than the supported minimum. Use the original photo if available.");
     requestRetake();
   } else if (minSide < 480) {
-    hints.push("The image resolution is limited. Move closer if the leaf spots are hard to see.");
+    hints.push("This is a small image. You can continue; the server will check whether enough detail is available.");
     requestReview();
   }
-  if (metrics.averageLuminance < 24 || metrics.darkFraction > 0.95) {
+  if (metrics.averageLuminance < 4) {
     hints.push("This photo is extremely dark. Move into indirect daylight and try again.");
     requestRetake();
   } else if (metrics.averageLuminance < 55 || metrics.darkFraction > 0.66) {
-    hints.push("The image may be too dark to assess reliably. Try softer daylight.");
+    hints.push("This image is dark. You can continue; indirect daylight may help if details are difficult to see.");
     requestReview();
   }
-  if (metrics.averageLuminance > 249 || metrics.brightFraction > 0.96) {
+  if (metrics.averageLuminance > 252) {
     hints.push("Most detail appears washed out. Turn away from direct light and retake.");
     requestRetake();
-  } else if (metrics.averageLuminance > 222 || metrics.glareFraction > 0.16) {
-    hints.push("Strong highlights may hide leaf details. Avoid direct sun or flash glare.");
+  } else if (metrics.averageLuminance > 222 || metrics.brightFraction > 0.96 || metrics.glareFraction > 0.16) {
+    hints.push("Strong highlights may hide some detail. You can continue with this photo.");
     requestReview();
   }
   const blurMayBePresent = metrics.focusVariance < 65;
   if (blurMayBePresent) {
-    hints.push("Fine details may be soft. Tap the leaf to focus, hold still and retake if needed.");
+    hints.push("Fine details may be soft. You can continue with this photo; this check cannot determine disease.");
     requestReview();
   }
   if (!hints.length) hints.push("Basic exposure and detail checks passed. This does not confirm the plant or diagnosis.");

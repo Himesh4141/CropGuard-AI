@@ -24,6 +24,7 @@ import type {
 } from "@/features/diagnosis/types";
 
 import { DiagnosisFeedback } from "@/features/reliability/DiagnosisFeedback";
+import { cropReferenceForResult } from "@/features/diagnosis/cropReference";
 import "@/features/diagnosis/diagnosis.css";
 
 
@@ -89,6 +90,7 @@ export function DiagnosisResult({
 
   const topPredictions =
     diagnosis.top_predictions ?? [];
+  const cropReference = cropReferenceForResult(diagnosis);
 
   const headline =
     uncertain
@@ -237,6 +239,16 @@ export function DiagnosisResult({
           </div>
         </div>
       ) : null}
+
+      {cropReference && <section className="diagnosis-care-plan">
+        <h3>About the suggested crop: {cropReference.profile.crop}</h3>
+        <p>Botanical reference: <i>{cropReference.profile.botanicalName}</i>. This crop group is suggested by the disease model; it does not verify the exact species or variety.</p>
+        {cropReference.coverageKnown && <>
+          <p>Conditions represented in this model: {cropReference.profile.conditions.map(condition => condition.name).join(", ")}.</p>
+          {cropReference.profile.conditions.length === 1 && <p>This crop has only one reference class. The model cannot reliably distinguish healthy plants from other diseases in this crop.</p>}
+        </>}
+        <a href={cropReference.profile.sourceUrl} target="_blank" rel="noreferrer">Botanical reference · {cropReference.profile.sourceName}</a>
+      </section>}
 
       <div className="diagnosis-context">
         <span>

@@ -9,7 +9,7 @@ export const en = {
   screeningCompleted: "Screening completed",
   screeningUnavailable: "Screening unavailable",
   legacySimulation: "LEGACY DEVELOPMENT SIMULATION",
-  uncertainExplanation: "Not sure: the available image or model signals do not support a reliable disease label. Review the reason and consider a clearer photo.",
+  uncertainExplanation: "The model could not reliably distinguish the possible conditions. Review the reason and possible matches below. This does not necessarily mean your photo is unclear.",
   modelExplanation: "This is a model suggestion, not a confirmed disease diagnosis. Use the supporting guidance to verify it.",
   currentAssessment: "Current assessment",
   leadingModelMatch: "Leading model match",

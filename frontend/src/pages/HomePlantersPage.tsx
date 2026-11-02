@@ -1,5 +1,7 @@
 import { cgText, useCropGuardLanguage } from "@/features/preferences/preferences";
 import FlowerGardenPanel from "../features/homePlanters/FlowerGardenPanel";
+import { AdditionalPlantPhotos } from "@/features/homePlanters/AdditionalPlantPhotos";
+import { SpeciesDetails } from "@/features/homePlanters/SpeciesDetails";
 import { useEffect, useRef, useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Camera, CheckCircle2, Flower2, ImagePlus, Leaf, ScanSearch, ShieldAlert, Trash2, History, Save } from "lucide-react";
@@ -26,6 +28,7 @@ export default function HomePlantersPage() {
   const cameraRequest = useRef(0);
   const scanSequence = useRef(0);
   const [photo, setPhoto] = useState<File | null>(null);
+  const [additionalPhotos, setAdditionalPhotos] = useState<File[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
   const [plant, setPlant] = useState<PlantChoice>("unknown");
   const [identity, setIdentity] = useState<PlantIdentity | null>(null);
@@ -64,6 +67,7 @@ export default function HomePlantersPage() {
     setSavedId(null);
     setScanning(false);
     setPhoto(null);
+    setAdditionalPhotos([]);
     setSymptoms([]);
     if (!allowedTypes.has(next.type)) { setError("Choose a JPG, PNG or WebP photograph."); return; }
     if (!next.size || next.size > maxBytes) { setError("Photo must be under 10 MB and not empty."); return; }
@@ -74,6 +78,7 @@ export default function HomePlantersPage() {
     cameraRequest.current++;
     scanSequence.current++;
     setPhoto(null);
+    setAdditionalPhotos([]);
     setSymptoms([]);
     setAssessment(null);
     setPlant("unknown");
@@ -141,10 +146,15 @@ export default function HomePlantersPage() {
     try {
       // Analyze colors locally; species ID is an independent remote workflow.
       // Promise.allSettled keeps care guidance available if recognition is offline.
-      const prepared = await preparePlantPhoto(photo);
+      const prepared = await preparePlantPhoto(photo, { maxBytes: 2 * 1024 * 1024, maxEdge: 1920 });
+      const extraPrepared: File[] = [];
+      for (const extra of additionalPhotos) {
+        if (scanSequence.current !== id) return;
+        extraPrepared.push((await preparePlantPhoto(extra, { maxBytes: 2 * 1024 * 1024, maxEdge: 1920 })).file);
+      }
       if (scanSequence.current !== id) return;
       setPhotoAdjustment(prepared.message);
-      const [visual, identification] = await Promise.allSettled([screenPhoto(photo), identifyPlant(prepared.file, true)]);
+      const [visual, identification] = await Promise.allSettled([screenPhoto(photo), identifyPlant(prepared.file, true, extraPrepared)]);
       if (scanSequence.current !== id) return;
       if (visual.status === "rejected") throw visual.reason;
       setAssessment(visual.value);
@@ -225,7 +235,7 @@ export default function HomePlantersPage() {
     <div className="page hp-page">
       <div className="hp-head">
         <span className="eyebrow">CROPGUARD · HOME PLANTERS</span>
-        <h1><Flower2 size={30} aria-hidden="true" /> Healthy home plants start with a clearer picture.</h1>
+        <h1><Flower2 size={30} aria-hidden="true" /> Know your plant. Understand its care.</h1>
         <p>{cgText("Take or upload a photo to screen visible foliage patterns and receive practical care guidance. No farm or field is required.", language)}</p>
       </div>
       <div className="hp-grid">
@@ -242,8 +252,12 @@ export default function HomePlantersPage() {
           <input ref={uploadRef} type="file" className="hp-hidden" accept="image/jpeg,image/png,image/webp" aria-label="Upload a plant photo" onChange={event => { receivePhoto(event.target.files?.[0]); event.target.value = ""; }} />
           {isAndroid && <input ref={cameraRef} type="file" className="hp-hidden" capture="environment" accept="image/*" aria-label="Take a plant photo" onChange={event => { receivePhoto(event.target.files?.[0]); event.target.value = ""; }} />}
           <button className="button primary hp-scan-button" type="button" disabled={!photo || scanning} onClick={() => void analyzePhoto()}><ScanSearch size={19} /> {scanning ? cgText("Analyzing photo…", language) : cgText("Analyze photo and get care guidance", language)}</button>
+          {photo && <AdditionalPlantPhotos files={additionalPhotos} disabled={scanning} onChange={files => {
+            scanSequence.current++; setAdditionalPhotos(files); setIdentity(null); setPlant("unknown");
+            setIdentityMessage(""); setAssessment(null); setSavedId(null); setError(null);
+          }} />}
           {error && <p className="hp-error" role="alert">{error}</p>}
-          <p className="hp-privacy">Visual screening stays on this device. For automatic species recognition, the photograph is sent through the CropGuard API to Pl@ntNet when the service is configured. No farmer field is required.</p>
+          <p className="hp-privacy">Visual screening stays on this device. For automatic species recognition, your selected photographs are sent through the CropGuard API to Pl@ntNet when the service is configured. No farmer field is required.</p>
         </section>
 
         <section className="hp-panel" aria-labelledby="hp-identity-title">
@@ -259,6 +273,7 @@ export default function HomePlantersPage() {
             {identity && <span>Species matching score: {Math.round(identity.confidence * 100)}% · {identity.status === "identified" ? "strong suggestion" : identity.status === "uncertain" ? "possible match" : "not identified"} (not a disease-confidence score)</span>}
             {identityMessage && <p>{identityMessage}</p>}
           </div>
+          {identity && <SpeciesDetails identity={identity} />}
           <div className="hp-section-title hp-section-space"><ShieldAlert size={20} aria-hidden="true" /><h2>{cgText("3. Add observations (optional)", language)}</h2></div>
           <p className="hp-muted">{cgText("Tell CropGuard what you see on the real leaves. This helps distinguish visible symptoms from photo backgrounds.", language)}</p>
           <div className="hp-symptoms">{allSymptoms.map(value => <label className="hp-check" key={value}><input type="checkbox" disabled={scanning} checked={symptoms.includes(value)} onChange={() => toggleSymptom(value)} /><span>{symptomLabels[value]}</span></label>)}</div>

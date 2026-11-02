@@ -1,0 +1,5 @@
+Singh, Jain, Jain, Kayal, Kumawat, Batra. PlantDoc: A Dataset for Visual Plant Disease Detection. CoDS-COMAD 2020.
+https://github.com/pratikkayal/PlantDoc-Dataset
+Commit 5467f6012d78d1c446145d5f582da6096f852ae8
+Creative Commons Attribution 4.0 International. Images were deduplicated, split, resized, augmented and used for experimental fine-tuning. Original dataset labels are not independently verified.
+Original CropGuard/PlantVillage model provenance and dataset terms also continue to apply.

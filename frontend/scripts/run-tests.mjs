@@ -9,7 +9,7 @@ try {
   const output = join(dir, "tests.cjs");
   await build({entryPoints: ["tests/homePlanters.test.ts"], outfile: output, bundle: true, platform: "node", format: "cjs", plugins: [{name: "offline-api", setup(builder) {
     builder.onResolve({filter: /^@\/services\/apiClient$/}, () => ({path: "api", namespace: "offline"}));
-    builder.onLoad({filter: /.*/, namespace: "offline"}, () => ({contents: "export const apiClient = {post: async (_url, form) => {globalThis.testPhotoPrepared = form.get('photo_prepared'); return {data: globalThis.testApiData};}};"}));
+    builder.onLoad({filter: /.*/, namespace: "offline"}, () => ({contents: "export const apiClient = {post: async (_url, form) => {globalThis.testPhotoPrepared = form.get('photo_prepared'); globalThis.testExtraCount = form.getAll('additional_images').length; return {data: globalThis.testApiData};}};"}));
   }}]});
   const result = spawnSync(process.execPath, ["--test", output], {stdio: "inherit"});
   process.exitCode = result.status ?? 1;

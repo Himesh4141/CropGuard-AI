@@ -7,7 +7,9 @@ export function buildCropCareSteps(diagnosis: Diagnosis): string[] {
     diagnosis.inference_mode !== "onnx_model" || diagnosis.confidence === null ||
     diagnosis.confidence < 0.7 || /(unsupported|mismatch|quality|coverage)/.test(label);
   if (uncertain) return [
-    "Retake two clear photos in daylight: the entire affected plant and a sharp close-up of both sides of a leaf.",
+    diagnosis.predicted_label === "image_quality_check_failed"
+      ? "The image could not support screening. If possible, try another view in daylight with the leaf filling more of the frame."
+      : "Compare the suggested patterns with the real plant and confirm the selected crop. A clear photo can still be uncertain when diseases look alike or the model lacks examples.",
     "Check whether the pattern occurs on several plants or only one, and compare with healthy plants of the same crop.",
     "Request an agronomist or extension officer review before starting disease-specific treatment. Keep monitoring and record changes.",
   ];

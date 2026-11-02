@@ -1,4 +1,11 @@
 from uuid import UUID
+import json
+import logging
+from threading import Lock
+from time import perf_counter
+
+from starlette.concurrency import run_in_threadpool
+from app.ml.diagnosis_timing import capture_timings, measure_stage
 
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
@@ -14,6 +21,10 @@ from app.repositories.diagnosis_repository import DiagnosisRepository
 from app.repositories.field_repository import FieldRepository
 from app.storage.base import StorageProvider
 from app.storage.local import LocalStorageProvider
+
+
+_inference_lock = Lock()
+logger = logging.getLogger(__name__)
 
 
 class DiagnosisInferenceError(RuntimeError):
@@ -50,10 +61,44 @@ class DiagnosisService:
         file: UploadFile,
         create_care_case: bool = True,
     ) -> Diagnosis:
-        field = self.fields.get_owned(
-            field_id,
-            owner_id,
-        )
+        # Keep this request's synchronous SQLAlchemy/file/model work together
+        # in one worker. Otherwise an async route blocks all event-loop traffic.
+        started = perf_counter()
+        try:
+            return await run_in_threadpool(
+                self._timed_upload, owner_id=owner_id, field_id=field_id,
+                file=file, create_care_case=create_care_case, queued_at=started,
+            )
+        finally:
+            await file.close()
+
+    def _timed_upload(self, *, queued_at: float, **kwargs) -> Diagnosis:
+        with capture_timings() as timings:
+            timings["worker_queue"] = (perf_counter() - queued_at) * 1000
+            outcome = "failed"
+            try:
+                with measure_stage("service"):
+                    result = self._upload_sync(**kwargs)
+                outcome = "completed"
+                return result
+            finally:
+                timings["postprocess"] = max(0.0, timings.get("prediction", 0.0)
+                    - timings.get("preprocess", 0.0) - timings.get("inference", 0.0))
+                # Timings only: no photos, filenames, tokens or user identifiers.
+                logger.info("diagnosis_timing %s", json.dumps({
+                    "outcome": outcome,
+                    "stages_ms": {key: round(value, 3) for key, value in timings.items()},
+                }))
+
+    def _upload_sync(
+        self, *, owner_id: UUID, field_id: UUID, file: UploadFile,
+        create_care_case: bool = True,
+    ) -> Diagnosis:
+        with measure_stage("field_lookup"):
+            field = self.fields.get_owned(
+                field_id,
+                owner_id,
+            )
 
         if field is None:
             raise NotFoundError(
@@ -66,27 +111,25 @@ class DiagnosisService:
             * 1024
         )
 
-        try:
-            content = await file.read(
-                maximum_bytes + 1
-            )
-        finally:
-            await file.close()
+        with measure_stage("spooled_file_read"):
+            content = file.file.read(maximum_bytes + 1)
 
         if len(content) > maximum_bytes:
             raise ValueError(
                 f"Image must be smaller than {settings.max_upload_mb} MB"
             )
 
-        validated_image = validate_image_bytes(
-            content=content,
-            declared_content_type=file.content_type,
-        )
+        with measure_stage("validation"):
+            validated_image = validate_image_bytes(
+                content=content,
+                declared_content_type=file.content_type,
+            )
 
-        stored = self.storage.save(
-            content=content,
-            suffix=validated_image.suffix,
-        )
+        with measure_stage("storage"):
+            stored = self.storage.save(
+                content=content,
+                suffix=validated_image.suffix,
+            )
 
         diagnosis = Diagnosis(
             field_id=field_id,
@@ -99,9 +142,8 @@ class DiagnosisService:
         )
 
         try:
-            diagnosis = self.diagnoses.add(
-                diagnosis
-            )
+            with measure_stage("database_insert"):
+                diagnosis = self.diagnoses.add(diagnosis)
         except Exception:
             self.storage.delete(
                 stored.path
@@ -109,16 +151,14 @@ class DiagnosisService:
             raise
 
         try:
-            classifier = (
-                self.classifier
-                if self.classifier is not None
-                else get_classifier()
-            )
-
-            prediction = classifier.predict(
-                image_bytes=content,
-                crop_name=field.crop_name,
-            )
+            with measure_stage("inference_queue"):
+                _inference_lock.acquire()
+            try:
+                with measure_stage("model_acquire"):
+                    classifier = self.classifier if self.classifier is not None else get_classifier()
+                prediction = classifier.predict(image_bytes=content, crop_name=field.crop_name)
+            finally:
+                _inference_lock.release()
         except Exception as exc:
             diagnosis.status = DiagnosisStatus.FAILED
             self.diagnoses.save(diagnosis)
@@ -155,19 +195,17 @@ class DiagnosisService:
         diagnosis.is_uncertain = prediction.is_uncertain
         diagnosis.rejection_reason = prediction.rejection_reason
 
-        diagnosis = self.diagnoses.save(
-            diagnosis
-        )
+        with measure_stage("database_save"):
+            diagnosis = self.diagnoses.save(diagnosis)
 
         if create_care_case:
             try:
                 from app.services.care_case_service import CareCaseService
 
-                CareCaseService(self.diagnoses.db).create_or_update_from_diagnosis(
-                    diagnosis=diagnosis,
-                    field=field,
-                    farmer_id=owner_id,
-                )
+                with measure_stage("care_case"):
+                    CareCaseService(self.diagnoses.db).create_or_update_from_diagnosis(
+                        diagnosis=diagnosis, field=field, farmer_id=owner_id,
+                    )
             except Exception:
                 # A care-case workflow failure must never turn a successful
                 # ML screening into an API failure. The diagnosis remains saved.

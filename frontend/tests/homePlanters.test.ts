@@ -1,4 +1,5 @@
 import test from "node:test";
+import "./identificationRelease.test";
 import assert from "node:assert/strict";
 import { assessPixels } from "../src/features/homePlanters/imageAssessment";
 import { buildCareGuide } from "../src/features/homePlanters/careGuide";
@@ -59,4 +60,26 @@ test("prepared flag is submitted and malformed identity is rejected", async () =
   state.testApiData = null;
   await assert.rejects(identifyPlant(new File(["x"], "leaf.png", {type: "image/png"}), true), /invalid result/);
   assert.equal(state.testPhotoPrepared, "true");
+});
+
+import { evaluatePhotoMetrics, type PhotoMetrics } from "../src/features/diagnosis/photoQuality";
+const ordinaryPhoto: PhotoMetrics = {width: 640, height: 480, averageLuminance: 100, darkFraction: .1, brightFraction: .01, glareFraction: .01, focusVariance: 120};
+test("small supported phone images can proceed without a retake override", () => {
+  for (const size of [64, 128, 192, 239, 320]) {
+    assert.equal(evaluatePhotoMetrics({...ordinaryPhoto, width: size, height: size}).status, "review");
+  }
+  assert.equal(evaluatePhotoMetrics({...ordinaryPhoto, width: 63}).status, "retake");
+});
+test("recoverable shade and highlights are advisory, while extreme exposure still requests retake", () => {
+  assert.equal(evaluatePhotoMetrics({...ordinaryPhoto, averageLuminance: 18, darkFraction: .97}).status, "review");
+  assert.equal(evaluatePhotoMetrics({...ordinaryPhoto, averageLuminance: 250, brightFraction: .98}).status, "review");
+  for (const averageLuminance of [0, 3, 253, 255]) {
+    assert.equal(evaluatePhotoMetrics({...ordinaryPhoto, averageLuminance}).status, "retake");
+  }
+});
+test("low texture never requires retake and ordinary images pass", () => {
+  const result = evaluatePhotoMetrics({...ordinaryPhoto, focusVariance: 0});
+  assert.equal(result.status, "review");
+  assert.ok(result.hints.some(hint => hint.includes("You can continue")));
+  assert.equal(evaluatePhotoMetrics(ordinaryPhoto).status, "ready");
 });

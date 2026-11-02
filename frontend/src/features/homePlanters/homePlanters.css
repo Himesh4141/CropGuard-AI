@@ -107,3 +107,11 @@
   .hp-history-open > span:last-child { flex-shrink: 1; }
   .hp-actions .button { min-height: 44px; }
 }
+.hp-extra-photos,.hp-species-details{margin-top:1rem;padding:1rem;border:1px solid var(--border,#d5e2d9);border-radius:12px;min-width:0}
+.hp-extra-grid{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.hp-extra-grid>div{width:120px;display:grid;gap:6px}
+.hp-extra-grid img{width:120px;height:110px;object-fit:cover;border-radius:8px}
+.hp-species-details dl{margin:12px 0}
+.hp-species-details dl>div{display:grid;grid-template-columns:minmax(80px,1fr) minmax(0,2fr);gap:12px;margin:8px 0}
+.hp-species-details dt{font-weight:600}.hp-species-details dd{margin:0;overflow-wrap:anywhere}
+.hp-species-details summary{cursor:pointer;font-weight:600}.hp-species-details p{line-height:1.6}

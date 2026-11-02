@@ -12,6 +12,7 @@ from PIL import Image, ImageEnhance, ImageOps
 
 from app.core.config import settings
 from app.ml.base import DiseasePrediction, PredictionAlternative
+from app.ml.diagnosis_timing import timed_stage
 
 
 IMAGENET_MEAN = np.asarray(
@@ -63,14 +64,6 @@ def canonical_crop(value: str) -> str:
     exact = CROP_ALIASES.get(normalized)
     if exact is not None:
         return exact
-
-    for alias in sorted(
-        CROP_ALIASES,
-        key=len,
-        reverse=True,
-    ):
-        if alias in normalized:
-            return CROP_ALIASES[alias]
 
     return value.replace("_", " ").strip().title()
 
@@ -288,7 +281,17 @@ class OnnxMultiCropDiseaseClassifier:
             providers=["CPUExecutionProvider"],
         )
 
-        self.input_name = self.session.get_inputs()[0].name
+        model_input = self.session.get_inputs()[0]
+        model_output = self.session.get_outputs()[0]
+        if len(set(self.class_names)) != len(self.class_names):
+            raise RuntimeError("Model metadata contains duplicate class labels")
+        if (len(model_output.shape) != 2
+                or model_output.shape[-1] != len(self.class_names)):
+            raise RuntimeError("ONNX class count does not match model metadata")
+        if (model_input.type != "tensor(float)" or len(model_input.shape) != 4
+                or model_input.shape[1:] != [3, self.image_size, self.image_size]):
+            raise RuntimeError("ONNX input does not match model preprocessing metadata")
+        self.input_name = model_input.name
 
     @staticmethod
     def _resolve_artifact(
@@ -302,13 +305,14 @@ class OnnxMultiCropDiseaseClassifier:
         if direct.exists():
             return direct
 
-        return (
-            project_root
-            / "ml"
-            / "artifacts"
-            / configured_path.name
-        ).resolve()
+        # Local checkout stores artifacts beside backend; packaged deployments
+        # may store them inside backend. Preserve the configured relative path.
+        repository_relative = (project_root.parent / configured_path).resolve()
+        if repository_relative.is_file():
+            return repository_relative
+        return direct
 
+    @timed_stage("prediction")
     def predict(
         self,
         *,
@@ -472,12 +476,14 @@ class OnnxMultiCropDiseaseClassifier:
 
         if margin < self.minimum_margin:
             reasons.append(
-                "the leading disease possibilities are too close"
+                f"model score gap {margin:.4f} is below the configured "
+                f"{self.minimum_margin:.4f} acceptance margin"
             )
 
         if entropy > self.maximum_entropy:
             reasons.append(
-                "the model distribution remains too uncertain"
+                f"model entropy {entropy:.6f} exceeds the configured "
+                f"{self.maximum_entropy:.6f} limit"
             )
 
         if reasons:
@@ -524,6 +530,7 @@ class OnnxMultiCropDiseaseClassifier:
             rejection_reason=None,
         )
 
+    @timed_stage("inference")
     def _ensemble_logits(
         self,
         tensors: list[np.ndarray],
@@ -603,12 +610,13 @@ class OnnxMultiCropDiseaseClassifier:
         )
         return entropy / math.log(len(probabilities))
 
+    @timed_stage("preprocess")
     def _prepare_views(
         self,
         image_bytes: bytes,
     ) -> tuple[list[np.ndarray], str | None]:
         with Image.open(BytesIO(image_bytes)) as image:
-            image = image.convert("RGB")
+            image = ImageOps.exif_transpose(image).convert("RGB")
 
             if min(image.size) < 64:
                 return (
@@ -663,12 +671,12 @@ class OnnxMultiCropDiseaseClassifier:
 
         if width <= height:
             resized_width = resize_short_side
-            resized_height = round(
+            resized_height = int(
                 height * resize_short_side / width
             )
         else:
             resized_height = resize_short_side
-            resized_width = round(
+            resized_width = int(
                 width * resize_short_side / height
             )
 
@@ -679,11 +687,11 @@ class OnnxMultiCropDiseaseClassifier:
 
         left = max(
             0,
-            (resized_width - self.image_size) // 2,
+            int(round((resized_width - self.image_size) / 2.0)),
         )
         top = max(
             0,
-            (resized_height - self.image_size) // 2,
+            int(round((resized_height - self.image_size) / 2.0)),
         )
 
         image = image.crop(
