@@ -68,6 +68,10 @@ function isAuthEndpoint(
   }
 
   return [
+    // Firebase token exchange requests are authentication operations too.
+    // Never try to refresh a session after these expected identity failures.
+    "/auth/firebase",
+    "/auth/mobile/firebase",
     "/auth/google",
     "/auth/mobile/google",
     "/auth/login",

@@ -11,9 +11,11 @@ interface NativeGoogle {
 
 const nativeGoogle = registerPlugin<NativeGoogle>("CropGuardGoogle");
 
-// Must stay false unless the matching Render backend is deployed and enabled.
+// Production defaults to the Firebase exchange because the matching Render
+// backend is enabled. An explicit false remains available for a safe rollback.
 export function firebaseAuthPilotEnabled(): boolean {
-  return import.meta.env.VITE_CROPGUARD_FIREBASE_AUTH === "true";
+  const override = import.meta.env.VITE_CROPGUARD_FIREBASE_AUTH;
+  return override === "true" || (override !== "false" && import.meta.env.PROD);
 }
 
 // The native plugin obtains a Google ID token, then Firebase exchanges it for
