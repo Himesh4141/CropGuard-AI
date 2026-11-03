@@ -33,6 +33,10 @@ services:
       - key: CORS_ORIGINS
         value: '["http://localhost:4141","https://himesh4141.github.io"]'
 
+      # Google ID-token exchange is served by this API for both web and Android.
+      - key: GOOGLE_SIGN_IN_ENABLED
+        value: "true"
+
       - key: ML_MODEL_PATH
         value: ml/artifacts/field_robust_v2/cropguard_field_robust_v2.onnx
 
