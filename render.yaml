@@ -68,7 +68,6 @@ services:
   - type: web
     name: cropguard-ai-himesh4141
     runtime: static
-    plan: free
     rootDir: frontend
 
     buildCommand: npm ci && npm run build
